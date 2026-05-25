@@ -25,3 +25,11 @@ export const UserStatus = {
 } as const
 
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
+
+
+export const VisibilityStatus = {
+  public: 'public',
+  private: 'private'
+} as const
+
+export type VisibilityStatus = (typeof VisibilityStatus)[keyof typeof VisibilityStatus]

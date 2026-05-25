@@ -22,6 +22,11 @@ enum UserStatus {
   pending
 }
 
+enum VisibilityStatus {
+  public
+  private
+}
+
 model User {
   id           String     @id @default(uuid())
   firstName    String     @map("first_name")
@@ -33,6 +38,29 @@ model User {
   profileImage String?    @map("profile_image")
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
+  profile      Profile?
 
   @@map("users")
+}
+
+model Profile {
+  id               String           @id @default(uuid())
+  userId           String           @unique @map("user_id")
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio              String?          @db.Text
+  phone            String?
+  city             String?
+  state            String?
+  location         String?
+  timeZone         String?          @map("time_zone")
+  preferredContact String?          @map("preferred_contact")
+  totalEarnings    Decimal          @default(0.0) @map("total_earnings") @db.Decimal(10, 2)
+  jobsCompleted    Int              @default(0) @map("jobs_completed")
+  visibility       VisibilityStatus @default(public)
+  ratePerHour      Decimal?         @map("rate_per_hour") @db.Decimal(10, 2)
+  services         String?          @db.Text // Store as comma separated or JSON if needed, but for now simple text
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@map("profiles")
 }
