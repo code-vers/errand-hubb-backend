@@ -12,9 +12,12 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
-    const pool = new Pool({ 
+    const pool = new Pool({
       connectionString: config.DATABASE_URL,
-      ssl: true // Required for some cloud databases like Neon
+      ssl: config.DATABASE_SSL ? { rejectUnauthorized: false } : false,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
     });
     const adapter = new PrismaPg(pool);
 
@@ -28,6 +31,10 @@ export class PrismaService
       console.log('Prisma connected successfully');
     } catch (error) {
       console.error('Prisma connection error:', error);
+      console.error(
+        'FATAL: Could not connect to the database. Stopping server...',
+      );
+      process.exit(1);
     }
   }
 
