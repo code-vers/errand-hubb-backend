@@ -14,6 +14,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    // Log the full exception for debugging
+    console.error('Full Exception:', exception);
+
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -22,25 +25,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const exceptionResponse =
       exception instanceof HttpException ? exception.getResponse() : null;
 
-    const message =
-      typeof exceptionResponse === 'object' && exceptionResponse !== null
-        ? (exceptionResponse as any).message || exception.message
-        : exception.message || 'Internal server error';
+    let message = exception.message || 'Internal server error';
+    let errors = null;
 
-    const errors =
-      typeof exceptionResponse === 'object' &&
-      exceptionResponse !== null &&
-      Array.isArray((exceptionResponse as any).message)
-        ? (exceptionResponse as any).message
-        : null;
+    if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      const res = exceptionResponse as any;
+      
+      // Handle the custom structure from our ValidationPipe exceptionFactory
+      if (Array.isArray(res.message) && res.message.length > 0 && typeof res.message[0] === 'object') {
+        message = 'Validation failed';
+        errors = res.message; // This is our [{ property, message }] array
+      } else {
+        message = res.message || message;
+      }
+    }
 
     response.status(status).json({
       success: false,
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: Array.isArray(errors) ? 'Validation failed' : message,
-      errors: errors,
+      message,
+      errors,
     });
   }
 }

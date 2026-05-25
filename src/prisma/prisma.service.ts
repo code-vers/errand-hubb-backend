@@ -12,16 +12,23 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
-    const pool = new Pool({ connectionString: config.DATABASE_URL });
+    const pool = new Pool({ 
+      connectionString: config.DATABASE_URL,
+      ssl: true // Required for some cloud databases like Neon
+    });
     const adapter = new PrismaPg(pool);
 
-    // In Prisma 7, we pass the adapter to the constructor.
-    // The 'datasources' property is no longer used for direct connection strings.
+    // Standard Prisma 7 inheritance with Driver Adapter
     super({ adapter });
   }
 
   async onModuleInit() {
-    await (this as any).$connect();
+    try {
+      await (this as any).$connect();
+      console.log('Prisma connected successfully');
+    } catch (error) {
+      console.error('Prisma connection error:', error);
+    }
   }
 
   async onModuleDestroy() {
