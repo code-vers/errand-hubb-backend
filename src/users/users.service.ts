@@ -32,4 +32,22 @@ export class UsersService {
       include: { profile: true },
     });
   }
+
+  async update(id: string, data: Prisma.UserUpdateInput) {
+    return this.prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async findByResetToken(token: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: {
+          gt: new Date(),
+        },
+      },
+    });
+  }
 }

@@ -1,11 +1,23 @@
 import 'dotenv/config';
 
+// Debug: Check if env vars are loaded
+if (!process.env.SMTP_USER) {
+  console.warn('WARNING: SMTP_USER is not defined in environment variables');
+  console.log('Current working directory:', process.cwd());
+}
+
 export const config = {
   PORT: process.env.PORT || 3001,
-  DATABASE_URL: process.env.DATABASE_URL,
+  DATABASE_URL: process.env.DATABASE_URL as string,
   DATABASE_SSL: process.env.DATABASE_SSL === 'true',
-  JWT_SECRET: process.env.JWT_SECRET,
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  JWT_SECRET: process.env.JWT_SECRET as string,
+  JWT_EXPIRES_IN: (process.env.JWT_EXPIRES_IN || '1d') as string,
+  SMTP_HOST: (process.env.SMTP_HOST || 'smtp.gmail.com') as string,
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || '587'),
+  SMTP_USER: process.env.SMTP_USER as string,
+  SMTP_PASS: process.env.SMTP_PASS as string,
+  SMTP_FROM: (process.env.SMTP_FROM || 'noreply@errandhub.com') as string,
+  FRONTEND_URL: (process.env.FRONTEND_URL || 'http://localhost:3000') as string,
 };
 
 // Simple validation to ensure required config is present
