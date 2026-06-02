@@ -242,6 +242,40 @@ export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
 }
 
+export type EnumIconTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.IconType | Prisma.EnumIconTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumIconTypeFilter<$PrismaModel> | $Enums.IconType
+}
+
+export type EnumCategoryStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CategoryStatus | Prisma.EnumCategoryStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCategoryStatusFilter<$PrismaModel> | $Enums.CategoryStatus
+}
+
+export type EnumIconTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.IconType | Prisma.EnumIconTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumIconTypeWithAggregatesFilter<$PrismaModel> | $Enums.IconType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumIconTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumIconTypeFilter<$PrismaModel>
+}
+
+export type EnumCategoryStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CategoryStatus | Prisma.EnumCategoryStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCategoryStatusWithAggregatesFilter<$PrismaModel> | $Enums.CategoryStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCategoryStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCategoryStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -481,6 +515,40 @@ export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumIconTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.IconType | Prisma.EnumIconTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumIconTypeFilter<$PrismaModel> | $Enums.IconType
+}
+
+export type NestedEnumCategoryStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CategoryStatus | Prisma.EnumCategoryStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCategoryStatusFilter<$PrismaModel> | $Enums.CategoryStatus
+}
+
+export type NestedEnumIconTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.IconType | Prisma.EnumIconTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.IconType[] | Prisma.ListEnumIconTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumIconTypeWithAggregatesFilter<$PrismaModel> | $Enums.IconType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumIconTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumIconTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumCategoryStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CategoryStatus | Prisma.EnumCategoryStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CategoryStatus[] | Prisma.ListEnumCategoryStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCategoryStatusWithAggregatesFilter<$PrismaModel> | $Enums.CategoryStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCategoryStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCategoryStatusFilter<$PrismaModel>
 }
 
 

@@ -51,3 +51,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type Profile = Prisma.ProfileModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel

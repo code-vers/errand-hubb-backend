@@ -33,3 +33,19 @@ export const VisibilityStatus = {
 } as const
 
 export type VisibilityStatus = (typeof VisibilityStatus)[keyof typeof VisibilityStatus]
+
+
+export const IconType = {
+  emoji: 'emoji',
+  url: 'url'
+} as const
+
+export type IconType = (typeof IconType)[keyof typeof IconType]
+
+
+export const CategoryStatus = {
+  active: 'active',
+  inactive: 'inactive'
+} as const
+
+export type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus]

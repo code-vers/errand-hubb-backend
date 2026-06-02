@@ -45,6 +45,20 @@ model Profile {
   @@map("profiles")
 }
 
+model Category {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  description String?
+  icon        String?
+  iconType    IconType       @default(emoji)
+  color       String?
+  status      CategoryStatus @default(active)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
 enum UserRole {
   admin
   client
@@ -60,4 +74,14 @@ enum UserStatus {
 enum VisibilityStatus {
   public
   private
+}
+
+enum IconType {
+  emoji
+  url
+}
+
+enum CategoryStatus {
+  active
+  inactive
 }
