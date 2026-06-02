@@ -18,12 +18,32 @@ export class UsersService {
 
   async findOneById(id: string) {
     if (!id) {
-      throw new BadRequestException('ID is required');
+      console.error('SERVICE: findOneById called without ID');
+      return null;
     }
-    return this.prisma.user.findUnique({
+    
+    // Attempt standard UUID lookup
+    let user = await this.prisma.user.findUnique({
       where: { id },
       include: { profile: true },
     });
+    
+    // Backup search
+    if (!user) {
+      console.warn('SERVICE: findUnique failed for ID:', id, '- trying findFirst');
+      user = await this.prisma.user.findFirst({
+        where: { id },
+        include: { profile: true },
+      });
+    }
+
+    if (!user) {
+      console.error('SERVICE: User NOT FOUND in database for ID:', id);
+    } else {
+      console.log('SERVICE: User found:', user.email);
+    }
+    
+    return user;
   }
 
   async createUser(data: Prisma.UserCreateInput) {

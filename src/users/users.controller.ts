@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Body, Patch, UseGuards, Request, UseInterceptors, UploadedFile, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -10,36 +10,44 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  getMe(@Request() req: any) {
-    return this.usersService.findOneById(req.user.sub);
+  async getMe(@Request() req: any) {
+    const userId = req.user?.id || req.user?.sub;
+    console.log('CONTROLLER: Fetching profile for ID:', userId);
+    const user = await this.usersService.findOneById(userId);
+    if (!user) {
+      throw new NotFoundException('Current user record not found');
+    }
+    return user;
   }
 
   @Patch('profile')
   @UseInterceptors(FileInterceptor('profileImage', multerOptions('profiles')))
-  updateProfile(
+  async updateProfile(
     @Request() req: any,
     @Body() updateData: any,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    console.log('--- Update Profile ---');
-    console.log('Body:', updateData);
-    console.log('File:', file);
+    const userId = req.user?.id || req.user?.sub;
+    console.log('CONTROLLER: Updating profile for ID:', userId);
     
-    const userId = req.user.sub;
     const data = { ...updateData };
-    
     if (file) {
       data.profileImage = `/media/profiles/${file.filename}`;
     }
 
-    // Handle nested profile data if present
     const { firstName, lastName, profileImage, ...profileData } = data;
     
-    return this.usersService.updateFullProfile(userId, {
+    const user = await this.usersService.updateFullProfile(userId, {
       firstName,
       lastName,
       profileImage,
       profile: Object.keys(profileData).length > 0 ? profileData : undefined,
     });
+
+    if (!user) {
+      throw new NotFoundException('User profile could not be updated');
+    }
+
+    return user;
   }
 }

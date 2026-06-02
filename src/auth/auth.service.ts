@@ -9,6 +9,7 @@ import { UserRole } from '../generated/prisma/enums.js';
 import { MailService } from '../mail/mail.service.js';
 import * as crypto from 'crypto';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -82,7 +83,17 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    // Using both id and sub to be as compatible as possible
+    const payload = { 
+      id: user.id, 
+      sub: user.id, 
+      email: user.email, 
+      role: user.role 
+    };
+    
+    console.log('--- LOGIN SUCCESS ---');
+    console.log('Generating token for User ID:', user.id);
+    
     const accessToken = await this.jwtService.signAsync(payload);
 
     // Remove password from user object
@@ -128,5 +139,33 @@ export class AuthService {
     });
 
     return { message: 'Password has been reset successfully' };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    console.log('--- CHANGE PASSWORD REQUEST ---');
+    console.log('User ID from token:', userId);
+    
+    if (!userId) {
+      throw new UnauthorizedException('User ID missing from token');
+    }
+
+    const user = await this.usersService.findOneById(userId);
+    if (!user) {
+      console.error('FAILED: User not found for ID:', userId);
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Incorrect current password');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
+    await this.usersService.update(user.id, {
+      password: hashedPassword,
+    });
+
+    return { message: 'Password updated successfully' };
   }
 }

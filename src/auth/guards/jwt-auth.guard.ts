@@ -14,25 +14,47 @@ export class JwtAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromCookie(request);
+    const token = this.extractToken(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      console.warn('GUARD: No token found');
+      throw new UnauthorizedException('Authentication token missing');
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: config.JWT_SECRET,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
+
+      console.log(
+        'GUARD: Token verified. User ID from payload:',
+        payload.id || payload.sub,
+      );
+
+      // Attach full payload to request
       request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException();
+    } catch (error: any) {
+      console.error('GUARD: JWT Error:', error.message);
+
+      throw new UnauthorizedException('Invalid or expired token');
     }
     return true;
   }
 
-  private extractTokenFromCookie(request: Request): string | undefined {
-    return request.cookies?.['access_token'];
+  private extractToken(request: Request): string | undefined {
+    // 1. Check cookies
+    if (request.cookies?.['access_token']) {
+      return request.cookies['access_token'];
+    }
+
+    // 2. Check Authorization header
+    const authHeader = request.headers.authorization;
+    if (authHeader) {
+      const [type, token] = authHeader.split(' ');
+      if (type === 'Bearer') {
+        return token;
+      }
+    }
+
+    return undefined;
   }
 }
