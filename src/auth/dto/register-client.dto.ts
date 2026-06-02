@@ -34,4 +34,7 @@ export class RegisterClientDto {
   @IsString()
   @IsOptional()
   state?: string;
+
+  @IsOptional()
+  profileImage?: any;
 }

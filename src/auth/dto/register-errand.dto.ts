@@ -47,4 +47,7 @@ export class RegisterErrandDto {
   @IsNumberString()
   @IsOptional()
   rate?: string;
+
+  @IsOptional()
+  profileImage?: any;
 }

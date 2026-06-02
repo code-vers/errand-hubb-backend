@@ -18,7 +18,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async registerClient(dto: RegisterClientDto) {
+  async registerClient(dto: RegisterClientDto, profileImage?: string) {
     const existingUser = await this.usersService.findOneByEmail(dto.email);
     if (existingUser) {
       throw new ConflictException('Email already registered');
@@ -32,6 +32,7 @@ export class AuthService {
       email: dto.email,
       password: hashedPassword,
       role: UserRole.client,
+      profileImage,
       profile: {
         create: {
           phone: dto.phone,
@@ -42,7 +43,7 @@ export class AuthService {
     });
   }
 
-  async registerErrand(dto: RegisterErrandDto) {
+  async registerErrand(dto: RegisterErrandDto, profileImage?: string) {
     const existingUser = await this.usersService.findOneByEmail(dto.email);
     if (existingUser) {
       throw new ConflictException('Email already registered');
@@ -56,6 +57,7 @@ export class AuthService {
       email: dto.email,
       password: hashedPassword,
       role: UserRole.errand,
+      profileImage,
       profile: {
         create: {
           phone: dto.phone,

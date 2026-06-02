@@ -40,6 +40,23 @@ export class UsersService {
     });
   }
 
+  async updateFullProfile(id: string, data: { firstName?: string; lastName?: string; profileImage?: string; profile?: any }) {
+    const { firstName, lastName, profileImage, profile } = data;
+    
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        firstName,
+        lastName,
+        profileImage,
+        profile: profile ? {
+          update: profile,
+        } : undefined,
+      },
+      include: { profile: true },
+    });
+  }
+
   async findByResetToken(token: string) {
     return this.prisma.user.findFirst({
       where: {

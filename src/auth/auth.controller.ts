@@ -1,23 +1,41 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegisterClientDto } from './dto/register-client.dto.js';
 import { RegisterErrandDto } from './dto/register-errand.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '../common/utils/multer-options.js';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register/client')
-  registerClient(@Body() dto: RegisterClientDto) {
-    return this.authService.registerClient(dto);
+  @UseInterceptors(FileInterceptor('profileImage', multerOptions('profiles')))
+  registerClient(
+    @Body() dto: RegisterClientDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    console.log('--- Register Client ---');
+    console.log('Body:', dto);
+    console.log('File:', file);
+    const profileImage = file ? `/media/profiles/${file.filename}` : undefined;
+    return this.authService.registerClient(dto, profileImage);
   }
 
   @Post('register/errand')
-  registerErrand(@Body() dto: RegisterErrandDto) {
-    return this.authService.registerErrand(dto);
+  @UseInterceptors(FileInterceptor('profileImage', multerOptions('profiles')))
+  registerErrand(
+    @Body() dto: RegisterErrandDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    console.log('--- Register Errand ---');
+    console.log('Body:', dto);
+    console.log('File:', file);
+    const profileImage = file ? `/media/profiles/${file.filename}` : undefined;
+    return this.authService.registerErrand(dto, profileImage);
   }
 
   @Post('login')
