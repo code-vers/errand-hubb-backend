@@ -5,6 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { DeleteAccountDto } from './dto/delete-account.dto.js';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -53,6 +54,7 @@ export class UsersController {
     return user;
   }
 
+  @Throttle({ default: { limit: 3, ttl: 900000 } }) // 3 requests per 15 minutes
   @Post('request-delete-account')
   @HttpCode(HttpStatus.OK)
   async requestDeleteAccount(@Request() req: any) {

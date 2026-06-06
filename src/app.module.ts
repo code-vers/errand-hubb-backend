@@ -7,6 +7,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,12 +17,27 @@ const __dirname = dirname(__filename);
   imports: [
     PrismaModule, 
     AuthModule,
+    ThrottlerModule.forRoot([{
+      name: 'short',
+      ttl: 60000, // 1 minute
+      limit: 10,
+    }, {
+      name: 'medium',
+      ttl: 900000, // 15 minutes
+      limit: 100,
+    }]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'media'),
       serveRoot: '/media',
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

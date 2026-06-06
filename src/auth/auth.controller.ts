@@ -23,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import type { Response } from 'express';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -50,6 +51,7 @@ export class AuthController {
     return this.authService.registerErrand(dto, profileImage);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 900000 } }) // 5 attempts per 15 minutes
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -72,6 +74,7 @@ export class AuthController {
     return result;
   }
 
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('verify-2fa-login')
   @HttpCode(HttpStatus.OK)
   async verifyTwoFactorLogin(
@@ -129,6 +132,7 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
+  @Throttle({ default: { limit: 3, ttl: 900000 } }) // 3 requests per 15 minutes
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   forgotPassword(@Body() dto: ForgotPasswordDto) {
