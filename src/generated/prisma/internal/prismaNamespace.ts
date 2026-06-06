@@ -757,6 +757,7 @@ export const UserScalarFieldEnum = {
   deleteAccountExpires: 'deleteAccountExpires',
   twoFactorSecret: 'twoFactorSecret',
   isTwoFactorEnabled: 'isTwoFactorEnabled',
+  recoveryCodes: 'recoveryCodes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

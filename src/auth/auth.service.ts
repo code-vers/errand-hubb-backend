@@ -110,14 +110,31 @@ export class AuthService {
       throw new UnauthorizedException('Invalid request');
     }
 
-    const isValid = speakeasy.totp.verify({
+    // Try verifying TOTP first
+    let isValid = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
       encoding: 'base32',
       token: code,
     });
 
+    // If TOTP fails, check if it's a recovery code
+    if (!isValid && user.recoveryCodes?.length > 0) {
+      console.log('SERVICE: TOTP failed, checking recovery codes...');
+      const recoveryCodeIndex = await this.findRecoveryCodeIndex(code, user.recoveryCodes);
+      
+      if (recoveryCodeIndex !== -1) {
+        console.log('SERVICE: Recovery code verified!');
+        isValid = true;
+        
+        // Remove used recovery code
+        const updatedCodes = [...user.recoveryCodes];
+        updatedCodes.splice(recoveryCodeIndex, 1);
+        await this.usersService.update(userId, { recoveryCodes: updatedCodes });
+      }
+    }
+
     if (!isValid) {
-      throw new UnauthorizedException('Invalid 2FA code');
+      throw new UnauthorizedException('Invalid 2FA code or recovery code');
     }
 
     // Record login activity
@@ -126,6 +143,14 @@ export class AuthService {
     }
 
     return this.generateAuthResponse(user);
+  }
+
+  private async findRecoveryCodeIndex(code: string, hashedCodes: string[]): Promise<number> {
+    for (let i = 0; i < hashedCodes.length; i++) {
+      const match = await bcrypt.compare(code, hashedCodes[i]);
+      if (match) return i;
+    }
+    return -1;
   }
 
   async recordLoginActivity(userId: string, req: any) {
@@ -195,7 +220,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     // Remove sensitive data
-    const { password, twoFactorSecret, ...result } = user;
+    const { password, twoFactorSecret, recoveryCodes, ...result } = user;
     return {
       user: result,
       accessToken,
@@ -238,17 +263,31 @@ export class AuthService {
       throw new BadRequestException('Invalid 2FA code');
     }
 
+    // Generate 10 backup codes
+    const codes = Array.from({ length: 10 }, () => 
+      crypto.randomBytes(4).toString('hex').toUpperCase()
+    );
+
+    const hashedCodes = await Promise.all(
+      codes.map(c => bcrypt.hash(c, 10))
+    );
+
     await this.usersService.update(userId, {
       isTwoFactorEnabled: true,
+      recoveryCodes: hashedCodes,
     });
 
-    return { message: '2FA enabled successfully' };
+    return { 
+      message: '2FA enabled successfully',
+      recoveryCodes: codes,
+    };
   }
 
   async disableTwoFactor(userId: string) {
     await this.usersService.update(userId, {
       isTwoFactorEnabled: false,
       twoFactorSecret: null,
+      recoveryCodes: [],
     });
 
     return { message: '2FA disabled successfully' };
