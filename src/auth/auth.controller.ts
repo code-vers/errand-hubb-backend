@@ -17,6 +17,7 @@ import { LoginDto } from './dto/login.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
+import { TwoFactorVerifyDto } from './dto/two-factor.dto.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
@@ -56,15 +57,59 @@ export class AuthController {
   ) {
     const result = await this.authService.login(dto);
 
-    // Set cookie
-    response.cookie('access_token', result.accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    if ('accessToken' in result) {
+      // Set cookie
+      response.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+    }
 
     return result;
+  }
+
+  @Post('verify-2fa-login')
+  @HttpCode(HttpStatus.OK)
+  async verifyTwoFactorLogin(
+    @Body() dto: TwoFactorVerifyDto & { userId: string },
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const result = await this.authService.verifyTwoFactorLogin(dto.userId, dto.code);
+
+    if ('accessToken' in result) {
+      // Set cookie
+      response.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+    }
+
+    return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('generate-2fa')
+  generateTwoFactor(@Request() req: any) {
+    const userId = req.user?.sub || req.user?.id;
+    return this.authService.generateTwoFactorSecret(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('enable-2fa')
+  enableTwoFactor(@Request() req: any, @Body() dto: TwoFactorVerifyDto) {
+    const userId = req.user?.sub || req.user?.id;
+    return this.authService.enableTwoFactor(userId, dto.code);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('disable-2fa')
+  disableTwoFactor(@Request() req: any) {
+    const userId = req.user?.sub || req.user?.id;
+    return this.authService.disableTwoFactor(userId);
   }
 
   @Post('logout')

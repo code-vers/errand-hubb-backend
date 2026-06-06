@@ -10,6 +10,8 @@ import { MailService } from '../mail/mail.service.js';
 import * as crypto from 'crypto';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
+import * as speakeasy from 'speakeasy';
+import * as QRCode from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -83,6 +85,37 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Check if 2FA is enabled
+    if (user.isTwoFactorEnabled) {
+      return {
+        mfaRequired: true,
+        userId: user.id,
+      };
+    }
+
+    return this.generateAuthResponse(user);
+  }
+
+  async verifyTwoFactorLogin(userId: string, code: string) {
+    const user = await this.usersService.findOneById(userId);
+    if (!user || !user.twoFactorSecret) {
+      throw new UnauthorizedException('Invalid request');
+    }
+
+    const isValid = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token: code,
+    });
+
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid 2FA code');
+    }
+
+    return this.generateAuthResponse(user);
+  }
+
+  private async generateAuthResponse(user: any) {
     // Using both id and sub to be as compatible as possible
     const payload = { 
       id: user.id, 
@@ -91,17 +124,69 @@ export class AuthService {
       role: user.role 
     };
     
-    console.log('--- LOGIN SUCCESS ---');
-    console.log('Generating token for User ID:', user.id);
+    console.log('--- GENERATING TOKEN ---');
+    console.log('User ID:', user.id);
     
     const accessToken = await this.jwtService.signAsync(payload);
 
-    // Remove password from user object
-    const { password, ...result } = user;
+    // Remove sensitive data
+    const { password, twoFactorSecret, ...result } = user;
     return {
       user: result,
       accessToken,
     };
+  }
+
+  async generateTwoFactorSecret(userId: string) {
+    const user = await this.usersService.findOneById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const secret = speakeasy.generateSecret({
+      name: `ErrandHub (${user.email})`,
+    });
+
+    const qrCodeDataUrl = await QRCode.toDataURL(secret.otpauth_url || '');
+
+    await this.usersService.update(userId, {
+      twoFactorSecret: secret.base32,
+    });
+
+    return {
+      secret: secret.base32,
+      qrCode: qrCodeDataUrl,
+    };
+  }
+
+  async enableTwoFactor(userId: string, code: string) {
+    const user = await this.usersService.findOneById(userId);
+    if (!user || !user.twoFactorSecret) {
+      throw new BadRequestException('2FA secret not generated');
+    }
+
+    const isValid = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token: code,
+    });
+
+    if (!isValid) {
+      throw new BadRequestException('Invalid 2FA code');
+    }
+
+    await this.usersService.update(userId, {
+      isTwoFactorEnabled: true,
+    });
+
+    return { message: '2FA enabled successfully' };
+  }
+
+  async disableTwoFactor(userId: string) {
+    await this.usersService.update(userId, {
+      isTwoFactorEnabled: false,
+      twoFactorSecret: null,
+    });
+
+    return { message: '2FA disabled successfully' };
   }
 
   async forgotPassword(email: string) {
