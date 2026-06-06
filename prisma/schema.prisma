@@ -27,6 +27,7 @@ model User {
   updatedAt            DateTime        @updatedAt @map("updated_at")
   profile              Profile?
   loginActivities      LoginActivity[]
+  securityLogs         SecurityLog[]
 
   @@map("users")
 }
@@ -67,6 +68,19 @@ model LoginActivity {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("login_activities")
+}
+
+model SecurityLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  event      String   // e.g., 'PASSWORD_CHANGE', '2FA_ENABLED', '2FA_DISABLED'
+  device     String?
+  browser    String?
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("security_logs")
 }
 
 model Category {

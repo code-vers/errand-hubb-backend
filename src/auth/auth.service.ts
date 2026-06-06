@@ -32,7 +32,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return this.usersService.createUser({
+    const user = await this.usersService.createUser({
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
@@ -47,6 +47,9 @@ export class AuthService {
         },
       },
     });
+
+    await this.recordSecurityLog(user.id, 'ACCOUNT_CREATED');
+    return user;
   }
 
   async registerErrand(dto: RegisterErrandDto, profileImage?: string) {
@@ -57,7 +60,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return this.usersService.createUser({
+    const user = await this.usersService.createUser({
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
@@ -75,6 +78,9 @@ export class AuthService {
         },
       },
     });
+
+    await this.recordSecurityLog(user.id, 'ACCOUNT_CREATED');
+    return user;
   }
 
   async login(dto: LoginDto, req?: any) {
@@ -130,6 +136,9 @@ export class AuthService {
         const updatedCodes = [...user.recoveryCodes];
         updatedCodes.splice(recoveryCodeIndex, 1);
         await this.usersService.update(userId, { recoveryCodes: updatedCodes });
+        
+        // Log recovery code usage
+        await this.recordSecurityLog(userId, 'RECOVERY_CODE_USED', req);
       }
     }
 
@@ -180,6 +189,39 @@ export class AuthService {
         deviceIcon,
         status: 'active',
       },
+    });
+  }
+
+  async recordSecurityLog(userId: string, event: string, req?: any) {
+    let device = 'System';
+    let browser = 'Server';
+    let ipAddress = '127.0.0.1';
+
+    if (req) {
+      const userAgent = req.headers['user-agent'] || '';
+      ipAddress = req.ip || req.headers['x-forwarded-for'] || '127.0.0.1';
+      const parser = new UAParser(userAgent);
+      const result = parser.getResult();
+      device = result.device.model || result.os.name || 'Unknown Device';
+      browser = `${result.browser.name || 'Unknown Browser'} ${result.browser.version || ''}`.trim();
+    }
+
+    await this.prisma.securityLog.create({
+      data: {
+        userId,
+        event,
+        device,
+        browser,
+        ipAddress: String(ipAddress),
+      },
+    });
+  }
+
+  async getSecurityLogs(userId: string) {
+    return this.prisma.securityLog.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
     });
   }
 
@@ -247,7 +289,7 @@ export class AuthService {
     };
   }
 
-  async enableTwoFactor(userId: string, code: string) {
+  async enableTwoFactor(userId: string, code: string, req?: any) {
     const user = await this.usersService.findOneById(userId);
     if (!user || !user.twoFactorSecret) {
       throw new BadRequestException('2FA secret not generated');
@@ -277,18 +319,22 @@ export class AuthService {
       recoveryCodes: hashedCodes,
     });
 
+    await this.recordSecurityLog(userId, 'TWO_FACTOR_ENABLED', req);
+
     return { 
       message: '2FA enabled successfully',
       recoveryCodes: codes,
     };
   }
 
-  async disableTwoFactor(userId: string) {
+  async disableTwoFactor(userId: string, req?: any) {
     await this.usersService.update(userId, {
       isTwoFactorEnabled: false,
       twoFactorSecret: null,
       recoveryCodes: [],
     });
+
+    await this.recordSecurityLog(userId, 'TWO_FACTOR_DISABLED', req);
 
     return { message: '2FA disabled successfully' };
   }
@@ -309,6 +355,7 @@ export class AuthService {
     });
 
     await this.mailService.sendPasswordResetEmail(user.email, token);
+    await this.recordSecurityLog(user.id, 'PASSWORD_RESET_REQUESTED');
 
     return { message: 'Password reset email sent' };
   }
@@ -327,10 +374,12 @@ export class AuthService {
       resetPasswordExpires: null,
     });
 
+    await this.recordSecurityLog(user.id, 'PASSWORD_RESET_COMPLETED');
+
     return { message: 'Password has been reset successfully' };
   }
 
-  async changePassword(userId: string, dto: ChangePasswordDto) {
+  async changePassword(userId: string, dto: ChangePasswordDto, req?: any) {
     console.log('--- CHANGE PASSWORD REQUEST ---');
     console.log('User ID from token:', userId);
     
@@ -354,6 +403,8 @@ export class AuthService {
     await this.usersService.update(user.id, {
       password: hashedPassword,
     });
+
+    await this.recordSecurityLog(userId, 'PASSWORD_CHANGED', req);
 
     return { message: 'Password updated successfully' };
   }
