@@ -3,6 +3,7 @@ import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -24,18 +25,18 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('profileImage', multerOptions('profiles')))
   async updateProfile(
     @Request() req: any,
-    @Body() updateData: any,
+    @Body() updateDto: UpdateProfileDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const userId = req.user?.id || req.user?.sub;
     console.log('CONTROLLER: Updating profile for ID:', userId);
     
-    const data = { ...updateData };
+    let profileImage: string | undefined;
     if (file) {
-      data.profileImage = `/media/profiles/${file.filename}`;
+      profileImage = `/media/profiles/${file.filename}`;
     }
 
-    const { firstName, lastName, profileImage, ...profileData } = data;
+    const { firstName, lastName, ...profileData } = updateDto;
     
     const user = await this.usersService.updateFullProfile(userId, {
       firstName,

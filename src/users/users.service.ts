@@ -63,14 +63,39 @@ export class UsersService {
   async updateFullProfile(id: string, data: { firstName?: string; lastName?: string; profileImage?: string; profile?: any }) {
     const { firstName, lastName, profileImage, profile } = data;
     
+    let profileUpdateData: any = undefined;
+    if (profile) {
+      profileUpdateData = { ...profile };
+      
+      // Sanitize profile data: convert empty strings to null for optional fields
+      // This prevents Prisma from failing on empty strings for Decimal/Int fields
+      Object.keys(profileUpdateData).forEach(key => {
+        if (profileUpdateData[key] === '') {
+          profileUpdateData[key] = null;
+        }
+      });
+
+      if (profileUpdateData.ratePerHour !== undefined && profileUpdateData.ratePerHour !== null) {
+        try {
+          profileUpdateData.ratePerHour = new Prisma.Decimal(profileUpdateData.ratePerHour);
+        } catch (error) {
+          console.error('SERVICE: Failed to parse ratePerHour:', profileUpdateData.ratePerHour);
+          profileUpdateData.ratePerHour = null;
+        }
+      }
+    }
+
     return this.prisma.user.update({
       where: { id },
       data: {
         firstName,
         lastName,
         profileImage,
-        profile: profile ? {
-          update: profile,
+        profile: profileUpdateData ? {
+          upsert: {
+            create: profileUpdateData,
+            update: profileUpdateData,
+          },
         } : undefined,
       },
       include: { profile: true },
