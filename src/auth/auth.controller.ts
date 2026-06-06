@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
   Res,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegisterClientDto } from './dto/register-client.dto.js';
@@ -53,11 +54,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() dto: LoginDto,
+    @Request() req: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.login(dto);
+    const result = await this.authService.login(dto, req);
 
-    if ('accessToken' in result) {
+    if (result && 'accessToken' in result) {
       // Set cookie
       response.cookie('access_token', result.accessToken, {
         httpOnly: true,
@@ -74,11 +76,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async verifyTwoFactorLogin(
     @Body() dto: TwoFactorVerifyDto & { userId: string },
+    @Request() req: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.verifyTwoFactorLogin(dto.userId, dto.code);
+    const result = await this.authService.verifyTwoFactorLogin(dto.userId, dto.code, req);
 
-    if ('accessToken' in result) {
+    if (result && 'accessToken' in result) {
       // Set cookie
       response.cookie('access_token', result.accessToken, {
         httpOnly: true,
@@ -89,6 +92,13 @@ export class AuthController {
     }
 
     return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('login-activity')
+  getLoginActivity(@Request() req: any) {
+    const userId = req.user?.sub || req.user?.id;
+    return this.authService.getLoginActivity(userId);
   }
 
   @UseGuards(JwtAuthGuard)

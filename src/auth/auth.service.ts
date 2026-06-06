@@ -12,6 +12,8 @@ import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { UAParser } from 'ua-parser-js';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +21,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async registerClient(dto: RegisterClientDto, profileImage?: string) {
@@ -74,7 +77,7 @@ export class AuthService {
     });
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, req?: any) {
     const user = await this.usersService.findOneByEmail(dto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -93,10 +96,15 @@ export class AuthService {
       };
     }
 
+    // Record login activity if successful and 2FA not required
+    if (req) {
+      await this.recordLoginActivity(user.id, req);
+    }
+
     return this.generateAuthResponse(user);
   }
 
-  async verifyTwoFactorLogin(userId: string, code: string) {
+  async verifyTwoFactorLogin(userId: string, code: string, req?: any) {
     const user = await this.usersService.findOneById(userId);
     if (!user || !user.twoFactorSecret) {
       throw new UnauthorizedException('Invalid request');
@@ -112,7 +120,64 @@ export class AuthService {
       throw new UnauthorizedException('Invalid 2FA code');
     }
 
+    // Record login activity
+    if (req) {
+      await this.recordLoginActivity(user.id, req);
+    }
+
     return this.generateAuthResponse(user);
+  }
+
+  async recordLoginActivity(userId: string, req: any) {
+    const userAgent = req.headers['user-agent'] || '';
+    const ipAddress = req.ip || req.headers['x-forwarded-for'] || '127.0.0.1';
+    
+    const parser = new UAParser(userAgent);
+    const result = parser.getResult();
+
+    const device = result.device.model || result.os.name || 'Unknown Device';
+    const browser = `${result.browser.name || 'Unknown Browser'} ${result.browser.version || ''}`.trim();
+    const os = `${result.os.name || ''} ${result.os.version || ''}`.trim();
+    
+    let deviceIcon = 'globe';
+    if (result.device.type === 'mobile') deviceIcon = 'smartphone';
+    else if (result.device.type === 'tablet') deviceIcon = 'tablet';
+    else if (!result.device.type) deviceIcon = 'laptop';
+
+    await this.prisma.loginActivity.create({
+      data: {
+        userId,
+        device,
+        browser,
+        os,
+        ipAddress: String(ipAddress),
+        location: 'Detected Login', // In a real app, use GeoIP
+        deviceIcon,
+        status: 'active',
+      },
+    });
+  }
+
+  async getLoginActivity(userId: string, req?: any) {
+    const activities = await this.prisma.loginActivity.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+
+    // If no activities exist and we have the request, record the current session 
+    // so the user sees something immediately without having to re-login.
+    if (activities.length === 0 && req) {
+      console.log('SERVICE: No activity found, recording current session for ID:', userId);
+      await this.recordLoginActivity(userId, req);
+      return this.prisma.loginActivity.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      });
+    }
+
+    return activities;
   }
 
   private async generateAuthResponse(user: any) {

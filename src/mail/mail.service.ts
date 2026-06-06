@@ -59,4 +59,36 @@ export class MailService {
       throw error;
     }
   }
+
+  async sendAccountDeletionEmail(email: string, code: string) {
+    const mailOptions = {
+      from: `"Errand Hub Security" <${config.SMTP_FROM}>`,
+      to: email,
+      subject: 'Account Deletion Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h1 style="color: #dc2626; text-align: center;">Security Verification</h1>
+          <p>Hello,</p>
+          <p>We received a request to permanently delete your Errand Hub account. To proceed, please use the following verification code:</p>
+          <div style="text-align: center; margin: 40px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; background-color: #f3f4f6; padding: 15px 30px; border-radius: 10px; border: 2px dashed #dc2626;">
+              ${code}
+            </span>
+          </div>
+          <p>This code will expire in 15 minutes.</p>
+          <p style="color: #6b7280; font-size: 14px;">If you did not request this, your account is still secure. Please change your password immediately as a precaution.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #666; text-align: center;">&copy; 2026 Errand Hub. All rights reserved.</p>
+        </div>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log('Deletion verification email sent to:', email);
+    } catch (error) {
+      console.error('Failed to send deletion email:', error);
+      throw error;
+    }
+  }
 }

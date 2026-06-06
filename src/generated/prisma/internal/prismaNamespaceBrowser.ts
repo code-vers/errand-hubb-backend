@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Profile: 'Profile',
+  LoginActivity: 'LoginActivity',
   Category: 'Category'
 } as const
 
@@ -83,6 +84,8 @@ export const UserScalarFieldEnum = {
   profileImage: 'profileImage',
   resetPasswordToken: 'resetPasswordToken',
   resetPasswordExpires: 'resetPasswordExpires',
+  deleteAccountToken: 'deleteAccountToken',
+  deleteAccountExpires: 'deleteAccountExpires',
   twoFactorSecret: 'twoFactorSecret',
   isTwoFactorEnabled: 'isTwoFactorEnabled',
   createdAt: 'createdAt',
@@ -112,6 +115,22 @@ export const ProfileScalarFieldEnum = {
 } as const
 
 export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
+
+
+export const LoginActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  device: 'device',
+  browser: 'browser',
+  os: 'os',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  deviceIcon: 'deviceIcon',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type LoginActivityScalarFieldEnum = (typeof LoginActivityScalarFieldEnum)[keyof typeof LoginActivityScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {

@@ -8,21 +8,24 @@ datasource db {
 }
 
 model User {
-  id                   String     @id @default(uuid())
-  firstName            String     @map("first_name")
-  lastName             String     @map("last_name")
-  email                String     @unique
+  id                   String          @id @default(uuid())
+  firstName            String          @map("first_name")
+  lastName             String          @map("last_name")
+  email                String          @unique
   password             String
-  role                 UserRole   @default(client)
-  status               UserStatus @default(pending)
-  profileImage         String?    @map("profile_image")
-  resetPasswordToken   String?    @map("reset_password_token")
-  resetPasswordExpires DateTime?  @map("reset_password_expires")
-  twoFactorSecret      String?    @map("two_factor_secret")
-  isTwoFactorEnabled   Boolean    @default(false) @map("is_two_factor_enabled")
-  createdAt            DateTime   @default(now()) @map("created_at")
-  updatedAt            DateTime   @updatedAt @map("updated_at")
+  role                 UserRole        @default(client)
+  status               UserStatus      @default(pending)
+  profileImage         String?         @map("profile_image")
+  resetPasswordToken   String?         @map("reset_password_token")
+  resetPasswordExpires DateTime?       @map("reset_password_expires")
+  deleteAccountToken   String?         @map("delete_account_token")
+  deleteAccountExpires DateTime?       @map("delete_account_expires")
+  twoFactorSecret      String?         @map("two_factor_secret")
+  isTwoFactorEnabled   Boolean         @default(false) @map("is_two_factor_enabled")
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
   profile              Profile?
+  loginActivities      LoginActivity[]
 
   @@map("users")
 }
@@ -47,6 +50,22 @@ model Profile {
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+}
+
+model LoginActivity {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  device     String
+  browser    String
+  os         String?
+  ipAddress  String?  @map("ip_address")
+  location   String?
+  deviceIcon String   @default("globe") @map("device_icon")
+  status     String   @default("active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("login_activities")
 }
 
 model Category {

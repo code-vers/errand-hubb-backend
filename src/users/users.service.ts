@@ -1,10 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import { MailService } from '../mail/mail.service.js';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
 
   async findOneByEmail(email: string) {
     if (!email) {
@@ -100,6 +106,72 @@ export class UsersService {
       },
       include: { profile: true },
     });
+  }
+
+  async requestDeleteAccount(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new BadRequestException('User not found');
+
+    // Generate a 6-digit numeric code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 15); // 15 minute expiry
+
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        deleteAccountToken: code,
+        deleteAccountExpires: expires,
+      },
+    });
+
+    await this.mailService.sendAccountDeletionEmail(user.email, code);
+
+    return { message: 'Deletion verification code sent to your email' };
+  }
+
+  async deleteAccount(id: string, passwordAttempt: string, verificationCode: string) {
+    console.log('DEBUG: Attempting account deletion for user ID:', id);
+    console.log('DEBUG: Verification code provided:', `[${verificationCode}]`, 'Length:', verificationCode?.length);
+    console.log('DEBUG: Password provided length:', passwordAttempt?.length);
+    
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      console.error('DEBUG: User not found for deletion');
+      throw new BadRequestException('User not found');
+    }
+
+    // 1. Verify Password
+    console.log('DEBUG: Verifying password...');
+    const isPasswordValid = await bcrypt.compare(passwordAttempt, user.password);
+    if (!isPasswordValid) {
+      console.error('DEBUG: Password mismatch');
+      throw new UnauthorizedException('Incorrect password. Account deletion aborted.');
+    }
+
+    // 2. Verify Email Token
+    console.log('DEBUG: Verifying email token. Stored:', `[${user.deleteAccountToken}]`, 'Provided:', `[${verificationCode}]`);
+    if (!user.deleteAccountToken || user.deleteAccountToken !== verificationCode) {
+      console.error('DEBUG: Token mismatch. Equal:', user.deleteAccountToken === verificationCode);
+      throw new BadRequestException('Invalid verification code');
+    }
+
+    console.log('DEBUG: Checking token expiry. Expires:', user.deleteAccountExpires, 'Now:', new Date());
+    if (!user.deleteAccountExpires || user.deleteAccountExpires < new Date()) {
+      console.error('DEBUG: Token expired');
+      throw new BadRequestException('Verification code has expired');
+    }
+
+    // 3. Perform the deletion
+    console.log('DEBUG: All checks passed. Deleting user...');
+    await this.prisma.user.delete({
+      where: { id },
+    });
+
+    return { message: 'Account deleted successfully' };
   }
 
   async findByResetToken(token: string) {

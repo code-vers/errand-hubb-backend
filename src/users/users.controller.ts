@@ -1,9 +1,10 @@
-import { Controller, Get, Body, Patch, UseGuards, Request, UseInterceptors, UploadedFile, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Body, Patch, UseGuards, Request, UseInterceptors, UploadedFile, NotFoundException, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { DeleteAccountDto } from './dto/delete-account.dto.js';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -30,14 +31,14 @@ export class UsersController {
   ) {
     const userId = req.user?.id || req.user?.sub;
     console.log('CONTROLLER: Updating profile for ID:', userId);
-    
+
     let profileImage: string | undefined;
     if (file) {
       profileImage = `/media/profiles/${file.filename}`;
     }
 
     const { firstName, lastName, ...profileData } = updateDto;
-    
+
     const user = await this.usersService.updateFullProfile(userId, {
       firstName,
       lastName,
@@ -51,4 +52,19 @@ export class UsersController {
 
     return user;
   }
+
+  @Post('request-delete-account')
+  @HttpCode(HttpStatus.OK)
+  async requestDeleteAccount(@Request() req: any) {
+    const userId = req.user?.id || req.user?.sub;
+    return this.usersService.requestDeleteAccount(userId);
+  }
+
+  @Post('delete-account-permanently')
+  @HttpCode(HttpStatus.OK)
+  async deleteAccount(@Request() req: any, @Body() dto: DeleteAccountDto) {
+    const userId = req.user?.id || req.user?.sub;
+    return this.usersService.deleteAccount(userId, dto.password, dto.code);
+  }
 }
+

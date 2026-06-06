@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Profile: 'Profile',
+  LoginActivity: 'LoginActivity',
   Category: 'Category'
 } as const
 
@@ -402,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "category"
+    modelProps: "user" | "profile" | "loginActivity" | "category"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -554,6 +555,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LoginActivity: {
+      payload: Prisma.$LoginActivityPayload<ExtArgs>
+      fields: Prisma.LoginActivityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LoginActivityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LoginActivityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>
+        }
+        findFirst: {
+          args: Prisma.LoginActivityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LoginActivityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>
+        }
+        findMany: {
+          args: Prisma.LoginActivityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>[]
+        }
+        create: {
+          args: Prisma.LoginActivityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>
+        }
+        createMany: {
+          args: Prisma.LoginActivityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LoginActivityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>[]
+        }
+        delete: {
+          args: Prisma.LoginActivityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>
+        }
+        update: {
+          args: Prisma.LoginActivityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>
+        }
+        deleteMany: {
+          args: Prisma.LoginActivityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LoginActivityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LoginActivityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>[]
+        }
+        upsert: {
+          args: Prisma.LoginActivityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginActivityPayload>
+        }
+        aggregate: {
+          args: Prisma.LoginActivityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLoginActivity>
+        }
+        groupBy: {
+          args: Prisma.LoginActivityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LoginActivityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LoginActivityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LoginActivityCountAggregateOutputType> | number
+        }
+      }
+    }
     Category: {
       payload: Prisma.$CategoryPayload<ExtArgs>
       fields: Prisma.CategoryFieldRefs
@@ -678,6 +753,8 @@ export const UserScalarFieldEnum = {
   profileImage: 'profileImage',
   resetPasswordToken: 'resetPasswordToken',
   resetPasswordExpires: 'resetPasswordExpires',
+  deleteAccountToken: 'deleteAccountToken',
+  deleteAccountExpires: 'deleteAccountExpires',
   twoFactorSecret: 'twoFactorSecret',
   isTwoFactorEnabled: 'isTwoFactorEnabled',
   createdAt: 'createdAt',
@@ -707,6 +784,22 @@ export const ProfileScalarFieldEnum = {
 } as const
 
 export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
+
+
+export const LoginActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  device: 'device',
+  browser: 'browser',
+  os: 'os',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  deviceIcon: 'deviceIcon',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type LoginActivityScalarFieldEnum = (typeof LoginActivityScalarFieldEnum)[keyof typeof LoginActivityScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {
@@ -1012,6 +1105,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   profile?: Prisma.ProfileOmit
+  loginActivity?: Prisma.LoginActivityOmit
   category?: Prisma.CategoryOmit
 }
 
