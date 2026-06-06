@@ -101,7 +101,14 @@ export class AuthController {
   @Get('login-activity')
   getLoginActivity(@Request() req: any) {
     const userId = req.user?.sub || req.user?.id;
-    return this.authService.getLoginActivity(userId);
+    return this.authService.getLoginActivity(userId, req);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('security-logs')
+  getSecurityLogs(@Request() req: any) {
+    const userId = req.user?.sub || req.user?.id;
+    return this.authService.getSecurityLogs(userId);
   }
 
   @UseGuards(JwtAuthGuard)
