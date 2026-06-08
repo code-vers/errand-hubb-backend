@@ -340,22 +340,31 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
+    console.log('SERVICE: forgotPassword started for:', email);
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
+      console.log('SERVICE: User not found for email:', email);
       throw new NotFoundException('User not found');
     }
 
+    console.log('SERVICE: Generating reset token...');
     const token = crypto.randomBytes(32).toString('hex');
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
 
+    console.log('SERVICE: Updating user reset token in database...');
     await this.usersService.update(user.id, {
       resetPasswordToken: token,
       resetPasswordExpires: expires,
     });
 
+    console.log('SERVICE: Calling mailService.sendPasswordResetEmail...');
     await this.mailService.sendPasswordResetEmail(user.email, token);
+    console.log('SERVICE: mailService.sendPasswordResetEmail completed.');
+
+    console.log('SERVICE: Recording security log...');
     await this.recordSecurityLog(user.id, 'PASSWORD_RESET_REQUESTED');
+    console.log('SERVICE: forgotPassword finished successfully.');
 
     return { message: 'Password reset email sent' };
   }
