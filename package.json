@@ -17,6 +17,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
+    "seed:admin": "node --loader ts-node/esm prisma/seed-admin.ts",
+    "seed:categories": "node --loader ts-node/esm prisma/seed-categories.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
