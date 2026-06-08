@@ -32,15 +32,21 @@ export class MailService {
         user: config.SMTP_USER,
         pass: config.SMTP_PASS,
       },
-      // Adding timeouts to prevent hanging
-      connectionTimeout: 10000, // 10 seconds
+      // Force IPv4 to avoid ENETUNREACH errors on Render/Cloud environments
+      // that might have issues with IPv6
+      connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 20000,
     };
 
     // If using Gmail, 'service' property is often more reliable on cloud providers
+    // because it handles the host/port/secure settings automatically.
     if (config.SMTP_HOST.includes('gmail.com')) {
-      console.log('MailService: Gmail detected, using optimized settings');
+      console.log('MailService: Gmail detected, using optimized service settings');
+      delete transportConfig.host;
+      delete transportConfig.port;
+      delete transportConfig.secure;
+      transportConfig.service = 'gmail';
     }
 
     this.transporter = nodemailer.createTransport(transportConfig);
