@@ -28,6 +28,7 @@ model User {
   profile              Profile?
   loginActivities      LoginActivity[]
   securityLogs         SecurityLog[]
+  posts                Post[]
 
   @@map("users")
 }
@@ -93,8 +94,31 @@ model Category {
   status      CategoryStatus @default(active)
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
+  posts       Post[]
 
   @@map("categories")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  title       String
+  description String
+  city        String
+  state       String
+  budget      Decimal? @db.Decimal(10, 2)
+  dateNeeded  DateTime? @map("date_needed")
+  contactInfo String?  @map("contact_info")
+  photoUrl    String?  @map("photo_url")
+  categoryId  String   @map("category_id")
+  status      String   @default("active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("posts")
 }
 
 enum UserRole {

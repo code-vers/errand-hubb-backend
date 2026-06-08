@@ -66,3 +66,8 @@ export type SecurityLog = Prisma.SecurityLogModel
  * 
  */
 export type Category = Prisma.CategoryModel
+/**
+ * Model Post
+ * 
+ */
+export type Post = Prisma.PostModel
