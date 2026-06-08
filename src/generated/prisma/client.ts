@@ -57,6 +57,11 @@ export type Profile = Prisma.ProfileModel
  */
 export type LoginActivity = Prisma.LoginActivityModel
 /**
+ * Model SecurityLog
+ * 
+ */
+export type SecurityLog = Prisma.SecurityLogModel
+/**
  * Model Category
  * 
  */

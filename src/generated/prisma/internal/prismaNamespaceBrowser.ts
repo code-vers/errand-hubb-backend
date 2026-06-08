@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Profile: 'Profile',
   LoginActivity: 'LoginActivity',
+  SecurityLog: 'SecurityLog',
   Category: 'Category'
 } as const
 
@@ -132,6 +133,19 @@ export const LoginActivityScalarFieldEnum = {
 } as const
 
 export type LoginActivityScalarFieldEnum = (typeof LoginActivityScalarFieldEnum)[keyof typeof LoginActivityScalarFieldEnum]
+
+
+export const SecurityLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  event: 'event',
+  device: 'device',
+  browser: 'browser',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+} as const
+
+export type SecurityLogScalarFieldEnum = (typeof SecurityLogScalarFieldEnum)[keyof typeof SecurityLogScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {

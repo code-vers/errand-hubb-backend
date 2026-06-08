@@ -1,18 +1,22 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
-import { config } from './config/config.js';
+import { AppModule } from '../src/app.module.js';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
+import { TransformInterceptor } from '../src/common/interceptors/transform.interceptor.js';
+import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter.js';
 import cookieParser from 'cookie-parser';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+const server = express();
 
-  // Global Prefix
+export const createApp = async (expressInstance) => {
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressInstance),
+  );
+
   app.setGlobalPrefix('api/v1');
 
-  // Global Validation Pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,7 +32,6 @@ async function bootstrap() {
     }),
   );
 
-  // Global Interceptor & Filter
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
@@ -49,7 +52,7 @@ async function bootstrap() {
       if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
         callback(null, true);
       } else {
-        callback(null, true); // Fallback to true for debugging, change to error in strict prod
+        callback(null, true);
       }
     },
     credentials: true,
@@ -57,7 +60,15 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
 
-  await app.listen(config.PORT);
-  console.log(`Application is running on: http://localhost:${config.PORT}/api/v1`);
-}
-bootstrap();
+  await app.init();
+  return app;
+};
+
+let cachedApp;
+
+export default async (req, res) => {
+  if (!cachedApp) {
+    cachedApp = await createApp(server);
+  }
+  return server(req, res);
+};

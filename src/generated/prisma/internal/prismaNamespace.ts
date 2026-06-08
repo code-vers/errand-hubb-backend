@@ -387,6 +387,7 @@ export const ModelName = {
   User: 'User',
   Profile: 'Profile',
   LoginActivity: 'LoginActivity',
+  SecurityLog: 'SecurityLog',
   Category: 'Category'
 } as const
 
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "profile" | "loginActivity" | "category"
+    modelProps: "user" | "profile" | "loginActivity" | "securityLog" | "category"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -629,6 +630,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SecurityLog: {
+      payload: Prisma.$SecurityLogPayload<ExtArgs>
+      fields: Prisma.SecurityLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SecurityLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SecurityLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>
+        }
+        findFirst: {
+          args: Prisma.SecurityLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SecurityLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>
+        }
+        findMany: {
+          args: Prisma.SecurityLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>[]
+        }
+        create: {
+          args: Prisma.SecurityLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>
+        }
+        createMany: {
+          args: Prisma.SecurityLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SecurityLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>[]
+        }
+        delete: {
+          args: Prisma.SecurityLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>
+        }
+        update: {
+          args: Prisma.SecurityLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.SecurityLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SecurityLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SecurityLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.SecurityLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SecurityLogPayload>
+        }
+        aggregate: {
+          args: Prisma.SecurityLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSecurityLog>
+        }
+        groupBy: {
+          args: Prisma.SecurityLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SecurityLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SecurityLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SecurityLogCountAggregateOutputType> | number
+        }
+      }
+    }
     Category: {
       payload: Prisma.$CategoryPayload<ExtArgs>
       fields: Prisma.CategoryFieldRefs
@@ -801,6 +876,19 @@ export const LoginActivityScalarFieldEnum = {
 } as const
 
 export type LoginActivityScalarFieldEnum = (typeof LoginActivityScalarFieldEnum)[keyof typeof LoginActivityScalarFieldEnum]
+
+
+export const SecurityLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  event: 'event',
+  device: 'device',
+  browser: 'browser',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+} as const
+
+export type SecurityLogScalarFieldEnum = (typeof SecurityLogScalarFieldEnum)[keyof typeof SecurityLogScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {
@@ -1107,6 +1195,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   profile?: Prisma.ProfileOmit
   loginActivity?: Prisma.LoginActivityOmit
+  securityLog?: Prisma.SecurityLogOmit
   category?: Prisma.CategoryOmit
 }
 
