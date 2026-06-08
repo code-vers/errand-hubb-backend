@@ -23,7 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import type { Response } from 'express';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -51,6 +51,7 @@ export class AuthController {
     return this.authService.registerErrand(dto, profileImage);
   }
 
+  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 5, ttl: 900000 } }) // 5 attempts per 15 minutes
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -74,6 +75,7 @@ export class AuthController {
     return result;
   }
 
+  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('verify-2fa-login')
   @HttpCode(HttpStatus.OK)
@@ -139,6 +141,7 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
+  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 3, ttl: 900000 } }) // 3 requests per 15 minutes
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
@@ -147,6 +150,7 @@ export class AuthController {
     return this.authService.forgotPassword(dto.email);
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   resetPassword(@Body() dto: ResetPasswordDto) {

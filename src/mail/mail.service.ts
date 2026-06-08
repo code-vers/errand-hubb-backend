@@ -22,6 +22,19 @@ export class MailService {
         user: config.SMTP_USER,
         pass: config.SMTP_PASS,
       },
+      // Adding timeouts to prevent hanging
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
+    });
+
+    // Verify connection configuration
+    this.transporter.verify((error, success) => {
+      if (error) {
+        console.error('MailService: Connection verification failed:', error.message);
+      } else {
+        console.log('MailService: Server is ready to take our messages');
+      }
     });
   }
 
@@ -52,10 +65,11 @@ export class MailService {
       if (!config.SMTP_USER || !config.SMTP_PASS) {
         throw new Error('SMTP credentials are missing. Please check your .env file.');
       }
+      console.log('MailService: Sending reset email to:', email);
       await this.transporter.sendMail(mailOptions);
-      console.log('Reset email sent successfully to:', email);
+      console.log('MailService: Reset email sent successfully to:', email);
     } catch (error) {
-      console.error('Failed to send reset email:', error);
+      console.error('MailService: Failed to send reset email:', error);
       throw error;
     }
   }
@@ -84,10 +98,11 @@ export class MailService {
     };
 
     try {
+      console.log('MailService: Sending deletion verification email to:', email);
       await this.transporter.sendMail(mailOptions);
-      console.log('Deletion verification email sent to:', email);
+      console.log('MailService: Deletion verification email sent to:', email);
     } catch (error) {
-      console.error('Failed to send deletion email:', error);
+      console.error('MailService: Failed to send deletion email:', error);
       throw error;
     }
   }
