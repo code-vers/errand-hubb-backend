@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDecimal, IsDateString, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -22,7 +22,7 @@ export class CreatePostDto {
   budget?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsString()
   dateNeeded?: string;
 
   @IsOptional()
@@ -33,7 +33,11 @@ export class CreatePostDto {
   @IsString()
   photoUrl?: string;
 
-  @IsUUID()
+  @IsOptional()
+  @IsString()
+  youtubeLink?: string;
+
+  @IsString()
   @IsNotEmpty()
   categoryId: string;
 }

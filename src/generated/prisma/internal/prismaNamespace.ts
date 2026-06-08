@@ -992,6 +992,7 @@ export const PostScalarFieldEnum = {
   dateNeeded: 'dateNeeded',
   contactInfo: 'contactInfo',
   photoUrl: 'photoUrl',
+  youtubeLink: 'youtubeLink',
   categoryId: 'categoryId',
   status: 'status',
   createdAt: 'createdAt',

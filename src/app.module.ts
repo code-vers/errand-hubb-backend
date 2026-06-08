@@ -10,8 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,11 +27,11 @@ const __dirname = dirname(__filename);
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000, // 1 minute
-      limit: 10,
+      limit: 100, // Increased default
     }, {
       name: 'medium',
       ttl: 900000, // 15 minutes
-      limit: 100,
+      limit: 1000, // Increased default
     }]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'media'),
@@ -42,10 +41,6 @@ const __dirname = dirname(__filename);
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
   ],
 })
 export class AppModule {}

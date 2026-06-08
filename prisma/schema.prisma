@@ -110,6 +110,7 @@ model Post {
   dateNeeded  DateTime? @map("date_needed")
   contactInfo String?  @map("contact_info")
   photoUrl    String?  @map("photo_url")
+  youtubeLink String?  @map("youtube_link")
   categoryId  String   @map("category_id")
   status      String   @default("active")
   createdAt   DateTime @default(now()) @map("created_at")

@@ -45,6 +45,7 @@ export type PostMinAggregateOutputType = {
   dateNeeded: Date | null
   contactInfo: string | null
   photoUrl: string | null
+  youtubeLink: string | null
   categoryId: string | null
   status: string | null
   createdAt: Date | null
@@ -62,6 +63,7 @@ export type PostMaxAggregateOutputType = {
   dateNeeded: Date | null
   contactInfo: string | null
   photoUrl: string | null
+  youtubeLink: string | null
   categoryId: string | null
   status: string | null
   createdAt: Date | null
@@ -79,6 +81,7 @@ export type PostCountAggregateOutputType = {
   dateNeeded: number
   contactInfo: number
   photoUrl: number
+  youtubeLink: number
   categoryId: number
   status: number
   createdAt: number
@@ -106,6 +109,7 @@ export type PostMinAggregateInputType = {
   dateNeeded?: true
   contactInfo?: true
   photoUrl?: true
+  youtubeLink?: true
   categoryId?: true
   status?: true
   createdAt?: true
@@ -123,6 +127,7 @@ export type PostMaxAggregateInputType = {
   dateNeeded?: true
   contactInfo?: true
   photoUrl?: true
+  youtubeLink?: true
   categoryId?: true
   status?: true
   createdAt?: true
@@ -140,6 +145,7 @@ export type PostCountAggregateInputType = {
   dateNeeded?: true
   contactInfo?: true
   photoUrl?: true
+  youtubeLink?: true
   categoryId?: true
   status?: true
   createdAt?: true
@@ -244,6 +250,7 @@ export type PostGroupByOutputType = {
   dateNeeded: Date | null
   contactInfo: string | null
   photoUrl: string | null
+  youtubeLink: string | null
   categoryId: string
   status: string
   createdAt: Date
@@ -284,6 +291,7 @@ export type PostWhereInput = {
   dateNeeded?: Prisma.DateTimeNullableFilter<"Post"> | Date | string | null
   contactInfo?: Prisma.StringNullableFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
+  youtubeLink?: Prisma.StringNullableFilter<"Post"> | string | null
   categoryId?: Prisma.StringFilter<"Post"> | string
   status?: Prisma.StringFilter<"Post"> | string
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -303,6 +311,7 @@ export type PostOrderByWithRelationInput = {
   dateNeeded?: Prisma.SortOrderInput | Prisma.SortOrder
   contactInfo?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  youtubeLink?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -325,6 +334,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   dateNeeded?: Prisma.DateTimeNullableFilter<"Post"> | Date | string | null
   contactInfo?: Prisma.StringNullableFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
+  youtubeLink?: Prisma.StringNullableFilter<"Post"> | string | null
   categoryId?: Prisma.StringFilter<"Post"> | string
   status?: Prisma.StringFilter<"Post"> | string
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -344,6 +354,7 @@ export type PostOrderByWithAggregationInput = {
   dateNeeded?: Prisma.SortOrderInput | Prisma.SortOrder
   contactInfo?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  youtubeLink?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -369,6 +380,7 @@ export type PostScalarWhereWithAggregatesInput = {
   dateNeeded?: Prisma.DateTimeNullableWithAggregatesFilter<"Post"> | Date | string | null
   contactInfo?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
+  youtubeLink?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   categoryId?: Prisma.StringWithAggregatesFilter<"Post"> | string
   status?: Prisma.StringWithAggregatesFilter<"Post"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
@@ -385,6 +397,7 @@ export type PostCreateInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -403,6 +416,7 @@ export type PostUncheckedCreateInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   categoryId: string
   status?: string
   createdAt?: Date | string
@@ -419,6 +433,7 @@ export type PostUpdateInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -437,6 +452,7 @@ export type PostUncheckedUpdateInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -454,6 +470,7 @@ export type PostCreateManyInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   categoryId: string
   status?: string
   createdAt?: Date | string
@@ -470,6 +487,7 @@ export type PostUpdateManyMutationInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -486,6 +504,7 @@ export type PostUncheckedUpdateManyInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -513,6 +532,7 @@ export type PostCountOrderByAggregateInput = {
   dateNeeded?: Prisma.SortOrder
   contactInfo?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
+  youtubeLink?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -534,6 +554,7 @@ export type PostMaxOrderByAggregateInput = {
   dateNeeded?: Prisma.SortOrder
   contactInfo?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
+  youtubeLink?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -551,6 +572,7 @@ export type PostMinOrderByAggregateInput = {
   dateNeeded?: Prisma.SortOrder
   contactInfo?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
+  youtubeLink?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -655,6 +677,7 @@ export type PostCreateWithoutUserInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -671,6 +694,7 @@ export type PostUncheckedCreateWithoutUserInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   categoryId: string
   status?: string
   createdAt?: Date | string
@@ -717,6 +741,7 @@ export type PostScalarWhereInput = {
   dateNeeded?: Prisma.DateTimeNullableFilter<"Post"> | Date | string | null
   contactInfo?: Prisma.StringNullableFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
+  youtubeLink?: Prisma.StringNullableFilter<"Post"> | string | null
   categoryId?: Prisma.StringFilter<"Post"> | string
   status?: Prisma.StringFilter<"Post"> | string
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -733,6 +758,7 @@ export type PostCreateWithoutCategoryInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -750,6 +776,7 @@ export type PostUncheckedCreateWithoutCategoryInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -791,6 +818,7 @@ export type PostCreateManyUserInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   categoryId: string
   status?: string
   createdAt?: Date | string
@@ -807,6 +835,7 @@ export type PostUpdateWithoutUserInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -823,6 +852,7 @@ export type PostUncheckedUpdateWithoutUserInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -839,6 +869,7 @@ export type PostUncheckedUpdateManyWithoutUserInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -856,6 +887,7 @@ export type PostCreateManyCategoryInput = {
   dateNeeded?: Date | string | null
   contactInfo?: string | null
   photoUrl?: string | null
+  youtubeLink?: string | null
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -871,6 +903,7 @@ export type PostUpdateWithoutCategoryInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -888,6 +921,7 @@ export type PostUncheckedUpdateWithoutCategoryInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -904,6 +938,7 @@ export type PostUncheckedUpdateManyWithoutCategoryInput = {
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -922,6 +957,7 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   dateNeeded?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
+  youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
   createdAt?: boolean
@@ -941,6 +977,7 @@ export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   dateNeeded?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
+  youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
   createdAt?: boolean
@@ -960,6 +997,7 @@ export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   dateNeeded?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
+  youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
   createdAt?: boolean
@@ -979,13 +1017,14 @@ export type PostSelectScalar = {
   dateNeeded?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
+  youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "city" | "state" | "budget" | "dateNeeded" | "contactInfo" | "photoUrl" | "categoryId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "city" | "state" | "budget" | "dateNeeded" | "contactInfo" | "photoUrl" | "youtubeLink" | "categoryId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -1016,6 +1055,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     dateNeeded: Date | null
     contactInfo: string | null
     photoUrl: string | null
+    youtubeLink: string | null
     categoryId: string
     status: string
     createdAt: Date
@@ -1455,6 +1495,7 @@ export interface PostFieldRefs {
   readonly dateNeeded: Prisma.FieldRef<"Post", 'DateTime'>
   readonly contactInfo: Prisma.FieldRef<"Post", 'String'>
   readonly photoUrl: Prisma.FieldRef<"Post", 'String'>
+  readonly youtubeLink: Prisma.FieldRef<"Post", 'String'>
   readonly categoryId: Prisma.FieldRef<"Post", 'String'>
   readonly status: Prisma.FieldRef<"Post", 'String'>
   readonly createdAt: Prisma.FieldRef<"Post", 'DateTime'>
