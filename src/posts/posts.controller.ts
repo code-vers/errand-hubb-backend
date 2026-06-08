@@ -29,11 +29,26 @@ export class PostsController {
   @Get()
   findAll(
     @Query('categoryId') categoryId?: string,
-    @Query('city') city?: string,
-    @Query('state') state?: string,
+    @Query('location') location?: string,
     @Query('search') search?: string,
+    @Query('minBudget') minBudget?: string,
+    @Query('maxBudget') maxBudget?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    return this.postsService.findAll({ categoryId, city, state, search });
+    return this.postsService.findAll({ 
+      categoryId, 
+      location, 
+      search, 
+      minBudget, 
+      maxBudget, 
+      page, 
+      limit, 
+      sortBy, 
+      sortOrder 
+    });
   }
 
   @Get('my-posts')

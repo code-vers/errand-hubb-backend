@@ -34,47 +34,83 @@ export class PostsService {
     });
   }
 
-  async findAll(query: { categoryId?: string; city?: string; state?: string; search?: string }) {
-    const { categoryId, city, state, search } = query;
+  async findAll(query: { 
+    categoryId?: string; 
+    location?: string; 
+    search?: string;
+    minBudget?: string;
+    maxBudget?: string;
+    page?: string;
+    limit?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const { categoryId, location, search, minBudget, maxBudget, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+
+    const page = Math.max(1, parseInt(query.page || '1', 10));
+    const limit = Math.max(1, parseInt(query.limit || '10', 10));
+    const skip = (page - 1) * limit;
 
     const where: Prisma.PostWhereInput = {
       status: 'active',
     };
 
-    if (categoryId) {
+    if (categoryId && categoryId !== 'all') {
       where.categoryId = categoryId;
     }
 
-    if (city) {
-      where.city = { contains: city, mode: 'insensitive' };
-    }
-
-    if (state) {
-      where.state = { contains: state, mode: 'insensitive' };
+    if (location) {
+      where.OR = [
+        ...(where.OR || []),
+        { city: { contains: location, mode: 'insensitive' } },
+        { state: { contains: location, mode: 'insensitive' } },
+      ];
     }
 
     if (search) {
       where.OR = [
+        ...(where.OR || []),
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    return this.prisma.post.findMany({
-      where,
-      include: {
-        category: true,
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            profileImage: true,
+    if (minBudget || maxBudget) {
+      where.budget = {};
+      if (minBudget) where.budget.gte = new Prisma.Decimal(minBudget);
+      if (maxBudget) where.budget.lte = new Prisma.Decimal(maxBudget);
+    }
+
+    const [posts, total] = await Promise.all([
+      this.prisma.post.findMany({
+        where,
+        include: {
+          category: true,
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profileImage: true,
+            },
           },
         },
+        orderBy: { [sortBy]: sortOrder },
+        skip,
+        take: limit,
+      }),
+      this.prisma.post.count({ where }),
+    ]);
+
+    return {
+      data: posts,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
   }
 
   async findOne(id: string) {
