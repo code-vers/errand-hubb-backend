@@ -24,38 +24,40 @@ export class MailService {
     console.log('FRONTEND_URL:', config.FRONTEND_URL);
     console.log('-------------------------');
 
-    // On Render, IPv6 is often problematic. We force IPv4 using 'family: 4'
+    // On Render, IPv6 is often problematic. We are being VERY explicit here.
+    // We are NOT using 'service: gmail' because it can override 'family: 4'.
     const transportConfig: any = {
-      host: config.SMTP_HOST,
-      port: config.SMTP_PORT,
-      secure: config.SMTP_PORT === 465, // true for 465, false for other ports
+      host: 'smtp.gmail.com',
+      port: 465, // Using SSL port 465 as it is often more stable on cloud platforms
+      secure: true,
       auth: {
         user: config.SMTP_USER,
         pass: config.SMTP_PASS,
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000,
-      // CRITICAL: Force IPv4 to fix ENETUNREACH on Render
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 30000,
+      // CRITICAL: Force IPv4 strictly
       family: 4,
+      tls: {
+        // Ensure SSL certificate matches the host
+        servername: 'smtp.gmail.com',
+        // If it still fails, we might need to set rejectUnauthorized: false 
+        // but only as a last resort.
+        rejectUnauthorized: true,
+      }
     };
 
-    // If using Gmail, we can still use the service shortcut but keep the family: 4
-    if (config.SMTP_HOST.includes('gmail.com')) {
-      console.log('MailService: Gmail detected, applying IPv4-forced settings');
-      transportConfig.service = 'gmail';
-      // When using 'service', nodemailer ignores host/port/secure
-      // but 'family' and 'auth' are still used.
-    }
-
+    console.log('MailService: Using explicit IPv4 manual configuration for Gmail on port 465');
     this.transporter = nodemailer.createTransport(transportConfig);
 
     // Verify connection configuration
     this.transporter.verify((error, success) => {
       if (error) {
         console.error('MailService: Connection verification failed:', error.message);
+        console.error('DEBUG: Full error details:', JSON.stringify(error, null, 2));
         if (error.message.includes('ENETUNREACH')) {
-          console.error('HINT: This is a network reachability issue. Render might be blocking this port or IPv6.');
+          console.error('HINT: Still seeing ENETUNREACH. This means the Render network is still trying to route to IPv6 despite our IPv4 force.');
         }
       } else {
         console.log('MailService: Server is ready to take our messages');
