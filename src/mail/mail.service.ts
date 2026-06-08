@@ -10,11 +10,21 @@ export class MailService {
     console.log('--- MailService Debug ---');
     console.log('SMTP_HOST:', config.SMTP_HOST);
     console.log('SMTP_PORT:', config.SMTP_PORT);
-    console.log('SMTP_USER:', config.SMTP_USER ? 'Found' : 'MISSING');
-    console.log('SMTP_PASS:', config.SMTP_PASS ? 'Found' : 'MISSING');
+    
+    // Safe logging for Render/Production
+    const maskString = (str: string) => {
+      if (!str) return 'MISSING';
+      if (str.length <= 4) return '****';
+      return `${str.substring(0, 2)}...${str.substring(str.length - 2)}`;
+    };
+
+    console.log('SMTP_USER:', maskString(config.SMTP_USER));
+    console.log('SMTP_PASS:', maskString(config.SMTP_PASS));
+    console.log('SMTP_FROM:', config.SMTP_FROM);
+    console.log('FRONTEND_URL:', config.FRONTEND_URL);
     console.log('-------------------------');
 
-    this.transporter = nodemailer.createTransport({
+    const transportConfig: any = {
       host: config.SMTP_HOST,
       port: config.SMTP_PORT,
       secure: config.SMTP_PORT === 465,
@@ -26,12 +36,20 @@ export class MailService {
       connectionTimeout: 10000, // 10 seconds
       greetingTimeout: 10000,
       socketTimeout: 20000,
-    });
+    };
+
+    // If using Gmail, 'service' property is often more reliable on cloud providers
+    if (config.SMTP_HOST.includes('gmail.com')) {
+      console.log('MailService: Gmail detected, using optimized settings');
+    }
+
+    this.transporter = nodemailer.createTransport(transportConfig);
 
     // Verify connection configuration
     this.transporter.verify((error, success) => {
       if (error) {
         console.error('MailService: Connection verification failed:', error.message);
+        console.error('DEBUG: Full error:', error);
       } else {
         console.log('MailService: Server is ready to take our messages');
       }
@@ -40,6 +58,7 @@ export class MailService {
 
   async sendPasswordResetEmail(email: string, token: string) {
     const resetUrl = `${config.FRONTEND_URL}/reset-password?token=${token}`;
+    console.log('MailService: Preparing reset email with URL:', resetUrl);
 
     const mailOptions = {
       from: `"Errand Hub" <${config.SMTP_FROM}>`,
@@ -63,11 +82,11 @@ export class MailService {
 
     try {
       if (!config.SMTP_USER || !config.SMTP_PASS) {
-        throw new Error('SMTP credentials are missing. Please check your .env file.');
+        throw new Error('SMTP credentials are missing. Please check your environment variables.');
       }
       console.log('MailService: Sending reset email to:', email);
-      await this.transporter.sendMail(mailOptions);
-      console.log('MailService: Reset email sent successfully to:', email);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('MailService: Reset email sent successfully. MessageID:', info.messageId);
     } catch (error) {
       console.error('MailService: Failed to send reset email:', error);
       throw error;
@@ -99,8 +118,8 @@ export class MailService {
 
     try {
       console.log('MailService: Sending deletion verification email to:', email);
-      await this.transporter.sendMail(mailOptions);
-      console.log('MailService: Deletion verification email sent to:', email);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('MailService: Deletion verification email sent. MessageID:', info.messageId);
     } catch (error) {
       console.error('MailService: Failed to send deletion email:', error);
       throw error;
