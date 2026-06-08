@@ -46,3 +46,23 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Profile
+ * 
+ */
+export type Profile = Prisma.ProfileModel
+/**
+ * Model LoginActivity
+ * 
+ */
+export type LoginActivity = Prisma.LoginActivityModel
+/**
+ * Model SecurityLog
+ * 
+ */
+export type SecurityLog = Prisma.SecurityLogModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel

@@ -33,6 +33,12 @@ export type UserMinAggregateOutputType = {
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   profileImage: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpires: Date | null
+  deleteAccountToken: string | null
+  deleteAccountExpires: Date | null
+  twoFactorSecret: string | null
+  isTwoFactorEnabled: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +52,12 @@ export type UserMaxAggregateOutputType = {
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   profileImage: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpires: Date | null
+  deleteAccountToken: string | null
+  deleteAccountExpires: Date | null
+  twoFactorSecret: string | null
+  isTwoFactorEnabled: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +71,13 @@ export type UserCountAggregateOutputType = {
   role: number
   status: number
   profileImage: number
+  resetPasswordToken: number
+  resetPasswordExpires: number
+  deleteAccountToken: number
+  deleteAccountExpires: number
+  twoFactorSecret: number
+  isTwoFactorEnabled: number
+  recoveryCodes: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,6 +93,12 @@ export type UserMinAggregateInputType = {
   role?: true
   status?: true
   profileImage?: true
+  resetPasswordToken?: true
+  resetPasswordExpires?: true
+  deleteAccountToken?: true
+  deleteAccountExpires?: true
+  twoFactorSecret?: true
+  isTwoFactorEnabled?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +112,12 @@ export type UserMaxAggregateInputType = {
   role?: true
   status?: true
   profileImage?: true
+  resetPasswordToken?: true
+  resetPasswordExpires?: true
+  deleteAccountToken?: true
+  deleteAccountExpires?: true
+  twoFactorSecret?: true
+  isTwoFactorEnabled?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +131,13 @@ export type UserCountAggregateInputType = {
   role?: true
   status?: true
   profileImage?: true
+  resetPasswordToken?: true
+  resetPasswordExpires?: true
+  deleteAccountToken?: true
+  deleteAccountExpires?: true
+  twoFactorSecret?: true
+  isTwoFactorEnabled?: true
+  recoveryCodes?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -186,6 +224,13 @@ export type UserGroupByOutputType = {
   role: $Enums.UserRole
   status: $Enums.UserStatus
   profileImage: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpires: Date | null
+  deleteAccountToken: string | null
+  deleteAccountExpires: Date | null
+  twoFactorSecret: string | null
+  isTwoFactorEnabled: boolean
+  recoveryCodes: string[]
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -220,8 +265,18 @@ export type UserWhereInput = {
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   profileImage?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deleteAccountToken?: Prisma.StringNullableFilter<"User"> | string | null
+  deleteAccountExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  twoFactorSecret?: Prisma.StringNullableFilter<"User"> | string | null
+  isTwoFactorEnabled?: Prisma.BoolFilter<"User"> | boolean
+  recoveryCodes?: Prisma.StringNullableListFilter<"User">
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
+  loginActivities?: Prisma.LoginActivityListRelationFilter
+  securityLogs?: Prisma.SecurityLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -233,8 +288,18 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleteAccountToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleteAccountExpires?: Prisma.SortOrderInput | Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  isTwoFactorEnabled?: Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  profile?: Prisma.ProfileOrderByWithRelationInput
+  loginActivities?: Prisma.LoginActivityOrderByRelationAggregateInput
+  securityLogs?: Prisma.SecurityLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -249,8 +314,18 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   profileImage?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deleteAccountToken?: Prisma.StringNullableFilter<"User"> | string | null
+  deleteAccountExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  twoFactorSecret?: Prisma.StringNullableFilter<"User"> | string | null
+  isTwoFactorEnabled?: Prisma.BoolFilter<"User"> | boolean
+  recoveryCodes?: Prisma.StringNullableListFilter<"User">
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  profile?: Prisma.XOR<Prisma.ProfileNullableScalarRelationFilter, Prisma.ProfileWhereInput> | null
+  loginActivities?: Prisma.LoginActivityListRelationFilter
+  securityLogs?: Prisma.SecurityLogListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -262,6 +337,13 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileImage?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleteAccountToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleteAccountExpires?: Prisma.SortOrderInput | Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  isTwoFactorEnabled?: Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -281,6 +363,13 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   profileImage?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  deleteAccountToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  deleteAccountExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  twoFactorSecret?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  isTwoFactorEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  recoveryCodes?: Prisma.StringNullableListFilter<"User">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -294,8 +383,18 @@ export type UserCreateInput = {
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -307,8 +406,18 @@ export type UserUncheckedCreateInput = {
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -320,8 +429,18 @@ export type UserUpdateInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -333,8 +452,18 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -346,6 +475,13 @@ export type UserCreateManyInput = {
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -359,6 +495,13 @@ export type UserUpdateManyMutationInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,8 +515,23 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -385,6 +543,13 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileImage?: Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrder
+  deleteAccountToken?: Prisma.SortOrder
+  deleteAccountExpires?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrder
+  isTwoFactorEnabled?: Prisma.SortOrder
+  recoveryCodes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -398,6 +563,12 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileImage?: Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrder
+  deleteAccountToken?: Prisma.SortOrder
+  deleteAccountExpires?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrder
+  isTwoFactorEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -411,8 +582,23 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileImage?: Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrder
+  deleteAccountToken?: Prisma.SortOrder
+  deleteAccountExpires?: Prisma.SortOrder
+  twoFactorSecret?: Prisma.SortOrder
+  isTwoFactorEnabled?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
+}
+
+export type UserCreaterecoveryCodesInput = {
+  set: string[]
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -431,10 +617,415 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
+export type UserUpdaterecoveryCodesInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserCreateNestedOneWithoutProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProfileInput
+  upsert?: Prisma.UserUpsertWithoutProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProfileInput, Prisma.UserUpdateWithoutProfileInput>, Prisma.UserUncheckedUpdateWithoutProfileInput>
+}
+
+export type UserCreateNestedOneWithoutLoginActivitiesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLoginActivitiesInput, Prisma.UserUncheckedCreateWithoutLoginActivitiesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLoginActivitiesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutLoginActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLoginActivitiesInput, Prisma.UserUncheckedCreateWithoutLoginActivitiesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLoginActivitiesInput
+  upsert?: Prisma.UserUpsertWithoutLoginActivitiesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLoginActivitiesInput, Prisma.UserUpdateWithoutLoginActivitiesInput>, Prisma.UserUncheckedUpdateWithoutLoginActivitiesInput>
+}
+
+export type UserCreateNestedOneWithoutSecurityLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSecurityLogsInput, Prisma.UserUncheckedCreateWithoutSecurityLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSecurityLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSecurityLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSecurityLogsInput, Prisma.UserUncheckedCreateWithoutSecurityLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSecurityLogsInput
+  upsert?: Prisma.UserUpsertWithoutSecurityLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSecurityLogsInput, Prisma.UserUpdateWithoutSecurityLogsInput>, Prisma.UserUncheckedUpdateWithoutSecurityLogsInput>
+}
+
+export type UserCreateWithoutProfileInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutProfileInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
+}
+
+export type UserUpsertWithoutProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutProfileInput, Prisma.UserUncheckedUpdateWithoutProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutProfileInput, Prisma.UserUncheckedCreateWithoutProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutProfileInput, Prisma.UserUncheckedUpdateWithoutProfileInput>
+}
+
+export type UserUpdateWithoutProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutLoginActivitiesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutLoginActivitiesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutLoginActivitiesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLoginActivitiesInput, Prisma.UserUncheckedCreateWithoutLoginActivitiesInput>
+}
+
+export type UserUpsertWithoutLoginActivitiesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLoginActivitiesInput, Prisma.UserUncheckedUpdateWithoutLoginActivitiesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLoginActivitiesInput, Prisma.UserUncheckedCreateWithoutLoginActivitiesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLoginActivitiesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLoginActivitiesInput, Prisma.UserUncheckedUpdateWithoutLoginActivitiesInput>
+}
+
+export type UserUpdateWithoutLoginActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLoginActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSecurityLogsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSecurityLogsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSecurityLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSecurityLogsInput, Prisma.UserUncheckedCreateWithoutSecurityLogsInput>
+}
+
+export type UserUpsertWithoutSecurityLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSecurityLogsInput, Prisma.UserUncheckedUpdateWithoutSecurityLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSecurityLogsInput, Prisma.UserUncheckedCreateWithoutSecurityLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSecurityLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSecurityLogsInput, Prisma.UserUncheckedUpdateWithoutSecurityLogsInput>
+}
+
+export type UserUpdateWithoutSecurityLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSecurityLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
+}
+
+
+/**
+ * Count Type UserCountOutputType
+ */
+
+export type UserCountOutputType = {
+  loginActivities: number
+  securityLogs: number
+}
+
+export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  loginActivities?: boolean | UserCountOutputTypeCountLoginActivitiesArgs
+  securityLogs?: boolean | UserCountOutputTypeCountSecurityLogsArgs
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserCountOutputType
+   */
+  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountLoginActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LoginActivityWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSecurityLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SecurityLogWhereInput
+}
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -446,8 +1037,19 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   status?: boolean
   profileImage?: boolean
+  resetPasswordToken?: boolean
+  resetPasswordExpires?: boolean
+  deleteAccountToken?: boolean
+  deleteAccountExpires?: boolean
+  twoFactorSecret?: boolean
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
+  loginActivities?: boolean | Prisma.User$loginActivitiesArgs<ExtArgs>
+  securityLogs?: boolean | Prisma.User$securityLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -459,6 +1061,13 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   status?: boolean
   profileImage?: boolean
+  resetPasswordToken?: boolean
+  resetPasswordExpires?: boolean
+  deleteAccountToken?: boolean
+  deleteAccountExpires?: boolean
+  twoFactorSecret?: boolean
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -472,6 +1081,13 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   status?: boolean
   profileImage?: boolean
+  resetPasswordToken?: boolean
+  resetPasswordExpires?: boolean
+  deleteAccountToken?: boolean
+  deleteAccountExpires?: boolean
+  twoFactorSecret?: boolean
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -485,15 +1101,34 @@ export type UserSelectScalar = {
   role?: boolean
   status?: boolean
   profileImage?: boolean
+  resetPasswordToken?: boolean
+  resetPasswordExpires?: boolean
+  deleteAccountToken?: boolean
+  deleteAccountExpires?: boolean
+  twoFactorSecret?: boolean
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "email" | "password" | "role" | "status" | "profileImage" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "email" | "password" | "role" | "status" | "profileImage" | "resetPasswordToken" | "resetPasswordExpires" | "deleteAccountToken" | "deleteAccountExpires" | "twoFactorSecret" | "isTwoFactorEnabled" | "recoveryCodes" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
+  loginActivities?: boolean | Prisma.User$loginActivitiesArgs<ExtArgs>
+  securityLogs?: boolean | Prisma.User$securityLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
-  objects: {}
+  objects: {
+    profile: Prisma.$ProfilePayload<ExtArgs> | null
+    loginActivities: Prisma.$LoginActivityPayload<ExtArgs>[]
+    securityLogs: Prisma.$SecurityLogPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     firstName: string
@@ -503,6 +1138,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: $Enums.UserRole
     status: $Enums.UserStatus
     profileImage: string | null
+    resetPasswordToken: string | null
+    resetPasswordExpires: Date | null
+    deleteAccountToken: string | null
+    deleteAccountExpires: Date | null
+    twoFactorSecret: string | null
+    isTwoFactorEnabled: boolean
+    recoveryCodes: string[]
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -899,6 +1541,9 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  profile<T extends Prisma.User$profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$profileArgs<ExtArgs>>): Prisma.Prisma__ProfileClient<runtime.Types.Result.GetResult<Prisma.$ProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  loginActivities<T extends Prisma.User$loginActivitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$loginActivitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  securityLogs<T extends Prisma.User$securityLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SecurityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -936,6 +1581,13 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
   readonly profileImage: Prisma.FieldRef<"User", 'String'>
+  readonly resetPasswordToken: Prisma.FieldRef<"User", 'String'>
+  readonly resetPasswordExpires: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deleteAccountToken: Prisma.FieldRef<"User", 'String'>
+  readonly deleteAccountExpires: Prisma.FieldRef<"User", 'DateTime'>
+  readonly twoFactorSecret: Prisma.FieldRef<"User", 'String'>
+  readonly isTwoFactorEnabled: Prisma.FieldRef<"User", 'Boolean'>
+  readonly recoveryCodes: Prisma.FieldRef<"User", 'String[]'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -955,6 +1607,10 @@ export type UserFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
@@ -973,6 +1629,10 @@ export type UserFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
@@ -990,6 +1650,10 @@ export type UserFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * Filter, which User to fetch.
    */
@@ -1039,6 +1703,10 @@ export type UserFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where?: Prisma.UserWhereInput
@@ -1086,6 +1754,10 @@ export type UserFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * Filter, which Users to fetch.
    */
@@ -1135,6 +1807,10 @@ export type UserCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * The data needed to create a User.
    */
   data: Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>
@@ -1182,6 +1858,10 @@ export type UserUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * The data needed to update a User.
    */
@@ -1249,6 +1929,10 @@ export type UserUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * The filter to search for the User to update in case it exists.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1275,6 +1959,10 @@ export type UserDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter which User to delete.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1295,6 +1983,73 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * User.profile
+ */
+export type User$profileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Profile
+   */
+  select?: Prisma.ProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Profile
+   */
+  omit?: Prisma.ProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProfileInclude<ExtArgs> | null
+  where?: Prisma.ProfileWhereInput
+}
+
+/**
+ * User.loginActivities
+ */
+export type User$loginActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LoginActivity
+   */
+  select?: Prisma.LoginActivitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LoginActivity
+   */
+  omit?: Prisma.LoginActivityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LoginActivityInclude<ExtArgs> | null
+  where?: Prisma.LoginActivityWhereInput
+  orderBy?: Prisma.LoginActivityOrderByWithRelationInput | Prisma.LoginActivityOrderByWithRelationInput[]
+  cursor?: Prisma.LoginActivityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LoginActivityScalarFieldEnum | Prisma.LoginActivityScalarFieldEnum[]
+}
+
+/**
+ * User.securityLogs
+ */
+export type User$securityLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SecurityLog
+   */
+  select?: Prisma.SecurityLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SecurityLog
+   */
+  omit?: Prisma.SecurityLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SecurityLogInclude<ExtArgs> | null
+  where?: Prisma.SecurityLogWhereInput
+  orderBy?: Prisma.SecurityLogOrderByWithRelationInput | Prisma.SecurityLogOrderByWithRelationInput[]
+  cursor?: Prisma.SecurityLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SecurityLogScalarFieldEnum | Prisma.SecurityLogScalarFieldEnum[]
+}
+
+/**
  * User without action
  */
 export type UserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1306,4 +2061,8 @@ export type UserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
 }

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -8,6 +5,96 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id                   String          @id @default(uuid())
+  firstName            String          @map("first_name")
+  lastName             String          @map("last_name")
+  email                String          @unique
+  password             String
+  role                 UserRole        @default(client)
+  status               UserStatus      @default(pending)
+  profileImage         String?         @map("profile_image")
+  resetPasswordToken   String?         @map("reset_password_token")
+  resetPasswordExpires DateTime?       @map("reset_password_expires")
+  deleteAccountToken   String?         @map("delete_account_token")
+  deleteAccountExpires DateTime?       @map("delete_account_expires")
+  twoFactorSecret      String?         @map("two_factor_secret")
+  isTwoFactorEnabled   Boolean         @default(false) @map("is_two_factor_enabled")
+  recoveryCodes        String[]        @map("recovery_codes")
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
+  profile              Profile?
+  loginActivities      LoginActivity[]
+  securityLogs         SecurityLog[]
+
+  @@map("users")
+}
+
+model Profile {
+  id               String           @id @default(uuid())
+  userId           String           @unique @map("user_id")
+  bio              String?
+  phone            String?
+  city             String?
+  state            String?
+  location         String?
+  timeZone         String?          @map("time_zone")
+  preferredContact String?          @map("preferred_contact")
+  totalEarnings    Decimal          @default(0.0) @map("total_earnings") @db.Decimal(10, 2)
+  jobsCompleted    Int              @default(0) @map("jobs_completed")
+  visibility       VisibilityStatus @default(public)
+  ratePerHour      Decimal?         @map("rate_per_hour") @db.Decimal(10, 2)
+  services         String?
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model LoginActivity {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  device     String
+  browser    String
+  os         String?
+  ipAddress  String?  @map("ip_address")
+  location   String?
+  deviceIcon String   @default("globe") @map("device_icon")
+  status     String   @default("active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("login_activities")
+}
+
+model SecurityLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  event      String   // e.g., 'PASSWORD_CHANGE', '2FA_ENABLED', '2FA_DISABLED'
+  device     String?
+  browser    String?
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("security_logs")
+}
+
+model Category {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  description String?
+  icon        String?
+  iconType    IconType       @default(emoji)
+  color       String?
+  status      CategoryStatus @default(active)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@map("categories")
 }
 
 enum UserRole {
@@ -22,17 +109,17 @@ enum UserStatus {
   pending
 }
 
-model User {
-  id           String     @id @default(uuid())
-  firstName    String     @map("first_name")
-  lastName     String     @map("last_name")
-  email        String     @unique
-  password     String
-  role         UserRole   @default(client)
-  status       UserStatus @default(pending)
-  profileImage String?    @map("profile_image")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+enum VisibilityStatus {
+  public
+  private
+}
 
-  @@map("users")
+enum IconType {
+  emoji
+  url
+}
+
+enum CategoryStatus {
+  active
+  inactive
 }

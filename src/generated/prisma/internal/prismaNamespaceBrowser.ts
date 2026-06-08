@@ -51,7 +51,11 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  User: 'User'
+  User: 'User',
+  Profile: 'Profile',
+  LoginActivity: 'LoginActivity',
+  SecurityLog: 'SecurityLog',
+  Category: 'Category'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -79,11 +83,84 @@ export const UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   profileImage: 'profileImage',
+  resetPasswordToken: 'resetPasswordToken',
+  resetPasswordExpires: 'resetPasswordExpires',
+  deleteAccountToken: 'deleteAccountToken',
+  deleteAccountExpires: 'deleteAccountExpires',
+  twoFactorSecret: 'twoFactorSecret',
+  isTwoFactorEnabled: 'isTwoFactorEnabled',
+  recoveryCodes: 'recoveryCodes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const ProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  bio: 'bio',
+  phone: 'phone',
+  city: 'city',
+  state: 'state',
+  location: 'location',
+  timeZone: 'timeZone',
+  preferredContact: 'preferredContact',
+  totalEarnings: 'totalEarnings',
+  jobsCompleted: 'jobsCompleted',
+  visibility: 'visibility',
+  ratePerHour: 'ratePerHour',
+  services: 'services',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProfileScalarFieldEnum = (typeof ProfileScalarFieldEnum)[keyof typeof ProfileScalarFieldEnum]
+
+
+export const LoginActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  device: 'device',
+  browser: 'browser',
+  os: 'os',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  deviceIcon: 'deviceIcon',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type LoginActivityScalarFieldEnum = (typeof LoginActivityScalarFieldEnum)[keyof typeof LoginActivityScalarFieldEnum]
+
+
+export const SecurityLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  event: 'event',
+  device: 'device',
+  browser: 'browser',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+} as const
+
+export type SecurityLogScalarFieldEnum = (typeof SecurityLogScalarFieldEnum)[keyof typeof SecurityLogScalarFieldEnum]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  icon: 'icon',
+  iconType: 'iconType',
+  color: 'color',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 
 export const SortOrder = {

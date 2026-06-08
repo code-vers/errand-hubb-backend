@@ -12,16 +12,50 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
-    const pool = new Pool({ connectionString: config.DATABASE_URL });
+    const isNeon = config.DATABASE_URL?.includes('neon.tech');
+    const isPooler = config.DATABASE_URL?.includes('-pooler');
+
+    if (isNeon && !isPooler) {
+      console.warn('ADVISORY: You are connecting to Neon directly. For Vercel/Production, the "-pooler" endpoint is highly recommended.');
+    }
+
+    // Prepare connection string - strip channel_binding if it causes issues
+    let connectionString = config.DATABASE_URL;
+    if (isNeon && connectionString.includes('channel_binding=')) {
+      connectionString = connectionString.replace(/&?channel_binding=[^&]*/, '');
+    }
+
+    const pool = new Pool({
+      connectionString: connectionString,
+      ssl: (config.DATABASE_SSL || isNeon) ? { rejectUnauthorized: false } : false,
+      max: isNeon ? 10 : 20, // Lower max for Neon free tier
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 30000, // 30s timeout for better reliability
+    });
+
+    pool.on('error', (err) => {
+      console.error('DATABASE: Unexpected error on idle client', err);
+    });
+
     const adapter = new PrismaPg(pool);
 
-    // In Prisma 7, we pass the adapter to the constructor.
-    // The 'datasources' property is no longer used for direct connection strings.
+    // Standard Prisma 7 inheritance with Driver Adapter
     super({ adapter });
   }
 
   async onModuleInit() {
-    await (this as any).$connect();
+    try {
+      console.log('Prisma: Attempting to connect...');
+      await (this as any).$connect();
+      console.log('Prisma: Connected successfully');
+    } catch (error: any) {
+      console.error('Prisma: Connection failed');
+      console.error('Error Detail:', error.message);
+      
+      if (error.message.includes('ETIMEDOUT')) {
+        console.error('DIAGNOSIS: Database connection timed out. Check your internet or Neon IP Allowlist.');
+      }
+    }
   }
 
   async onModuleDestroy() {
