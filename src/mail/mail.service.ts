@@ -24,29 +24,28 @@ export class MailService {
     console.log('FRONTEND_URL:', config.FRONTEND_URL);
     console.log('-------------------------');
 
+    // On Render, IPv6 is often problematic. We force IPv4 using 'family: 4'
     const transportConfig: any = {
       host: config.SMTP_HOST,
       port: config.SMTP_PORT,
-      secure: config.SMTP_PORT === 465,
+      secure: config.SMTP_PORT === 465, // true for 465, false for other ports
       auth: {
         user: config.SMTP_USER,
         pass: config.SMTP_PASS,
       },
-      // Force IPv4 to avoid ENETUNREACH errors on Render/Cloud environments
-      // that might have issues with IPv6
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 20000,
+      // CRITICAL: Force IPv4 to fix ENETUNREACH on Render
+      family: 4,
     };
 
-    // If using Gmail, 'service' property is often more reliable on cloud providers
-    // because it handles the host/port/secure settings automatically.
+    // If using Gmail, we can still use the service shortcut but keep the family: 4
     if (config.SMTP_HOST.includes('gmail.com')) {
-      console.log('MailService: Gmail detected, using optimized service settings');
-      delete transportConfig.host;
-      delete transportConfig.port;
-      delete transportConfig.secure;
+      console.log('MailService: Gmail detected, applying IPv4-forced settings');
       transportConfig.service = 'gmail';
+      // When using 'service', nodemailer ignores host/port/secure
+      // but 'family' and 'auth' are still used.
     }
 
     this.transporter = nodemailer.createTransport(transportConfig);
@@ -55,7 +54,9 @@ export class MailService {
     this.transporter.verify((error, success) => {
       if (error) {
         console.error('MailService: Connection verification failed:', error.message);
-        console.error('DEBUG: Full error:', error);
+        if (error.message.includes('ENETUNREACH')) {
+          console.error('HINT: This is a network reachability issue. Render might be blocking this port or IPv6.');
+        }
       } else {
         console.log('MailService: Server is ready to take our messages');
       }
