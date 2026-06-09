@@ -279,6 +279,8 @@ export type UserWhereInput = {
   securityLogs?: Prisma.SecurityLogListRelationFilter
   posts?: Prisma.PostListRelationFilter
   assignedPosts?: Prisma.PostListRelationFilter
+  subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  paymentHistories?: Prisma.PaymentHistoryListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -304,6 +306,8 @@ export type UserOrderByWithRelationInput = {
   securityLogs?: Prisma.SecurityLogOrderByRelationAggregateInput
   posts?: Prisma.PostOrderByRelationAggregateInput
   assignedPosts?: Prisma.PostOrderByRelationAggregateInput
+  subscription?: Prisma.SubscriptionOrderByWithRelationInput
+  paymentHistories?: Prisma.PaymentHistoryOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -332,6 +336,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   securityLogs?: Prisma.SecurityLogListRelationFilter
   posts?: Prisma.PostListRelationFilter
   assignedPosts?: Prisma.PostListRelationFilter
+  subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  paymentHistories?: Prisma.PaymentHistoryListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -403,6 +409,8 @@ export type UserCreateInput = {
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -428,6 +436,8 @@ export type UserUncheckedCreateInput = {
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -453,6 +463,8 @@ export type UserUpdateInput = {
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -478,6 +490,8 @@ export type UserUncheckedUpdateInput = {
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -725,6 +739,34 @@ export type UserUpdateOneWithoutAssignedPostsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedPostsInput, Prisma.UserUpdateWithoutAssignedPostsInput>, Prisma.UserUncheckedUpdateWithoutAssignedPostsInput>
 }
 
+export type UserCreateNestedOneWithoutSubscriptionInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSubscriptionNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionInput
+  upsert?: Prisma.UserUpsertWithoutSubscriptionInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubscriptionInput, Prisma.UserUpdateWithoutSubscriptionInput>, Prisma.UserUncheckedUpdateWithoutSubscriptionInput>
+}
+
+export type UserCreateNestedOneWithoutPaymentHistoriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPaymentHistoriesInput, Prisma.UserUncheckedCreateWithoutPaymentHistoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPaymentHistoriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPaymentHistoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPaymentHistoriesInput, Prisma.UserUncheckedCreateWithoutPaymentHistoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPaymentHistoriesInput
+  upsert?: Prisma.UserUpsertWithoutPaymentHistoriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPaymentHistoriesInput, Prisma.UserUpdateWithoutPaymentHistoriesInput>, Prisma.UserUncheckedUpdateWithoutPaymentHistoriesInput>
+}
+
 export type UserCreateWithoutProfileInput = {
   id?: string
   firstName: string
@@ -747,6 +789,8 @@ export type UserCreateWithoutProfileInput = {
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -771,6 +815,8 @@ export type UserUncheckedCreateWithoutProfileInput = {
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -811,6 +857,8 @@ export type UserUpdateWithoutProfileInput = {
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -835,6 +883,8 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLoginActivitiesInput = {
@@ -859,6 +909,8 @@ export type UserCreateWithoutLoginActivitiesInput = {
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLoginActivitiesInput = {
@@ -883,6 +935,8 @@ export type UserUncheckedCreateWithoutLoginActivitiesInput = {
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLoginActivitiesInput = {
@@ -923,6 +977,8 @@ export type UserUpdateWithoutLoginActivitiesInput = {
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLoginActivitiesInput = {
@@ -947,6 +1003,8 @@ export type UserUncheckedUpdateWithoutLoginActivitiesInput = {
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSecurityLogsInput = {
@@ -971,6 +1029,8 @@ export type UserCreateWithoutSecurityLogsInput = {
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSecurityLogsInput = {
@@ -995,6 +1055,8 @@ export type UserUncheckedCreateWithoutSecurityLogsInput = {
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSecurityLogsInput = {
@@ -1035,6 +1097,8 @@ export type UserUpdateWithoutSecurityLogsInput = {
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityLogsInput = {
@@ -1059,6 +1123,8 @@ export type UserUncheckedUpdateWithoutSecurityLogsInput = {
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -1083,6 +1149,8 @@ export type UserCreateWithoutPostsInput = {
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -1107,6 +1175,8 @@ export type UserUncheckedCreateWithoutPostsInput = {
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -1136,6 +1206,8 @@ export type UserCreateWithoutAssignedPostsInput = {
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedPostsInput = {
@@ -1160,6 +1232,8 @@ export type UserUncheckedCreateWithoutAssignedPostsInput = {
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedPostsInput = {
@@ -1200,6 +1274,8 @@ export type UserUpdateWithoutPostsInput = {
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -1224,6 +1300,8 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAssignedPostsInput = {
@@ -1259,6 +1337,8 @@ export type UserUpdateWithoutAssignedPostsInput = {
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedPostsInput = {
@@ -1283,6 +1363,248 @@ export type UserUncheckedUpdateWithoutAssignedPostsInput = {
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSubscriptionInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  paymentHistories?: Prisma.PaymentHistoryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSubscriptionInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSubscriptionInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
+}
+
+export type UserUpsertWithoutSubscriptionInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionInput, Prisma.UserUncheckedUpdateWithoutSubscriptionInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionInput, Prisma.UserUncheckedCreateWithoutSubscriptionInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSubscriptionInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionInput, Prisma.UserUncheckedUpdateWithoutSubscriptionInput>
+}
+
+export type UserUpdateWithoutSubscriptionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSubscriptionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  paymentHistories?: Prisma.PaymentHistoryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPaymentHistoriesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPaymentHistoriesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPaymentHistoriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPaymentHistoriesInput, Prisma.UserUncheckedCreateWithoutPaymentHistoriesInput>
+}
+
+export type UserUpsertWithoutPaymentHistoriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPaymentHistoriesInput, Prisma.UserUncheckedUpdateWithoutPaymentHistoriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPaymentHistoriesInput, Prisma.UserUncheckedCreateWithoutPaymentHistoriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPaymentHistoriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPaymentHistoriesInput, Prisma.UserUncheckedUpdateWithoutPaymentHistoriesInput>
+}
+
+export type UserUpdateWithoutPaymentHistoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPaymentHistoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 
@@ -1295,6 +1617,7 @@ export type UserCountOutputType = {
   securityLogs: number
   posts: number
   assignedPosts: number
+  paymentHistories: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1302,6 +1625,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   securityLogs?: boolean | UserCountOutputTypeCountSecurityLogsArgs
   posts?: boolean | UserCountOutputTypeCountPostsArgs
   assignedPosts?: boolean | UserCountOutputTypeCountAssignedPostsArgs
+  paymentHistories?: boolean | UserCountOutputTypeCountPaymentHistoriesArgs
 }
 
 /**
@@ -1342,6 +1666,13 @@ export type UserCountOutputTypeCountAssignedPostsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.PostWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPaymentHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentHistoryWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1366,6 +1697,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   securityLogs?: boolean | Prisma.User$securityLogsArgs<ExtArgs>
   posts?: boolean | Prisma.User$postsArgs<ExtArgs>
   assignedPosts?: boolean | Prisma.User$assignedPostsArgs<ExtArgs>
+  subscription?: boolean | Prisma.User$subscriptionArgs<ExtArgs>
+  paymentHistories?: boolean | Prisma.User$paymentHistoriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1436,6 +1769,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   securityLogs?: boolean | Prisma.User$securityLogsArgs<ExtArgs>
   posts?: boolean | Prisma.User$postsArgs<ExtArgs>
   assignedPosts?: boolean | Prisma.User$assignedPostsArgs<ExtArgs>
+  subscription?: boolean | Prisma.User$subscriptionArgs<ExtArgs>
+  paymentHistories?: boolean | Prisma.User$paymentHistoriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1449,6 +1784,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     securityLogs: Prisma.$SecurityLogPayload<ExtArgs>[]
     posts: Prisma.$PostPayload<ExtArgs>[]
     assignedPosts: Prisma.$PostPayload<ExtArgs>[]
+    subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+    paymentHistories: Prisma.$PaymentHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1867,6 +2204,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   securityLogs<T extends Prisma.User$securityLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SecurityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   posts<T extends Prisma.User$postsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$postsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedPosts<T extends Prisma.User$assignedPostsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedPostsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subscription<T extends Prisma.User$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  paymentHistories<T extends Prisma.User$paymentHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2418,6 +2757,49 @@ export type User$assignedPostsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.PostScalarFieldEnum | Prisma.PostScalarFieldEnum[]
+}
+
+/**
+ * User.subscription
+ */
+export type User$subscriptionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Subscription
+   */
+  select?: Prisma.SubscriptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Subscription
+   */
+  omit?: Prisma.SubscriptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionInclude<ExtArgs> | null
+  where?: Prisma.SubscriptionWhereInput
+}
+
+/**
+ * User.paymentHistories
+ */
+export type User$paymentHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentHistory
+   */
+  select?: Prisma.PaymentHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentHistory
+   */
+  omit?: Prisma.PaymentHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentHistoryInclude<ExtArgs> | null
+  where?: Prisma.PaymentHistoryWhereInput
+  orderBy?: Prisma.PaymentHistoryOrderByWithRelationInput | Prisma.PaymentHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentHistoryScalarFieldEnum | Prisma.PaymentHistoryScalarFieldEnum[]
 }
 
 /**

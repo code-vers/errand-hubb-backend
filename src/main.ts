@@ -7,7 +7,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // Global Prefix
   app.setGlobalPrefix('api/v1');

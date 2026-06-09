@@ -12,6 +12,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module.js';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
+import { WebhooksModule } from './webhooks/webhooks.module.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,6 +26,8 @@ const __dirname = dirname(__filename);
     CategoriesModule,
     UsersModule,
     MailModule,
+    SubscriptionsModule,
+    WebhooksModule,
     ThrottlerModule.forRoot([{
       name: 'short',
       ttl: 60000, // 1 minute

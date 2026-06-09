@@ -56,7 +56,10 @@ export const ModelName = {
   LoginActivity: 'LoginActivity',
   SecurityLog: 'SecurityLog',
   Category: 'Category',
-  Post: 'Post'
+  Post: 'Post',
+  Subscription: 'Subscription',
+  PaymentHistory: 'PaymentHistory',
+  WebhookEvent: 'WebhookEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -186,6 +189,68 @@ export const PostScalarFieldEnum = {
 } as const
 
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+
+
+export const SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  stripePriceId: 'stripePriceId',
+  status: 'status',
+  planName: 'planName',
+  amount: 'amount',
+  currency: 'currency',
+  interval: 'interval',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  trialStart: 'trialStart',
+  trialEnd: 'trialEnd',
+  latestInvoiceId: 'latestInvoiceId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const PaymentHistoryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subscriptionId: 'subscriptionId',
+  stripeInvoiceId: 'stripeInvoiceId',
+  stripePaymentIntentId: 'stripePaymentIntentId',
+  stripeChargeId: 'stripeChargeId',
+  amountPaid: 'amountPaid',
+  amountDue: 'amountDue',
+  currency: 'currency',
+  status: 'status',
+  invoiceUrl: 'invoiceUrl',
+  invoicePdf: 'invoicePdf',
+  hostedInvoiceUrl: 'hostedInvoiceUrl',
+  paidAt: 'paidAt',
+  billingReason: 'billingReason',
+  failureReason: 'failureReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentHistoryScalarFieldEnum = (typeof PaymentHistoryScalarFieldEnum)[keyof typeof PaymentHistoryScalarFieldEnum]
+
+
+export const WebhookEventScalarFieldEnum = {
+  id: 'id',
+  stripeEventId: 'stripeEventId',
+  type: 'type',
+  processed: 'processed',
+  processingError: 'processingError',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WebhookEventScalarFieldEnum = (typeof WebhookEventScalarFieldEnum)[keyof typeof WebhookEventScalarFieldEnum]
 
 
 export const SortOrder = {

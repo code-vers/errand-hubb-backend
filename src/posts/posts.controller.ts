@@ -14,13 +14,14 @@ import { PostsService } from './posts.service.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { SubscriptionGuard } from '../auth/guards/subscription.guard.js';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionGuard)
   create(@Request() req: any, @Body() createPostDto: CreatePostDto) {
     const userId = req.user.sub || req.user.id;
     return this.postsService.create(userId, createPostDto);
@@ -37,6 +38,7 @@ export class PostsController {
     @Query('limit') limit?: string,
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+    @Query('status') status?: string,
   ) {
     return this.postsService.findAll({ 
       categoryId, 
@@ -47,7 +49,8 @@ export class PostsController {
       page, 
       limit, 
       sortBy, 
-      sortOrder 
+      sortOrder,
+      status
     });
   }
 
@@ -64,7 +67,7 @@ export class PostsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionGuard)
   update(
     @Param('id') id: string,
     @Request() req: any,

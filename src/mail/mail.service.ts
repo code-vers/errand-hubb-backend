@@ -134,4 +134,57 @@ export class MailService {
       throw error;
     }
   }
+
+  async sendSubscriptionEmail(email: string, name: string, type: 'started' | 'succeeded' | 'failed' | 'canceled' | 'canceling_soon', details?: any) {
+    let subject = '';
+    let content = '';
+
+    switch (type) {
+      case 'started':
+        subject = 'Welcome to Errand Hub Pro!';
+        content = `<p>Welcome ${name},</p><p>Your ErrandHub Monthly Subscription has started. You can now access all Pro features.</p>`;
+        break;
+      case 'succeeded':
+        subject = 'Subscription Renewed Successfully';
+        content = `<p>Hello ${name},</p><p>Your monthly subscription payment of $${details?.amount || '5.00'} was successful.</p>
+        ${details?.invoiceUrl ? `<p><a href="${details.invoiceUrl}">View Invoice</a></p>` : ''}`;
+        break;
+      case 'failed':
+        subject = 'Subscription Payment Failed';
+        content = `<p>Hello ${name},</p><p>Your recent subscription payment failed. Please update your payment method to avoid service interruption.</p>
+        ${details?.invoiceUrl ? `<p><a href="${details.invoiceUrl}">Pay Invoice</a></p>` : ''}`;
+        break;
+      case 'canceled':
+        subject = 'Subscription Canceled';
+        content = `<p>Hello ${name},</p><p>Your subscription has been canceled successfully. You will retain access until the end of your billing cycle.</p>`;
+        break;
+      case 'canceling_soon':
+        subject = 'Subscription Set to Cancel';
+        content = `<p>Hello ${name},</p><p>Your subscription is scheduled to cancel at the end of the current billing period.</p>`;
+        break;
+    }
+
+    const mailOptions = {
+      from: `"Errand Hub" <${config.SMTP_FROM}>`,
+      to: email,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h1 style="color: #EC6F27; text-align: center;">Subscription Update</h1>
+          ${content}
+          <p>If you have any questions, please contact support.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #666; text-align: center;">&copy; 2026 Errand Hub. All rights reserved.</p>
+        </div>
+      `,
+    };
+
+    try {
+      if (!config.SMTP_USER || !config.SMTP_PASS) return;
+      await this.transporter.sendMail(mailOptions);
+      console.log(`MailService: Subscription email (${type}) sent to:`, email);
+    } catch (error) {
+      console.error(`MailService: Failed to send subscription email (${type}):`, error);
+    }
+  }
 }

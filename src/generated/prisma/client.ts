@@ -71,3 +71,18 @@ export type Category = Prisma.CategoryModel
  * 
  */
 export type Post = Prisma.PostModel
+/**
+ * Model Subscription
+ * 
+ */
+export type Subscription = Prisma.SubscriptionModel
+/**
+ * Model PaymentHistory
+ * 
+ */
+export type PaymentHistory = Prisma.PaymentHistoryModel
+/**
+ * Model WebhookEvent
+ * 
+ */
+export type WebhookEvent = Prisma.WebhookEventModel
