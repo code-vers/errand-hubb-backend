@@ -43,11 +43,14 @@ export type PostMinAggregateOutputType = {
   state: string | null
   budget: runtime.Decimal | null
   dateNeeded: Date | null
+  time: string | null
+  serviceType: string | null
   contactInfo: string | null
   photoUrl: string | null
   youtubeLink: string | null
   categoryId: string | null
   status: string | null
+  assignedToId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -61,11 +64,14 @@ export type PostMaxAggregateOutputType = {
   state: string | null
   budget: runtime.Decimal | null
   dateNeeded: Date | null
+  time: string | null
+  serviceType: string | null
   contactInfo: string | null
   photoUrl: string | null
   youtubeLink: string | null
   categoryId: string | null
   status: string | null
+  assignedToId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -79,11 +85,14 @@ export type PostCountAggregateOutputType = {
   state: number
   budget: number
   dateNeeded: number
+  time: number
+  serviceType: number
   contactInfo: number
   photoUrl: number
   youtubeLink: number
   categoryId: number
   status: number
+  assignedToId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -107,11 +116,14 @@ export type PostMinAggregateInputType = {
   state?: true
   budget?: true
   dateNeeded?: true
+  time?: true
+  serviceType?: true
   contactInfo?: true
   photoUrl?: true
   youtubeLink?: true
   categoryId?: true
   status?: true
+  assignedToId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -125,11 +137,14 @@ export type PostMaxAggregateInputType = {
   state?: true
   budget?: true
   dateNeeded?: true
+  time?: true
+  serviceType?: true
   contactInfo?: true
   photoUrl?: true
   youtubeLink?: true
   categoryId?: true
   status?: true
+  assignedToId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -143,11 +158,14 @@ export type PostCountAggregateInputType = {
   state?: true
   budget?: true
   dateNeeded?: true
+  time?: true
+  serviceType?: true
   contactInfo?: true
   photoUrl?: true
   youtubeLink?: true
   categoryId?: true
   status?: true
+  assignedToId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -248,11 +266,14 @@ export type PostGroupByOutputType = {
   state: string
   budget: runtime.Decimal | null
   dateNeeded: Date | null
+  time: string | null
+  serviceType: string | null
   contactInfo: string | null
   photoUrl: string | null
   youtubeLink: string | null
   categoryId: string
   status: string
+  assignedToId: string | null
   createdAt: Date
   updatedAt: Date
   _count: PostCountAggregateOutputType | null
@@ -289,14 +310,18 @@ export type PostWhereInput = {
   state?: Prisma.StringFilter<"Post"> | string
   budget?: Prisma.DecimalNullableFilter<"Post"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.DateTimeNullableFilter<"Post"> | Date | string | null
+  time?: Prisma.StringNullableFilter<"Post"> | string | null
+  serviceType?: Prisma.StringNullableFilter<"Post"> | string | null
   contactInfo?: Prisma.StringNullableFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
   youtubeLink?: Prisma.StringNullableFilter<"Post"> | string | null
   categoryId?: Prisma.StringFilter<"Post"> | string
   status?: Prisma.StringFilter<"Post"> | string
+  assignedToId?: Prisma.StringNullableFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
 }
 
@@ -309,14 +334,18 @@ export type PostOrderByWithRelationInput = {
   state?: Prisma.SortOrder
   budget?: Prisma.SortOrderInput | Prisma.SortOrder
   dateNeeded?: Prisma.SortOrderInput | Prisma.SortOrder
+  time?: Prisma.SortOrderInput | Prisma.SortOrder
+  serviceType?: Prisma.SortOrderInput | Prisma.SortOrder
   contactInfo?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   youtubeLink?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  assignedTo?: Prisma.UserOrderByWithRelationInput
   category?: Prisma.CategoryOrderByWithRelationInput
 }
 
@@ -332,14 +361,18 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   state?: Prisma.StringFilter<"Post"> | string
   budget?: Prisma.DecimalNullableFilter<"Post"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.DateTimeNullableFilter<"Post"> | Date | string | null
+  time?: Prisma.StringNullableFilter<"Post"> | string | null
+  serviceType?: Prisma.StringNullableFilter<"Post"> | string | null
   contactInfo?: Prisma.StringNullableFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
   youtubeLink?: Prisma.StringNullableFilter<"Post"> | string | null
   categoryId?: Prisma.StringFilter<"Post"> | string
   status?: Prisma.StringFilter<"Post"> | string
+  assignedToId?: Prisma.StringNullableFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
 }, "id">
 
@@ -352,11 +385,14 @@ export type PostOrderByWithAggregationInput = {
   state?: Prisma.SortOrder
   budget?: Prisma.SortOrderInput | Prisma.SortOrder
   dateNeeded?: Prisma.SortOrderInput | Prisma.SortOrder
+  time?: Prisma.SortOrderInput | Prisma.SortOrder
+  serviceType?: Prisma.SortOrderInput | Prisma.SortOrder
   contactInfo?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   youtubeLink?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PostCountOrderByAggregateInput
@@ -378,11 +414,14 @@ export type PostScalarWhereWithAggregatesInput = {
   state?: Prisma.StringWithAggregatesFilter<"Post"> | string
   budget?: Prisma.DecimalNullableWithAggregatesFilter<"Post"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.DateTimeNullableWithAggregatesFilter<"Post"> | Date | string | null
+  time?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
+  serviceType?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   contactInfo?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   youtubeLink?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   categoryId?: Prisma.StringWithAggregatesFilter<"Post"> | string
   status?: Prisma.StringWithAggregatesFilter<"Post"> | string
+  assignedToId?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
 }
@@ -395,6 +434,8 @@ export type PostCreateInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
@@ -402,6 +443,7 @@ export type PostCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPostsInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedPostsInput
   category: Prisma.CategoryCreateNestedOneWithoutPostsInput
 }
 
@@ -414,11 +456,14 @@ export type PostUncheckedCreateInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
   categoryId: string
   status?: string
+  assignedToId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -431,6 +476,8 @@ export type PostUpdateInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -438,6 +485,7 @@ export type PostUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedPostsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutPostsNestedInput
 }
 
@@ -450,11 +498,14 @@ export type PostUncheckedUpdateInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -468,11 +519,14 @@ export type PostCreateManyInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
   categoryId: string
   status?: string
+  assignedToId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -485,6 +539,8 @@ export type PostUpdateManyMutationInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -502,11 +558,14 @@ export type PostUncheckedUpdateManyInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -530,11 +589,14 @@ export type PostCountOrderByAggregateInput = {
   state?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   dateNeeded?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  serviceType?: Prisma.SortOrder
   contactInfo?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   youtubeLink?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -552,11 +614,14 @@ export type PostMaxOrderByAggregateInput = {
   state?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   dateNeeded?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  serviceType?: Prisma.SortOrder
   contactInfo?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   youtubeLink?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -570,11 +635,14 @@ export type PostMinOrderByAggregateInput = {
   state?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   dateNeeded?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  serviceType?: Prisma.SortOrder
   contactInfo?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   youtubeLink?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  assignedToId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -590,10 +658,24 @@ export type PostCreateNestedManyWithoutUserInput = {
   connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
 }
 
+export type PostCreateNestedManyWithoutAssignedToInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutAssignedToInput, Prisma.PostUncheckedCreateWithoutAssignedToInput> | Prisma.PostCreateWithoutAssignedToInput[] | Prisma.PostUncheckedCreateWithoutAssignedToInput[]
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutAssignedToInput | Prisma.PostCreateOrConnectWithoutAssignedToInput[]
+  createMany?: Prisma.PostCreateManyAssignedToInputEnvelope
+  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+}
+
 export type PostUncheckedCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.PostCreateWithoutUserInput, Prisma.PostUncheckedCreateWithoutUserInput> | Prisma.PostCreateWithoutUserInput[] | Prisma.PostUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.PostCreateOrConnectWithoutUserInput | Prisma.PostCreateOrConnectWithoutUserInput[]
   createMany?: Prisma.PostCreateManyUserInputEnvelope
+  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+}
+
+export type PostUncheckedCreateNestedManyWithoutAssignedToInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutAssignedToInput, Prisma.PostUncheckedCreateWithoutAssignedToInput> | Prisma.PostCreateWithoutAssignedToInput[] | Prisma.PostUncheckedCreateWithoutAssignedToInput[]
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutAssignedToInput | Prisma.PostCreateOrConnectWithoutAssignedToInput[]
+  createMany?: Prisma.PostCreateManyAssignedToInputEnvelope
   connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
 }
 
@@ -611,6 +693,20 @@ export type PostUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
 }
 
+export type PostUpdateManyWithoutAssignedToNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutAssignedToInput, Prisma.PostUncheckedCreateWithoutAssignedToInput> | Prisma.PostCreateWithoutAssignedToInput[] | Prisma.PostUncheckedCreateWithoutAssignedToInput[]
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutAssignedToInput | Prisma.PostCreateOrConnectWithoutAssignedToInput[]
+  upsert?: Prisma.PostUpsertWithWhereUniqueWithoutAssignedToInput | Prisma.PostUpsertWithWhereUniqueWithoutAssignedToInput[]
+  createMany?: Prisma.PostCreateManyAssignedToInputEnvelope
+  set?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  disconnect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  delete?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  update?: Prisma.PostUpdateWithWhereUniqueWithoutAssignedToInput | Prisma.PostUpdateWithWhereUniqueWithoutAssignedToInput[]
+  updateMany?: Prisma.PostUpdateManyWithWhereWithoutAssignedToInput | Prisma.PostUpdateManyWithWhereWithoutAssignedToInput[]
+  deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
+}
+
 export type PostUncheckedUpdateManyWithoutUserNestedInput = {
   create?: Prisma.XOR<Prisma.PostCreateWithoutUserInput, Prisma.PostUncheckedCreateWithoutUserInput> | Prisma.PostCreateWithoutUserInput[] | Prisma.PostUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.PostCreateOrConnectWithoutUserInput | Prisma.PostCreateOrConnectWithoutUserInput[]
@@ -622,6 +718,20 @@ export type PostUncheckedUpdateManyWithoutUserNestedInput = {
   connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
   update?: Prisma.PostUpdateWithWhereUniqueWithoutUserInput | Prisma.PostUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.PostUpdateManyWithWhereWithoutUserInput | Prisma.PostUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
+}
+
+export type PostUncheckedUpdateManyWithoutAssignedToNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutAssignedToInput, Prisma.PostUncheckedCreateWithoutAssignedToInput> | Prisma.PostCreateWithoutAssignedToInput[] | Prisma.PostUncheckedCreateWithoutAssignedToInput[]
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutAssignedToInput | Prisma.PostCreateOrConnectWithoutAssignedToInput[]
+  upsert?: Prisma.PostUpsertWithWhereUniqueWithoutAssignedToInput | Prisma.PostUpsertWithWhereUniqueWithoutAssignedToInput[]
+  createMany?: Prisma.PostCreateManyAssignedToInputEnvelope
+  set?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  disconnect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  delete?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+  update?: Prisma.PostUpdateWithWhereUniqueWithoutAssignedToInput | Prisma.PostUpdateWithWhereUniqueWithoutAssignedToInput[]
+  updateMany?: Prisma.PostUpdateManyWithWhereWithoutAssignedToInput | Prisma.PostUpdateManyWithWhereWithoutAssignedToInput[]
   deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
 }
 
@@ -675,12 +785,15 @@ export type PostCreateWithoutUserInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedPostsInput
   category: Prisma.CategoryCreateNestedOneWithoutPostsInput
 }
 
@@ -692,11 +805,14 @@ export type PostUncheckedCreateWithoutUserInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
   categoryId: string
   status?: string
+  assignedToId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -708,6 +824,56 @@ export type PostCreateOrConnectWithoutUserInput = {
 
 export type PostCreateManyUserInputEnvelope = {
   data: Prisma.PostCreateManyUserInput | Prisma.PostCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type PostCreateWithoutAssignedToInput = {
+  id?: string
+  title: string
+  description: string
+  city: string
+  state: string
+  budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
+  contactInfo?: string | null
+  photoUrl?: string | null
+  youtubeLink?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPostsInput
+  category: Prisma.CategoryCreateNestedOneWithoutPostsInput
+}
+
+export type PostUncheckedCreateWithoutAssignedToInput = {
+  id?: string
+  userId: string
+  title: string
+  description: string
+  city: string
+  state: string
+  budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
+  contactInfo?: string | null
+  photoUrl?: string | null
+  youtubeLink?: string | null
+  categoryId: string
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PostCreateOrConnectWithoutAssignedToInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutAssignedToInput, Prisma.PostUncheckedCreateWithoutAssignedToInput>
+}
+
+export type PostCreateManyAssignedToInputEnvelope = {
+  data: Prisma.PostCreateManyAssignedToInput | Prisma.PostCreateManyAssignedToInput[]
   skipDuplicates?: boolean
 }
 
@@ -739,13 +905,32 @@ export type PostScalarWhereInput = {
   state?: Prisma.StringFilter<"Post"> | string
   budget?: Prisma.DecimalNullableFilter<"Post"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.DateTimeNullableFilter<"Post"> | Date | string | null
+  time?: Prisma.StringNullableFilter<"Post"> | string | null
+  serviceType?: Prisma.StringNullableFilter<"Post"> | string | null
   contactInfo?: Prisma.StringNullableFilter<"Post"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
   youtubeLink?: Prisma.StringNullableFilter<"Post"> | string | null
   categoryId?: Prisma.StringFilter<"Post"> | string
   status?: Prisma.StringFilter<"Post"> | string
+  assignedToId?: Prisma.StringNullableFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Post"> | Date | string
+}
+
+export type PostUpsertWithWhereUniqueWithoutAssignedToInput = {
+  where: Prisma.PostWhereUniqueInput
+  update: Prisma.XOR<Prisma.PostUpdateWithoutAssignedToInput, Prisma.PostUncheckedUpdateWithoutAssignedToInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutAssignedToInput, Prisma.PostUncheckedCreateWithoutAssignedToInput>
+}
+
+export type PostUpdateWithWhereUniqueWithoutAssignedToInput = {
+  where: Prisma.PostWhereUniqueInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutAssignedToInput, Prisma.PostUncheckedUpdateWithoutAssignedToInput>
+}
+
+export type PostUpdateManyWithWhereWithoutAssignedToInput = {
+  where: Prisma.PostScalarWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateManyMutationInput, Prisma.PostUncheckedUpdateManyWithoutAssignedToInput>
 }
 
 export type PostCreateWithoutCategoryInput = {
@@ -756,6 +941,8 @@ export type PostCreateWithoutCategoryInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
@@ -763,6 +950,7 @@ export type PostCreateWithoutCategoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPostsInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedPostsInput
 }
 
 export type PostUncheckedCreateWithoutCategoryInput = {
@@ -774,10 +962,13 @@ export type PostUncheckedCreateWithoutCategoryInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
   status?: string
+  assignedToId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -816,6 +1007,29 @@ export type PostCreateManyUserInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
+  contactInfo?: string | null
+  photoUrl?: string | null
+  youtubeLink?: string | null
+  categoryId: string
+  status?: string
+  assignedToId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PostCreateManyAssignedToInput = {
+  id?: string
+  userId: string
+  title: string
+  description: string
+  city: string
+  state: string
+  budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
@@ -833,12 +1047,15 @@ export type PostUpdateWithoutUserInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedPostsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutPostsNestedInput
 }
 
@@ -850,11 +1067,14 @@ export type PostUncheckedUpdateWithoutUserInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -867,6 +1087,69 @@ export type PostUncheckedUpdateManyWithoutUserInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PostUpdateWithoutAssignedToInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutPostsNestedInput
+}
+
+export type PostUncheckedUpdateWithoutAssignedToInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PostUncheckedUpdateManyWithoutAssignedToInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -885,10 +1168,13 @@ export type PostCreateManyCategoryInput = {
   state: string
   budget?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Date | string | null
+  time?: string | null
+  serviceType?: string | null
   contactInfo?: string | null
   photoUrl?: string | null
   youtubeLink?: string | null
   status?: string
+  assignedToId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -901,6 +1187,8 @@ export type PostUpdateWithoutCategoryInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -908,6 +1196,7 @@ export type PostUpdateWithoutCategoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedPostsNestedInput
 }
 
 export type PostUncheckedUpdateWithoutCategoryInput = {
@@ -919,10 +1208,13 @@ export type PostUncheckedUpdateWithoutCategoryInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -936,10 +1228,13 @@ export type PostUncheckedUpdateManyWithoutCategoryInput = {
   state?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   dateNeeded?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactInfo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   youtubeLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -955,14 +1250,18 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   state?: boolean
   budget?: boolean
   dateNeeded?: boolean
+  time?: boolean
+  serviceType?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
   youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
+  assignedToId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.Post$assignedToArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
@@ -975,14 +1274,18 @@ export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   state?: boolean
   budget?: boolean
   dateNeeded?: boolean
+  time?: boolean
+  serviceType?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
   youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
+  assignedToId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.Post$assignedToArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
@@ -995,14 +1298,18 @@ export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   state?: boolean
   budget?: boolean
   dateNeeded?: boolean
+  time?: boolean
+  serviceType?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
   youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
+  assignedToId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.Post$assignedToArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
@@ -1015,26 +1322,32 @@ export type PostSelectScalar = {
   state?: boolean
   budget?: boolean
   dateNeeded?: boolean
+  time?: boolean
+  serviceType?: boolean
   contactInfo?: boolean
   photoUrl?: boolean
   youtubeLink?: boolean
   categoryId?: boolean
   status?: boolean
+  assignedToId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "city" | "state" | "budget" | "dateNeeded" | "contactInfo" | "photoUrl" | "youtubeLink" | "categoryId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "city" | "state" | "budget" | "dateNeeded" | "time" | "serviceType" | "contactInfo" | "photoUrl" | "youtubeLink" | "categoryId" | "status" | "assignedToId" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.Post$assignedToArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }
 export type PostIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.Post$assignedToArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }
 export type PostIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.Post$assignedToArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }
 
@@ -1042,6 +1355,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "Post"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    assignedTo: Prisma.$UserPayload<ExtArgs> | null
     category: Prisma.$CategoryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1053,11 +1367,14 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     state: string
     budget: runtime.Decimal | null
     dateNeeded: Date | null
+    time: string | null
+    serviceType: string | null
     contactInfo: string | null
     photoUrl: string | null
     youtubeLink: string | null
     categoryId: string
     status: string
+    assignedToId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["post"]>
@@ -1455,6 +1772,7 @@ readonly fields: PostFieldRefs;
 export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assignedTo<T extends Prisma.Post$assignedToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$assignedToArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1493,11 +1811,14 @@ export interface PostFieldRefs {
   readonly state: Prisma.FieldRef<"Post", 'String'>
   readonly budget: Prisma.FieldRef<"Post", 'Decimal'>
   readonly dateNeeded: Prisma.FieldRef<"Post", 'DateTime'>
+  readonly time: Prisma.FieldRef<"Post", 'String'>
+  readonly serviceType: Prisma.FieldRef<"Post", 'String'>
   readonly contactInfo: Prisma.FieldRef<"Post", 'String'>
   readonly photoUrl: Prisma.FieldRef<"Post", 'String'>
   readonly youtubeLink: Prisma.FieldRef<"Post", 'String'>
   readonly categoryId: Prisma.FieldRef<"Post", 'String'>
   readonly status: Prisma.FieldRef<"Post", 'String'>
+  readonly assignedToId: Prisma.FieldRef<"Post", 'String'>
   readonly createdAt: Prisma.FieldRef<"Post", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Post", 'DateTime'>
 }
@@ -1898,6 +2219,25 @@ export type PostDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Posts to delete.
    */
   limit?: number
+}
+
+/**
+ * Post.assignedTo
+ */
+export type Post$assignedToArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

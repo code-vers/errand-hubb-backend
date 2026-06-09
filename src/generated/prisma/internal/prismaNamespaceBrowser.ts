@@ -173,11 +173,14 @@ export const PostScalarFieldEnum = {
   state: 'state',
   budget: 'budget',
   dateNeeded: 'dateNeeded',
+  time: 'time',
+  serviceType: 'serviceType',
   contactInfo: 'contactInfo',
   photoUrl: 'photoUrl',
   youtubeLink: 'youtubeLink',
   categoryId: 'categoryId',
   status: 'status',
+  assignedToId: 'assignedToId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

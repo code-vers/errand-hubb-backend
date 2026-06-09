@@ -278,6 +278,7 @@ export type UserWhereInput = {
   loginActivities?: Prisma.LoginActivityListRelationFilter
   securityLogs?: Prisma.SecurityLogListRelationFilter
   posts?: Prisma.PostListRelationFilter
+  assignedPosts?: Prisma.PostListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -302,6 +303,7 @@ export type UserOrderByWithRelationInput = {
   loginActivities?: Prisma.LoginActivityOrderByRelationAggregateInput
   securityLogs?: Prisma.SecurityLogOrderByRelationAggregateInput
   posts?: Prisma.PostOrderByRelationAggregateInput
+  assignedPosts?: Prisma.PostOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -329,6 +331,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   loginActivities?: Prisma.LoginActivityListRelationFilter
   securityLogs?: Prisma.SecurityLogListRelationFilter
   posts?: Prisma.PostListRelationFilter
+  assignedPosts?: Prisma.PostListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -399,6 +402,7 @@ export type UserCreateInput = {
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -423,6 +427,7 @@ export type UserUncheckedCreateInput = {
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserUpdateInput = {
@@ -447,6 +452,7 @@ export type UserUpdateInput = {
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -471,6 +477,7 @@ export type UserUncheckedUpdateInput = {
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -604,6 +611,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type UserCreaterecoveryCodesInput = {
   set: string[]
 }
@@ -689,12 +701,28 @@ export type UserCreateNestedOneWithoutPostsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutAssignedPostsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedPostsInput, Prisma.UserUncheckedCreateWithoutAssignedPostsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedPostsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutPostsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPostsInput, Prisma.UserUncheckedCreateWithoutPostsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPostsInput
   upsert?: Prisma.UserUpsertWithoutPostsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPostsInput, Prisma.UserUpdateWithoutPostsInput>, Prisma.UserUncheckedUpdateWithoutPostsInput>
+}
+
+export type UserUpdateOneWithoutAssignedPostsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedPostsInput, Prisma.UserUncheckedCreateWithoutAssignedPostsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedPostsInput
+  upsert?: Prisma.UserUpsertWithoutAssignedPostsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedPostsInput, Prisma.UserUpdateWithoutAssignedPostsInput>, Prisma.UserUncheckedUpdateWithoutAssignedPostsInput>
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -718,6 +746,7 @@ export type UserCreateWithoutProfileInput = {
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -741,6 +770,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -780,6 +810,7 @@ export type UserUpdateWithoutProfileInput = {
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -803,6 +834,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserCreateWithoutLoginActivitiesInput = {
@@ -826,6 +858,7 @@ export type UserCreateWithoutLoginActivitiesInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserUncheckedCreateWithoutLoginActivitiesInput = {
@@ -849,6 +882,7 @@ export type UserUncheckedCreateWithoutLoginActivitiesInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserCreateOrConnectWithoutLoginActivitiesInput = {
@@ -888,6 +922,7 @@ export type UserUpdateWithoutLoginActivitiesInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLoginActivitiesInput = {
@@ -911,6 +946,7 @@ export type UserUncheckedUpdateWithoutLoginActivitiesInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserCreateWithoutSecurityLogsInput = {
@@ -934,6 +970,7 @@ export type UserCreateWithoutSecurityLogsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserUncheckedCreateWithoutSecurityLogsInput = {
@@ -957,6 +994,7 @@ export type UserUncheckedCreateWithoutSecurityLogsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserCreateOrConnectWithoutSecurityLogsInput = {
@@ -996,6 +1034,7 @@ export type UserUpdateWithoutSecurityLogsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSecurityLogsInput = {
@@ -1019,6 +1058,7 @@ export type UserUncheckedUpdateWithoutSecurityLogsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -1042,6 +1082,7 @@ export type UserCreateWithoutPostsInput = {
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
   loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -1065,11 +1106,65 @@ export type UserUncheckedCreateWithoutPostsInput = {
   profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
   loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
   securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
+  assignedPosts?: Prisma.PostUncheckedCreateNestedManyWithoutAssignedToInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutPostsInput, Prisma.UserUncheckedCreateWithoutPostsInput>
+}
+
+export type UserCreateWithoutAssignedPostsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignedPostsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  profileImage?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
+  deleteAccountToken?: string | null
+  deleteAccountExpires?: Date | string | null
+  twoFactorSecret?: string | null
+  isTwoFactorEnabled?: boolean
+  recoveryCodes?: Prisma.UserCreaterecoveryCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput
+  loginActivities?: Prisma.LoginActivityUncheckedCreateNestedManyWithoutUserInput
+  securityLogs?: Prisma.SecurityLogUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignedPostsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedPostsInput, Prisma.UserUncheckedCreateWithoutAssignedPostsInput>
 }
 
 export type UserUpsertWithoutPostsInput = {
@@ -1104,6 +1199,7 @@ export type UserUpdateWithoutPostsInput = {
   profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
   loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUpdateManyWithoutAssignedToNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -1127,6 +1223,66 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
   loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
   securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+  assignedPosts?: Prisma.PostUncheckedUpdateManyWithoutAssignedToNestedInput
+}
+
+export type UserUpsertWithoutAssignedPostsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedPostsInput, Prisma.UserUncheckedUpdateWithoutAssignedPostsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedPostsInput, Prisma.UserUncheckedCreateWithoutAssignedPostsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignedPostsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedPostsInput, Prisma.UserUncheckedUpdateWithoutAssignedPostsInput>
+}
+
+export type UserUpdateWithoutAssignedPostsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignedPostsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleteAccountToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleteAccountExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryCodes?: Prisma.UserUpdaterecoveryCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput
+  loginActivities?: Prisma.LoginActivityUncheckedUpdateManyWithoutUserNestedInput
+  securityLogs?: Prisma.SecurityLogUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1138,12 +1294,14 @@ export type UserCountOutputType = {
   loginActivities: number
   securityLogs: number
   posts: number
+  assignedPosts: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   loginActivities?: boolean | UserCountOutputTypeCountLoginActivitiesArgs
   securityLogs?: boolean | UserCountOutputTypeCountSecurityLogsArgs
   posts?: boolean | UserCountOutputTypeCountPostsArgs
+  assignedPosts?: boolean | UserCountOutputTypeCountAssignedPostsArgs
 }
 
 /**
@@ -1177,6 +1335,13 @@ export type UserCountOutputTypeCountPostsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.PostWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignedPostsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1200,6 +1365,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   loginActivities?: boolean | Prisma.User$loginActivitiesArgs<ExtArgs>
   securityLogs?: boolean | Prisma.User$securityLogsArgs<ExtArgs>
   posts?: boolean | Prisma.User$postsArgs<ExtArgs>
+  assignedPosts?: boolean | Prisma.User$assignedPostsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1269,6 +1435,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   loginActivities?: boolean | Prisma.User$loginActivitiesArgs<ExtArgs>
   securityLogs?: boolean | Prisma.User$securityLogsArgs<ExtArgs>
   posts?: boolean | Prisma.User$postsArgs<ExtArgs>
+  assignedPosts?: boolean | Prisma.User$assignedPostsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1281,6 +1448,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     loginActivities: Prisma.$LoginActivityPayload<ExtArgs>[]
     securityLogs: Prisma.$SecurityLogPayload<ExtArgs>[]
     posts: Prisma.$PostPayload<ExtArgs>[]
+    assignedPosts: Prisma.$PostPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1698,6 +1866,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   loginActivities<T extends Prisma.User$loginActivitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$loginActivitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   securityLogs<T extends Prisma.User$securityLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SecurityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   posts<T extends Prisma.User$postsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$postsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedPosts<T extends Prisma.User$assignedPostsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedPostsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2207,6 +2376,30 @@ export type User$securityLogsArgs<ExtArgs extends runtime.Types.Extensions.Inter
  * User.posts
  */
 export type User$postsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Post
+   */
+  select?: Prisma.PostSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Post
+   */
+  omit?: Prisma.PostOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostInclude<ExtArgs> | null
+  where?: Prisma.PostWhereInput
+  orderBy?: Prisma.PostOrderByWithRelationInput | Prisma.PostOrderByWithRelationInput[]
+  cursor?: Prisma.PostWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PostScalarFieldEnum | Prisma.PostScalarFieldEnum[]
+}
+
+/**
+ * User.assignedPosts
+ */
+export type User$assignedPostsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Post
    */

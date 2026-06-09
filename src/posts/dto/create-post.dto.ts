@@ -13,9 +13,9 @@ export class CreatePostDto {
   @IsNotEmpty()
   city: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  state: string;
+  state?: string;
 
   @IsOptional()
   @IsString()
@@ -24,6 +24,18 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   dateNeeded?: string;
+
+  @IsOptional()
+  @IsString()
+  time?: string;
+
+  @IsOptional()
+  @IsString()
+  serviceType?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 
   @IsOptional()
   @IsString()

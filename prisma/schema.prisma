@@ -28,7 +28,8 @@ model User {
   profile              Profile?
   loginActivities      LoginActivity[]
   securityLogs         SecurityLog[]
-  posts                Post[]
+  posts                Post[]          @relation("UserPosts")
+  assignedPosts        Post[]          @relation("AssignedPosts")
 
   @@map("users")
 }
@@ -108,16 +109,20 @@ model Post {
   state       String
   budget      Decimal? @db.Decimal(10, 2)
   dateNeeded  DateTime? @map("date_needed")
+  time        String?
+  serviceType String?  @map("service_type")
   contactInfo String?  @map("contact_info")
   photoUrl    String?  @map("photo_url")
   youtubeLink String?  @map("youtube_link")
   categoryId  String   @map("category_id")
   status      String   @default("active")
+  assignedToId String? @map("assigned_to_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id])
+  user       User     @relation("UserPosts", fields: [userId], references: [id], onDelete: Cascade)
+  assignedTo User?    @relation("AssignedPosts", fields: [assignedToId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
   @@map("posts")
 }
