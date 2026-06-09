@@ -14,6 +14,7 @@ export class PostsService {
     return this.prisma.post.create({
       data: {
         ...rest,
+        state: rest.state || '',
         budget: budget ? new Prisma.Decimal(budget) : null,
         dateNeeded: dateNeeded ? new Date(dateNeeded) : null,
         user: { connect: { id: userId } },
@@ -44,16 +45,21 @@ export class PostsService {
     limit?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    status?: string;
   }) {
-    const { categoryId, location, search, minBudget, maxBudget, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+    const { categoryId, location, search, minBudget, maxBudget, sortBy = 'createdAt', sortOrder = 'desc', status } = query;
 
     const page = Math.max(1, parseInt(query.page || '1', 10));
     const limit = Math.max(1, parseInt(query.limit || '10', 10));
     const skip = (page - 1) * limit;
 
-    const where: Prisma.PostWhereInput = {
-      status: 'active',
-    };
+    const where: Prisma.PostWhereInput = {};
+
+    if (status && status.toLowerCase() !== 'all') {
+      where.status = status;
+    } else if (status === undefined) {
+      where.status = 'active';
+    }
 
     if (categoryId && categoryId !== 'all') {
       where.categoryId = categoryId;
@@ -94,6 +100,13 @@ export class PostsService {
               profileImage: true,
             },
           },
+          assignedTo: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
         orderBy: { [sortBy]: sortOrder },
         skip,
@@ -127,6 +140,13 @@ export class PostsService {
             profile: true,
           },
         },
+        assignedTo: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
 
@@ -140,7 +160,16 @@ export class PostsService {
   async findByUser(userId: string) {
     return this.prisma.post.findMany({
       where: { userId },
-      include: { category: true },
+      include: { 
+        category: true,
+        assignedTo: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -156,7 +185,7 @@ export class PostsService {
 
     const data: Prisma.PostUpdateInput = {
       ...rest,
-    };
+    } as any;
 
     if (budget) data.budget = new Prisma.Decimal(budget);
     if (dateNeeded) data.dateNeeded = new Date(dateNeeded);
@@ -176,6 +205,38 @@ export class PostsService {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
+    return this.prisma.post.delete({
+      where: { id },
+    });
+  }
+
+  async adminUpdate(id: string, updatePostDto: UpdatePostDto) {
+    const { categoryId, budget, dateNeeded, ...rest } = updatePostDto;
+
+    const data: Prisma.PostUpdateInput = {
+      ...rest,
+    } as any;
+
+    if (budget) data.budget = new Prisma.Decimal(budget);
+    if (dateNeeded) data.dateNeeded = new Date(dateNeeded);
+    if (categoryId) data.category = { connect: { id: categoryId } };
+
+    return this.prisma.post.update({
+      where: { id },
+      data,
+      include: { 
+        category: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          }
+        }
+      },
+    });
+  }
+
+  async adminRemove(id: string) {
     return this.prisma.post.delete({
       where: { id },
     });

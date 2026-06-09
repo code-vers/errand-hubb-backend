@@ -9,6 +9,29 @@
 * 🟢 You can import this file directly.
 */
 
+export const SubscriptionStatus = {
+  active: 'active',
+  canceled: 'canceled',
+  incomplete: 'incomplete',
+  incomplete_expired: 'incomplete_expired',
+  past_due: 'past_due',
+  paused: 'paused',
+  trialing: 'trialing',
+  unpaid: 'unpaid'
+} as const
+
+export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]
+
+
+export const PaymentStatus = {
+  succeeded: 'succeeded',
+  pending: 'pending',
+  failed: 'failed'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
 export const UserRole = {
   admin: 'admin',
   client: 'client',

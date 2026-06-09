@@ -14,13 +14,16 @@ import { PostsService } from './posts.service.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { SubscriptionGuard } from '../auth/guards/subscription.guard.js';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionGuard)
   create(@Request() req: any, @Body() createPostDto: CreatePostDto) {
     const userId = req.user.sub || req.user.id;
     return this.postsService.create(userId, createPostDto);
@@ -37,6 +40,7 @@ export class PostsController {
     @Query('limit') limit?: string,
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+    @Query('status') status?: string,
   ) {
     return this.postsService.findAll({ 
       categoryId, 
@@ -47,7 +51,8 @@ export class PostsController {
       page, 
       limit, 
       sortBy, 
-      sortOrder 
+      sortOrder,
+      status
     });
   }
 
@@ -64,7 +69,7 @@ export class PostsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionGuard)
   update(
     @Param('id') id: string,
     @Request() req: any,
@@ -79,5 +84,44 @@ export class PostsController {
   remove(@Param('id') id: string, @Request() req: any) {
     const userId = req.user.sub || req.user.id;
     return this.postsService.remove(id, userId);
+  }
+
+  // Admin endpoints
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  findAllAdmin(
+    @Query('categoryId') categoryId?: string,
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.postsService.findAll({ 
+      categoryId, 
+      search, 
+      status,
+      page, 
+      limit,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    });
+  }
+
+  @Patch('admin/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  adminUpdate(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    return this.postsService.adminUpdate(id, updatePostDto);
+  }
+
+  @Delete('admin/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  adminRemove(@Param('id') id: string) {
+    return this.postsService.adminRemove(id);
   }
 }

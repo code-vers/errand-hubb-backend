@@ -18,6 +18,14 @@ export const config = {
   SMTP_PASS: process.env.SMTP_PASS as string,
   SMTP_FROM: (process.env.SMTP_FROM || 'noreply@errandhub.com') as string,
   FRONTEND_URL: (process.env.FRONTEND_URL || 'http://localhost:3000') as string,
+  BACKEND_URL: (process.env.BACKEND_URL || 'http://localhost:3001') as string,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
+  STRIPE_MONTHLY_PRICE_ID: process.env.STRIPE_MONTHLY_PRICE_ID as string,
+  STRIPE_CURRENCY: (process.env.STRIPE_CURRENCY || 'usd') as string,
+  STRIPE_SUCCESS_URL: (process.env.STRIPE_SUCCESS_URL || `${process.env.FRONTEND_URL}/dashboard/subscription?success=true`) as string,
+  STRIPE_CANCEL_URL: (process.env.STRIPE_CANCEL_URL || `${process.env.FRONTEND_URL}/dashboard/subscription?canceled=true`) as string,
+  STRIPE_CUSTOMER_PORTAL_RETURN_URL: (process.env.STRIPE_CUSTOMER_PORTAL_RETURN_URL || `${process.env.FRONTEND_URL}/dashboard/subscription`) as string,
 };
 
 // Simple validation to ensure required config is present
