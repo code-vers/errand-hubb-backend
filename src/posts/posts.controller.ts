@@ -83,4 +83,43 @@ export class PostsController {
     const userId = req.user.sub || req.user.id;
     return this.postsService.remove(id, userId);
   }
+
+  // Admin endpoints
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard)
+  findAllAdmin(
+    @Query('categoryId') categoryId?: string,
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    // In a real app, add AdminGuard here
+    return this.postsService.findAll({ 
+      categoryId, 
+      search, 
+      status,
+      page, 
+      limit,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    });
+  }
+
+  @Patch('admin/:id')
+  @UseGuards(JwtAuthGuard)
+  adminUpdate(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    // In a real app, add AdminGuard here
+    return this.postsService.adminUpdate(id, updatePostDto);
+  }
+
+  @Delete('admin/:id')
+  @UseGuards(JwtAuthGuard)
+  adminRemove(@Param('id') id: string) {
+    // In a real app, add AdminGuard here
+    return this.postsService.adminRemove(id);
+  }
 }

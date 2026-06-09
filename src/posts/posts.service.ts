@@ -55,7 +55,7 @@ export class PostsService {
 
     const where: Prisma.PostWhereInput = {};
 
-    if (status && status !== 'All') {
+    if (status && status !== 'All' && status !== 'all') {
       where.status = status;
     } else if (!status) {
       where.status = 'active';
@@ -205,6 +205,38 @@ export class PostsService {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
+    return this.prisma.post.delete({
+      where: { id },
+    });
+  }
+
+  async adminUpdate(id: string, updatePostDto: UpdatePostDto) {
+    const { categoryId, budget, dateNeeded, ...rest } = updatePostDto;
+
+    const data: Prisma.PostUpdateInput = {
+      ...rest,
+    } as any;
+
+    if (budget) data.budget = new Prisma.Decimal(budget);
+    if (dateNeeded) data.dateNeeded = new Date(dateNeeded);
+    if (categoryId) data.category = { connect: { id: categoryId } };
+
+    return this.prisma.post.update({
+      where: { id },
+      data,
+      include: { 
+        category: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          }
+        }
+      },
+    });
+  }
+
+  async adminRemove(id: string) {
     return this.prisma.post.delete({
       where: { id },
     });
