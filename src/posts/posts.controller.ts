@@ -15,6 +15,8 @@ import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { SubscriptionGuard } from '../auth/guards/subscription.guard.js';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
 
 @Controller('posts')
 export class PostsController {
@@ -86,7 +88,8 @@ export class PostsController {
 
   // Admin endpoints
   @Get('admin/all')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   findAllAdmin(
     @Query('categoryId') categoryId?: string,
     @Query('search') search?: string,
@@ -94,7 +97,6 @@ export class PostsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    // In a real app, add AdminGuard here
     return this.postsService.findAll({ 
       categoryId, 
       search, 
@@ -107,19 +109,19 @@ export class PostsController {
   }
 
   @Patch('admin/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   adminUpdate(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    // In a real app, add AdminGuard here
     return this.postsService.adminUpdate(id, updatePostDto);
   }
 
   @Delete('admin/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   adminRemove(@Param('id') id: string) {
-    // In a real app, add AdminGuard here
     return this.postsService.adminRemove(id);
   }
 }

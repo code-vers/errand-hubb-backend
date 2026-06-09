@@ -55,9 +55,9 @@ export class PostsService {
 
     const where: Prisma.PostWhereInput = {};
 
-    if (status && status !== 'All' && status !== 'all') {
+    if (status && status.toLowerCase() !== 'all') {
       where.status = status;
-    } else if (!status) {
+    } else if (status === undefined) {
       where.status = 'active';
     }
 
