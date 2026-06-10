@@ -38,7 +38,7 @@ const __dirname = dirname(__filename);
       limit: 1000, // Increased default
     }]),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'media'),
+      rootPath: join(process.cwd(), 'media'),
       serveRoot: '/media',
     }),
   ],
