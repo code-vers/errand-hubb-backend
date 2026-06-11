@@ -7,6 +7,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import cookieParser from 'cookie-parser';
 import { join } from 'path';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -38,8 +39,25 @@ async function bootstrap() {
   const cookieHandler = (cookieParser as any).default || cookieParser;
   app.use(cookieHandler());
 
-  console.log(`SERVER: Current working directory: ${process.cwd()}`);
-  console.log(`SERVER: Media directory path: ${join(process.cwd(), 'media')}`);
+  // Diagnostics for VPS File System
+  const mediaRoot = config.MEDIA_ROOT;
+  console.log(`SERVER: -----------------------------------------`);
+  console.log(`SERVER: Current Working Directory: ${process.cwd()}`);
+  console.log(`SERVER: Static Files (MEDIA_ROOT): ${mediaRoot}`);
+  
+  try {
+    if (!fs.existsSync(mediaRoot)) {
+      console.log(`SERVER: Media directory missing, creating at ${mediaRoot}`);
+      fs.mkdirSync(mediaRoot, { recursive: true });
+    }
+    const testFile = join(mediaRoot, '.boot-test');
+    fs.writeFileSync(testFile, 'test');
+    fs.unlinkSync(testFile);
+    console.log(`SERVER: Media directory is WRITABLE`);
+  } catch (err: any) {
+    console.error(`SERVER ERROR: Media directory issue: ${err.message}`);
+  }
+  console.log(`SERVER: -----------------------------------------`);
 
   // CORS
   app.enableCors({
