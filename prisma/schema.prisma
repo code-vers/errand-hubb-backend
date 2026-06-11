@@ -6,7 +6,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -34,8 +33,58 @@ model User {
   assignedPosts        Post[]          @relation("AssignedPosts")
   subscription         Subscription?
   paymentHistories     PaymentHistory[]
+  
+  // Messaging
+  conversationsAsClient Conversation[]  @relation("ClientConversations")
+  conversationsAsErrand Conversation[]  @relation("ErrandConversations")
+  sentMessages          Message[]       @relation("SentMessages")
+  notifications         Notification[]
 
   @@map("users")
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  clientId  String    @map("client_id")
+  errandId  String    @map("errand_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  client    User      @relation("ClientConversations", fields: [clientId], references: [id])
+  errand    User      @relation("ErrandConversations", fields: [errandId], references: [id])
+  messages  Message[]
+
+  @@unique([clientId, errandId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String       @map("conversation_id")
+  senderId       String       @map("sender_id")
+  content        String
+  isRead         Boolean      @default(false) @map("is_read")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  @@map("messages")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   // e.g., 'NEW_MESSAGE', 'POST_ASSIGNED'
+  title     String
+  message   String
+  metadata  Json?
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 model Profile {

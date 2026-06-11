@@ -6,7 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
-import { Category } from '../generated/prisma/client.js';
+import { Category } from '../generated/prisma/index.js';
 
 @Injectable()
 export class CategoriesService {

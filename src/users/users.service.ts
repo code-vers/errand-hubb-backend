@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Prisma } from '../generated/prisma/client.js';
+import { Prisma } from '../generated/prisma/index.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
@@ -50,6 +50,21 @@ export class UsersService {
     }
     
     return user;
+  }
+
+  async findAllErrands() {
+    return this.prisma.user.findMany({
+      where: {
+        role: 'errand',
+        status: 'active',
+      },
+      include: {
+        profile: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   async createUser(data: Prisma.UserCreateInput) {
