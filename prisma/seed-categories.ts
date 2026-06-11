@@ -1,5 +1,5 @@
-import { PrismaClient } from '../src/generated/prisma/client.js';
-import { IconType } from '../src/generated/prisma/enums.js';
+import { PrismaClient } from '@prisma/client';
+import { IconType } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pkg from 'pg';
 const { Pool } = pkg;

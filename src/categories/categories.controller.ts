@@ -19,7 +19,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
-import { UserRole } from '../generated/prisma/enums.js';
+import { UserRole } from '@prisma/client';
 
 @Controller('categories')
 export class CategoriesController {

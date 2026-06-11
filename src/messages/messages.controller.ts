@@ -12,7 +12,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { StartConversationDto } from './dto/start-conversation.dto.js';
-import { UserRole } from '../generated/prisma/enums.js';
+import { UserRole } from '@prisma/client';
 
 @Controller('messages')
 @UseGuards(JwtAuthGuard)

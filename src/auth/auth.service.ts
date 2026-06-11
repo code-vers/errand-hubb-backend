@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterClientDto } from './dto/register-client.dto.js';
 import { RegisterErrandDto } from './dto/register-errand.dto.js';
 import { LoginDto } from './dto/login.dto.js';
-import { UserRole } from '../generated/prisma/enums.js';
+import { UserRole } from '@prisma/client';
 import { MailService } from '../mail/mail.service.js';
 import * as crypto from 'crypto';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
