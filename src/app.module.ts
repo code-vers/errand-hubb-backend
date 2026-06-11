@@ -7,17 +7,12 @@ import { PostsModule } from './posts/posts.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { UsersModule } from './users/users.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MailModule } from './mail/mail.module.js';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
 import { WebhooksModule } from './webhooks/webhooks.module.js';
 import { MessagesModule } from './messages/messages.module.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { config } from './config/config.js';
 
 @Module({
   imports: [
@@ -40,7 +35,7 @@ const __dirname = dirname(__filename);
       limit: 1000, // Increased default
     }]),
     ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'media'),
+      rootPath: config.MEDIA_ROOT,
       serveRoot: '/media',
     }),
   ],
