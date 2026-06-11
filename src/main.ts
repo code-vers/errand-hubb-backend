@@ -6,6 +6,7 @@ import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import cookieParser from 'cookie-parser';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -36,6 +37,9 @@ async function bootstrap() {
   // Cookies - Use a more robust check for ESM
   const cookieHandler = (cookieParser as any).default || cookieParser;
   app.use(cookieHandler());
+
+  console.log(`SERVER: Current working directory: ${process.cwd()}`);
+  console.log(`SERVER: Media directory path: ${join(process.cwd(), 'media')}`);
 
   // CORS
   app.enableCors({
