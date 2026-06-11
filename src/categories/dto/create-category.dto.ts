@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsEnum } from 'class-validator';
-import { IconType, CategoryStatus } from '../../generated/prisma/enums.js';
+import { IconType, CategoryStatus } from '@prisma/client';
 
 export class CreateCategoryDto {
   @IsString()

@@ -1,4 +1,4 @@
-import { CategoryStatus, IconType } from '../../generated/prisma/enums.js';
+import { CategoryStatus, IconType } from '@prisma/client';
 import { IsString, IsOptional, IsEnum } from 'class-validator';
 
 export class UpdateCategoryDto {

@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsEnum, IsNumber, IsDecimal } from 'class-validator';
-import { VisibilityStatus } from '../../generated/prisma/enums.js';
+import { VisibilityStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 
 export class UpdateProfileDto {

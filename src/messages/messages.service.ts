@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
-import { UserRole } from '../generated/prisma/enums.js';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class MessagesService {
