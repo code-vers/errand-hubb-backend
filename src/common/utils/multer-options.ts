@@ -2,11 +2,12 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import * as fs from 'fs';
+import { config } from '../../config/config.js';
 
 export const multerOptions = (dest: string) => ({
   storage: diskStorage({
     destination: (req, file, callback) => {
-      const uploadPath = join(process.cwd(), 'media', dest);
+      const uploadPath = join(config.MEDIA_ROOT, dest);
       console.log(`MULTER: Uploading to ${uploadPath}`);
       
       try {

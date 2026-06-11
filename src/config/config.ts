@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { join } from 'path';
 
 // Debug: Check if env vars are loaded
 if (!process.env.SMTP_USER) {
@@ -26,6 +27,7 @@ export const config = {
   STRIPE_SUCCESS_URL: (process.env.STRIPE_SUCCESS_URL || `${process.env.FRONTEND_URL}/dashboard/subscription?success=true`) as string,
   STRIPE_CANCEL_URL: (process.env.STRIPE_CANCEL_URL || `${process.env.FRONTEND_URL}/dashboard/subscription?canceled=true`) as string,
   STRIPE_CUSTOMER_PORTAL_RETURN_URL: (process.env.STRIPE_CUSTOMER_PORTAL_RETURN_URL || `${process.env.FRONTEND_URL}/dashboard/subscription`) as string,
+  MEDIA_ROOT: process.env.MEDIA_ROOT || join(process.cwd(), 'media'),
 };
 
 // Simple validation to ensure required config is present
