@@ -11,8 +11,6 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
 import { CategoriesService } from './categories.service.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
@@ -20,6 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { UserRole } from '@prisma/client';
+import { multerOptions } from '../common/utils/multer-options.js';
 
 @Controller('categories')
 export class CategoriesController {
@@ -35,18 +34,7 @@ export class CategoriesController {
   @Post('upload-icon')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.admin)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: join(process.cwd(), 'media', 'categories'),
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `icon-${uniqueSuffix}${ext}`);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file', multerOptions('categories')))
   uploadIcon(@UploadedFile() file: Express.Multer.File) {
     return {
       url: `/media/categories/${file.filename}`,
