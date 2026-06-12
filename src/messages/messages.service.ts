@@ -109,6 +109,18 @@ export class MessagesService {
     });
   }
 
+  async markAsRead(conversationId: string, userId: string) {
+    const result = await this.prisma.message.updateMany({
+      where: {
+        conversationId,
+        senderId: { not: userId },
+        isRead: false,
+      },
+      data: { isRead: true },
+    });
+    return result.count > 0;
+  }
+
   async startConversation(userId: string, participantId: string) {
     console.log(`SERVICE: Starting conversation between ${userId} and ${participantId}`);
     const user = await this.prisma.user.findUnique({ where: { id: userId } });

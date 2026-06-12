@@ -156,6 +156,28 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
     });
   }
 
+  @SubscribeMessage('mark_read')
+  async handleMarkRead(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { conversationId: string },
+  ) {
+    const userId = client.data.userId;
+    if (!data?.conversationId) return;
+    
+    try {
+      const updated = await this.messagesService.markAsRead(data.conversationId, userId);
+      if (updated) {
+        // Broadcast to the room so the sender's UI updates to show 'Seen'
+        client.to(`conv_${data.conversationId}`).emit('messages_read', { 
+          conversationId: data.conversationId, 
+          readBy: userId 
+        });
+      }
+    } catch (error) {
+      this.logger.error(`Failed to mark messages as read: ${error.message}`);
+    }
+  }
+
   @SubscribeMessage('message_action')
   async handleMessageAction(
     @ConnectedSocket() client: Socket,
