@@ -155,4 +155,27 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
       isTyping: data.isTyping,
     });
   }
+
+  @SubscribeMessage('message_action')
+  async handleMessageAction(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { action: 'pin' | 'unsend' | 'delete_for_me'; messageId: string },
+  ) {
+    const userId = client.data.userId;
+    try {
+      if (data.action === 'pin') {
+        const message = await this.messagesService.pinMessage(data.messageId, userId);
+        this.server.to(`conv_${message.conversationId}`).emit('message_updated', message);
+      } else if (data.action === 'unsend') {
+        const message = await this.messagesService.unsendMessage(data.messageId, userId);
+        this.server.to(`conv_${message.conversationId}`).emit('message_updated', message);
+      } else if (data.action === 'delete_for_me') {
+        const message = await this.messagesService.deleteMessageForMe(data.messageId, userId);
+        // Only notify the person who deleted it to remove it from their view
+        client.emit('message_deleted', { messageId: data.messageId });
+      }
+    } catch (error) {
+      this.logger.error(`Failed to perform action ${data.action} on message ${data.messageId}: ${error.message}`);
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UserRole } from '@prisma/client';
@@ -34,6 +34,11 @@ export class MessagesService {
           },
         },
         messages: {
+          where: {
+            NOT: {
+              deletedFor: { has: userId }
+            }
+          },
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
@@ -43,6 +48,9 @@ export class MessagesService {
               where: {
                 senderId: { not: userId },
                 isRead: false,
+                NOT: {
+                  deletedFor: { has: userId }
+                }
               },
             },
           },
@@ -81,7 +89,12 @@ export class MessagesService {
     });
 
     return this.prisma.message.findMany({
-      where: { conversationId },
+      where: { 
+        conversationId,
+        NOT: {
+          deletedFor: { has: userId }
+        }
+      },
       orderBy: { createdAt: 'asc' },
       include: {
         sender: {
@@ -137,6 +150,11 @@ export class MessagesService {
         },
       },
       messages: {
+        where: {
+          NOT: {
+            deletedFor: { has: userId }
+          }
+        },
         orderBy: { createdAt: 'desc' as const },
         take: 1,
       },
@@ -146,6 +164,9 @@ export class MessagesService {
             where: {
               senderId: { not: userId },
               isRead: false,
+              NOT: {
+                deletedFor: { has: userId }
+              }
             },
           },
         },
@@ -214,6 +235,86 @@ export class MessagesService {
     });
 
     return message;
+  }
+
+  async pinMessage(messageId: string, userId: string) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+      include: { conversation: true },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+    if (message.conversation.clientId !== userId && message.conversation.errandId !== userId) {
+      throw new ForbiddenException('Not authorized');
+    }
+
+    return this.prisma.message.update({
+      where: { id: messageId },
+      data: { isPinned: !message.isPinned },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
+  }
+
+  async unsendMessage(messageId: string, userId: string) {
+    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
+
+    if (!message) throw new NotFoundException('Message not found');
+    if (message.senderId !== userId) {
+      throw new ForbiddenException('You can only unsend your own messages');
+    }
+
+    return this.prisma.message.update({
+      where: { id: messageId },
+      data: { isDeleted: true, content: 'This message was unsent', metadata: {} },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteMessageForMe(messageId: string, userId: string) {
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+      include: { conversation: true },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+    if (message.conversation.clientId !== userId && message.conversation.errandId !== userId) {
+      throw new ForbiddenException('Not authorized');
+    }
+
+    const updatedDeletedFor = [...new Set([...message.deletedFor, userId])];
+
+    return this.prisma.message.update({
+      where: { id: messageId },
+      data: { deletedFor: updatedDeletedFor },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
   }
 
   async getAdminConversations() {

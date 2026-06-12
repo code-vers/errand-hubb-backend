@@ -65,6 +65,9 @@ model Message {
   type           String       @default("text") // 'text', 'image', 'voice', 'location', 'calendar'
   metadata       Json?        // For storing file URLs, audio duration, or calendar dates
   isRead         Boolean      @default(false) @map("is_read")
+  isPinned       Boolean      @default(false) @map("is_pinned")
+  isDeleted      Boolean      @default(false) @map("is_deleted")
+  deletedFor     String[]     @default([]) @map("deleted_for")
   createdAt      DateTime     @default(now()) @map("created_at")
   
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
