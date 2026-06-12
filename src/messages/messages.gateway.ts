@@ -12,10 +12,12 @@ import { JwtService } from '@nestjs/jwt';
 import { MessagesService } from './messages.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UsePipes, ValidationPipe, Logger } from '@nestjs/common';
+import { config } from '../config/config.js';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
+    credentials: true,
   },
   namespace: 'messages',
 })
@@ -33,24 +35,39 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   async handleConnection(client: Socket) {
     try {
-      let token = client.handshake.auth.token || client.handshake.headers.authorization?.split(' ')[1];
+      this.logger.debug(`Connection attempt from: ${client.id}`);
+      
+      let token = client.handshake.auth?.token || client.handshake.headers.authorization?.split(' ')[1];
 
       if (!token && client.handshake.headers.cookie) {
-        const cookies = client.handshake.headers.cookie.split('; ');
+        // More robust cookie parsing
+        const cookieHeader = client.handshake.headers.cookie;
+        const cookies = cookieHeader.split(/;\s*/);
         const accessTokenCookie = cookies.find(c => c.startsWith('access_token='));
         if (accessTokenCookie) {
-          token = accessTokenCookie.split('=')[1];
+          token = accessTokenCookie.substring('access_token='.length);
         }
       }
 
       if (!token) {
+        this.logger.warn(`Connection rejected: No token provided for client ${client.id}`);
         client.disconnect();
         return;
       }
 
-      const payload = await this.jwtService.verifyAsync(token);
+      // Explicitly provide secret to verifyAsync to avoid "secret or public key must be provided" error
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: config.JWT_SECRET,
+      });
+      
       const userId = payload.sub || payload.id;
       
+      if (!userId) {
+        this.logger.warn(`Connection rejected: Invalid token payload for client ${client.id}`);
+        client.disconnect();
+        return;
+      }
+
       this.connectedUsers.set(userId, client.id);
       client.data.userId = userId;
       client.data.user = payload;
@@ -58,9 +75,9 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.logger.log(`Client connected: ${userId} (${client.id})`);
       
       // Join a room for this user to receive personal notifications
-      client.join(`user_${userId}`);
+      await client.join(`user_${userId}`);
     } catch (error) {
-      this.logger.error(`Connection error: ${error.message}`);
+      this.logger.error(`Connection error for client ${client.id}: ${error.message}`);
       client.disconnect();
     }
   }
@@ -74,20 +91,26 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   @SubscribeMessage('join_conversation')
-  handleJoinConversation(
+  async handleJoinConversation(
     @ConnectedSocket() client: Socket,
     @MessageBody('conversationId') conversationId: string,
   ) {
-    client.join(`conv_${conversationId}`);
+    if (!conversationId) return { error: 'Conversation ID is required' };
+    
+    await client.join(`conv_${conversationId}`);
+    this.logger.debug(`User ${client.data.userId} joined conversation: ${conversationId}`);
     return { status: 'joined', conversationId };
   }
 
   @SubscribeMessage('leave_conversation')
-  handleLeaveConversation(
+  async handleLeaveConversation(
     @ConnectedSocket() client: Socket,
     @MessageBody('conversationId') conversationId: string,
   ) {
-    client.leave(`conv_${conversationId}`);
+    if (!conversationId) return { error: 'Conversation ID is required' };
+    
+    await client.leave(`conv_${conversationId}`);
+    this.logger.debug(`User ${client.data.userId} left conversation: ${conversationId}`);
     return { status: 'left', conversationId };
   }
 
@@ -98,20 +121,24 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
     @MessageBody() dto: CreateMessageDto,
   ) {
     const userId = client.data.userId;
+    this.logger.debug(`Message from ${userId} to conversation ${dto.conversationId}`);
+    
     const message = await this.messagesService.createMessage(userId, dto);
 
-    // Broadcast to the conversation room
+    // Broadcast to the conversation room (including the sender)
     this.server.to(`conv_${dto.conversationId}`).emit('new_message', message);
     
     // Also notify the recipient if they're not in the conversation room
     const conversation = await this.messagesService.findConversation(dto.conversationId);
-    const recipientId = conversation.clientId === userId ? conversation.errandId : conversation.clientId;
-    
-    this.server.to(`user_${recipientId}`).emit('message_notification', {
-      conversationId: dto.conversationId,
-      senderName: `${client.data.user.firstName} ${client.data.user.lastName}`,
-      content: dto.content,
-    });
+    if (conversation) {
+      const recipientId = conversation.clientId === userId ? conversation.errandId : conversation.clientId;
+      
+      this.server.to(`user_${recipientId}`).emit('message_notification', {
+        conversationId: dto.conversationId,
+        senderName: `${client.data.user.firstName || 'Someone'} ${client.data.user.lastName || ''}`,
+        content: dto.content,
+      });
+    }
 
     return message;
   }
