@@ -53,7 +53,7 @@ export class MessagesService {
 
     return conversations.map(conv => ({
       ...conv,
-      unreadCount: conv._count.messages,
+      unreadCount: conv._count?.messages || 0,
     }));
   }
 
@@ -174,7 +174,7 @@ export class MessagesService {
     };
   }
 
-  async createMessage(senderId: string, dto: CreateMessageDto) {
+  async createMessage(senderId: string, dto: CreateMessageDto & { type?: string; metadata?: any }) {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id: dto.conversationId },
     });
@@ -192,6 +192,8 @@ export class MessagesService {
         conversationId: dto.conversationId,
         senderId: senderId,
         content: dto.content,
+        type: dto.type || 'text',
+        metadata: dto.metadata || {},
       },
       include: {
         sender: {

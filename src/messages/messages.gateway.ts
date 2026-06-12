@@ -118,10 +118,10 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
   @UsePipes(new ValidationPipe())
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() dto: CreateMessageDto,
+    @MessageBody() dto: CreateMessageDto & { type?: string; metadata?: any },
   ) {
     const userId = client.data.userId;
-    this.logger.debug(`Message from ${userId} to conversation ${dto.conversationId}`);
+    this.logger.debug(`Message from ${userId} to conversation ${dto.conversationId} of type ${dto.type || 'text'}`);
     
     const message = await this.messagesService.createMessage(userId, dto);
 
@@ -136,7 +136,8 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.server.to(`user_${recipientId}`).emit('message_notification', {
         conversationId: dto.conversationId,
         senderName: `${client.data.user.firstName || 'Someone'} ${client.data.user.lastName || ''}`,
-        content: dto.content,
+        content: dto.type === 'text' ? dto.content : `Sent a ${dto.type}`,
+        type: dto.type || 'text',
       });
     }
 
