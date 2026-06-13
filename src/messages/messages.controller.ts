@@ -6,6 +6,8 @@ import {
   Param,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -13,6 +15,8 @@ import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { StartConversationDto } from './dto/start-conversation.dto.js';
 import { UserRole } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '../common/utils/multer-options.js';
 
 @Controller('messages')
 @UseGuards(JwtAuthGuard)
@@ -32,6 +36,16 @@ export class MessagesController {
   @Post('conversations')
   startConversation(@Body() dto: StartConversationDto, @Request() req) {
     return this.messagesService.startConversation(req.user.sub || req.user.id, dto.participantId);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', multerOptions('chat')))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return {
+      url: `/media/chat/${file.filename}`,
+      mimetype: file.mimetype,
+      size: file.size,
+    };
   }
 
   @Get('admin/conversations')
