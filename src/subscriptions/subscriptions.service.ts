@@ -55,6 +55,7 @@ export class SubscriptionsService {
         mode: 'subscription',
         success_url: config.STRIPE_SUCCESS_URL,
         cancel_url: config.STRIPE_CANCEL_URL,
+        metadata: { userId: user.id },
         subscription_data: { metadata: { userId: user.id } },
       });
       return { url: session.url };
