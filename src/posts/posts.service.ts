@@ -15,6 +15,20 @@ export class PostsService {
   async create(userId: string, createPostDto: CreatePostDto) {
     const { categoryId, budget, dateNeeded, ...rest } = createPostDto;
 
+    // Check if user already has an active post to prevent duplicates
+    const existingPost = await this.prisma.post.findFirst({
+      where: { userId, status: 'active' },
+    });
+
+    if (existingPost) {
+      return this.update(existingPost.id, userId, {
+        ...rest,
+        categoryId,
+        budget,
+        dateNeeded,
+      } as any);
+    }
+
     return this.prisma.post.create({
       data: {
         ...rest,

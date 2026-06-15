@@ -61,31 +61,47 @@ export class UsersService {
   }
 
   async findAllErrands() {
-    return this.prisma.user.findMany({
+    // Fetch all posts from errand users with active subscriptions
+    const posts = await this.prisma.post.findMany({
       where: {
-        role: 'errand',
-        status: {
-          in: ['active', 'pending'],
-        },
-        subscription: {
-          status: {
-            in: ['active', 'trialing'],
+        user: {
+          role: 'errand',
+          status: 'active',
+          subscription: {
+            status: {
+              in: ['active', 'trialing'],
+            },
           },
         },
+        status: 'active',
       },
       include: {
-        profile: true,
-        posts: {
-          orderBy: {
-            createdAt: 'desc',
+        category: true,
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            profileImage: true,
+            profile: true,
           },
-          take: 1,
         },
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
+
+    // Filter to keep only the latest post per user
+    const uniquePostsMap = new Map();
+    for (const post of posts) {
+      if (!uniquePostsMap.has(post.userId)) {
+        uniquePostsMap.set(post.userId, post);
+      }
+    }
+
+    return Array.from(uniquePostsMap.values());
   }
 
   async createUser(data: Prisma.UserCreateInput) {
