@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UserRole } from '@prisma/client';
@@ -8,9 +13,8 @@ export class MessagesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getConversations(userId: string, role: string) {
-    const where = role === UserRole.client 
-      ? { clientId: userId } 
-      : { errandId: userId };
+    const where =
+      role === UserRole.client ? { clientId: userId } : { errandId: userId };
 
     const conversations = await this.prisma.conversation.findMany({
       where,
@@ -36,8 +40,8 @@ export class MessagesService {
         messages: {
           where: {
             NOT: {
-              deletedFor: { has: userId }
-            }
+              deletedFor: { has: userId },
+            },
           },
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -49,8 +53,8 @@ export class MessagesService {
                 senderId: { not: userId },
                 isRead: false,
                 NOT: {
-                  deletedFor: { has: userId }
-                }
+                  deletedFor: { has: userId },
+                },
               },
             },
           },
@@ -59,7 +63,7 @@ export class MessagesService {
       orderBy: { updatedAt: 'desc' },
     });
 
-    return conversations.map(conv => ({
+    return conversations.map((conv) => ({
       ...conv,
       unreadCount: conv._count?.messages || 0,
     }));
@@ -89,11 +93,11 @@ export class MessagesService {
     });
 
     return this.prisma.message.findMany({
-      where: { 
+      where: {
         conversationId,
         NOT: {
-          deletedFor: { has: userId }
-        }
+          deletedFor: { has: userId },
+        },
       },
       orderBy: { createdAt: 'asc' },
       include: {
@@ -122,9 +126,13 @@ export class MessagesService {
   }
 
   async startConversation(userId: string, participantId: string) {
-    console.log(`SERVICE: Starting conversation between ${userId} and ${participantId}`);
+    console.log(
+      `SERVICE: Starting conversation between ${userId} and ${participantId}`,
+    );
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const participant = await this.prisma.user.findUnique({ where: { id: participantId } });
+    const participant = await this.prisma.user.findUnique({
+      where: { id: participantId },
+    });
 
     if (!user || !participant) {
       throw new NotFoundException('User or participant not found');
@@ -135,11 +143,16 @@ export class MessagesService {
     if (user.role === UserRole.client && participant.role === UserRole.errand) {
       clientId = userId;
       errandId = participantId;
-    } else if (user.role === UserRole.errand && participant.role === UserRole.client) {
+    } else if (
+      user.role === UserRole.errand &&
+      participant.role === UserRole.client
+    ) {
       clientId = participantId;
       errandId = userId;
     } else {
-      throw new ForbiddenException('Conversations must be between a Client and an Errand professional');
+      throw new ForbiddenException(
+        'Conversations must be between a Client and an Errand professional',
+      );
     }
 
     const include = {
@@ -164,8 +177,8 @@ export class MessagesService {
       messages: {
         where: {
           NOT: {
-            deletedFor: { has: userId }
-          }
+            deletedFor: { has: userId },
+          },
         },
         orderBy: { createdAt: 'desc' as const },
         take: 1,
@@ -177,8 +190,8 @@ export class MessagesService {
               senderId: { not: userId },
               isRead: false,
               NOT: {
-                deletedFor: { has: userId }
-              }
+                deletedFor: { has: userId },
+              },
             },
           },
         },
@@ -194,7 +207,9 @@ export class MessagesService {
     });
 
     if (!conversation) {
-      console.log(`SERVICE: Creating new conversation for ${clientId} and ${errandId}`);
+      console.log(
+        `SERVICE: Creating new conversation for ${clientId} and ${errandId}`,
+      );
       conversation = await this.prisma.conversation.create({
         data: { clientId, errandId },
         include,
@@ -207,7 +222,10 @@ export class MessagesService {
     };
   }
 
-  async createMessage(senderId: string, dto: CreateMessageDto & { type?: string; metadata?: any }) {
+  async createMessage(
+    senderId: string,
+    dto: CreateMessageDto & { type?: string; metadata?: any },
+  ) {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id: dto.conversationId },
     });
@@ -216,8 +234,13 @@ export class MessagesService {
       throw new NotFoundException('Conversation not found');
     }
 
-    if (conversation.clientId !== senderId && conversation.errandId !== senderId) {
-      throw new ForbiddenException('Not authorized to send message in this conversation');
+    if (
+      conversation.clientId !== senderId &&
+      conversation.errandId !== senderId
+    ) {
+      throw new ForbiddenException(
+        'Not authorized to send message in this conversation',
+      );
     }
 
     const message = await this.prisma.message.create({
@@ -256,7 +279,10 @@ export class MessagesService {
     });
 
     if (!message) throw new NotFoundException('Message not found');
-    if (message.conversation.clientId !== userId && message.conversation.errandId !== userId) {
+    if (
+      message.conversation.clientId !== userId &&
+      message.conversation.errandId !== userId
+    ) {
       throw new ForbiddenException('Not authorized');
     }
 
@@ -277,7 +303,9 @@ export class MessagesService {
   }
 
   async unsendMessage(messageId: string, userId: string) {
-    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
 
     if (!message) throw new NotFoundException('Message not found');
     if (message.senderId !== userId) {
@@ -286,7 +314,11 @@ export class MessagesService {
 
     return this.prisma.message.update({
       where: { id: messageId },
-      data: { isDeleted: true, content: 'This message was unsent', metadata: {} },
+      data: {
+        isDeleted: true,
+        content: 'This message was unsent',
+        metadata: {},
+      },
       include: {
         sender: {
           select: {
@@ -307,7 +339,10 @@ export class MessagesService {
     });
 
     if (!message) throw new NotFoundException('Message not found');
-    if (message.conversation.clientId !== userId && message.conversation.errandId !== userId) {
+    if (
+      message.conversation.clientId !== userId &&
+      message.conversation.errandId !== userId
+    ) {
       throw new ForbiddenException('Not authorized');
     }
 

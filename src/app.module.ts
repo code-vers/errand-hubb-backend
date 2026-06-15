@@ -16,7 +16,7 @@ import { config } from './config/config.js';
 
 @Module({
   imports: [
-    PrismaModule, 
+    PrismaModule,
     AuthModule,
     PostsModule,
     CategoriesModule,
@@ -25,23 +25,24 @@ import { config } from './config/config.js';
     SubscriptionsModule,
     WebhooksModule,
     MessagesModule,
-    ThrottlerModule.forRoot([{
-      name: 'short',
-      ttl: 60000, // 1 minute
-      limit: 100, // Increased default
-    }, {
-      name: 'medium',
-      ttl: 900000, // 15 minutes
-      limit: 1000, // Increased default
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 60000, // 1 minute
+        limit: 100, // Increased default
+      },
+      {
+        name: 'medium',
+        ttl: 900000, // 15 minutes
+        limit: 1000, // Increased default
+      },
+    ]),
     ServeStaticModule.forRoot({
       rootPath: config.MEDIA_ROOT,
       serveRoot: '/media',
     }),
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

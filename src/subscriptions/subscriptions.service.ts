@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { config } from '../config/config.js';
 import Stripe from 'stripe';
@@ -20,7 +25,10 @@ export class SubscriptionsService {
     });
 
     if (!user) throw new NotFoundException('User not found');
-    if (user.role !== 'errand') throw new BadRequestException('Only Errand users can subscribe to this plan.');
+    if (user.role !== 'errand')
+      throw new BadRequestException(
+        'Only Errand users can subscribe to this plan.',
+      );
 
     let customerId = user.subscription?.stripeCustomerId;
 
@@ -34,7 +42,7 @@ export class SubscriptionsService {
 
       await this.prisma.subscription.upsert({
         where: { userId },
-        create: { userId, stripeCustomerId: customerId, amount: 5.00 },
+        create: { userId, stripeCustomerId: customerId, amount: 5.0 },
         update: { stripeCustomerId: customerId },
       });
     }
@@ -56,20 +64,25 @@ export class SubscriptionsService {
   }
 
   async getMySubscription(userId: string) {
-    const sub = await this.prisma.subscription.findUnique({ where: { userId } });
+    const sub = await this.prisma.subscription.findUnique({
+      where: { userId },
+    });
     if (!sub) return { status: 'none', isSubscribed: false };
     const isActive = ['active', 'trialing'].includes(sub.status);
     return { ...sub, isSubscribed: isActive };
   }
 
   async cancelSubscription(userId: string) {
-    const sub = await this.prisma.subscription.findUnique({ where: { userId } });
-    if (!sub || !sub.stripeSubscriptionId) throw new BadRequestException('No active subscription found.');
+    const sub = await this.prisma.subscription.findUnique({
+      where: { userId },
+    });
+    if (!sub || !sub.stripeSubscriptionId)
+      throw new BadRequestException('No active subscription found.');
 
     try {
       const updatedSubscription = await this.stripe.subscriptions.update(
         sub.stripeSubscriptionId,
-        { cancel_at_period_end: true }
+        { cancel_at_period_end: true },
       );
       return await this.prisma.subscription.update({
         where: { id: sub.id },
@@ -84,8 +97,11 @@ export class SubscriptionsService {
   }
 
   async createCustomerPortal(userId: string) {
-    const sub = await this.prisma.subscription.findUnique({ where: { userId } });
-    if (!sub || !sub.stripeCustomerId) throw new BadRequestException('No Stripe customer found.');
+    const sub = await this.prisma.subscription.findUnique({
+      where: { userId },
+    });
+    if (!sub || !sub.stripeCustomerId)
+      throw new BadRequestException('No Stripe customer found.');
 
     try {
       const session = await this.stripe.billingPortal.sessions.create({
@@ -118,7 +134,11 @@ export class SubscriptionsService {
     const [data, total] = await Promise.all([
       this.prisma.subscription.findMany({
         where,
-        include: { user: { select: { id: true, email: true, firstName: true, lastName: true } } },
+        include: {
+          user: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
+        },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -126,14 +146,19 @@ export class SubscriptionsService {
       this.prisma.subscription.count({ where }),
     ]);
 
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async getSubscriptionDetails(id: string) {
     const sub = await this.prisma.subscription.findUnique({
       where: { id },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        user: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
         paymentHistories: { orderBy: { createdAt: 'desc' } },
       },
     });
@@ -148,7 +173,11 @@ export class SubscriptionsService {
 
     const [data, total] = await Promise.all([
       this.prisma.paymentHistory.findMany({
-        include: { user: { select: { id: true, email: true, firstName: true, lastName: true } } },
+        include: {
+          user: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
+        },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -156,13 +185,20 @@ export class SubscriptionsService {
       this.prisma.paymentHistory.count(),
     ]);
 
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async getPaymentDetails(id: string) {
     const payment = await this.prisma.paymentHistory.findUnique({
       where: { id },
-      include: { user: { select: { id: true, email: true, firstName: true, lastName: true } } },
+      include: {
+        user: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
+      },
     });
     if (!payment) throw new NotFoundException('Payment not found');
     return payment;

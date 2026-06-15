@@ -42,17 +42,17 @@ export class PostsController {
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
     @Query('status') status?: string,
   ) {
-    return this.postsService.findAll({ 
-      categoryId, 
-      location, 
-      search, 
-      minBudget, 
-      maxBudget, 
-      page, 
-      limit, 
-      sortBy, 
+    return this.postsService.findAll({
+      categoryId,
+      location,
+      search,
+      minBudget,
+      maxBudget,
+      page,
+      limit,
+      sortBy,
       sortOrder,
-      status
+      status,
     });
   }
 
@@ -97,24 +97,21 @@ export class PostsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.postsService.findAll({ 
-      categoryId, 
-      search, 
+    return this.postsService.findAll({
+      categoryId,
+      search,
       status,
-      page, 
+      page,
       limit,
       sortBy: 'createdAt',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     });
   }
 
   @Patch('admin/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  adminUpdate(
-    @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto,
-  ) {
+  adminUpdate(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.adminUpdate(id, updatePostDto);
   }
 

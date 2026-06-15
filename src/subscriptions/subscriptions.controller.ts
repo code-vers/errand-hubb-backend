@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Request, UseGuards, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+  Query,
+  Param,
+} from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
@@ -9,25 +17,33 @@ export class SubscriptionsController {
   @UseGuards(JwtAuthGuard)
   @Post('create-checkout-session')
   createCheckoutSession(@Request() req: any) {
-    return this.subscriptionsService.createCheckoutSession(req.user.id || req.user.sub);
+    return this.subscriptionsService.createCheckoutSession(
+      req.user.id || req.user.sub,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMySubscription(@Request() req: any) {
-    return this.subscriptionsService.getMySubscription(req.user.id || req.user.sub);
+    return this.subscriptionsService.getMySubscription(
+      req.user.id || req.user.sub,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('cancel')
   cancelSubscription(@Request() req: any) {
-    return this.subscriptionsService.cancelSubscription(req.user.id || req.user.sub);
+    return this.subscriptionsService.cancelSubscription(
+      req.user.id || req.user.sub,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('customer-portal')
   createCustomerPortal(@Request() req: any) {
-    return this.subscriptionsService.createCustomerPortal(req.user.id || req.user.sub);
+    return this.subscriptionsService.createCustomerPortal(
+      req.user.id || req.user.sub,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

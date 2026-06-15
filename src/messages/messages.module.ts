@@ -5,9 +5,7 @@ import { MessagesController } from './messages.controller.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
-  imports: [
-    PrismaModule,
-  ],
+  imports: [PrismaModule],
   controllers: [MessagesController],
   providers: [MessagesService, MessagesGateway],
   exports: [MessagesService],

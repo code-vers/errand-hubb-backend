@@ -9,7 +9,7 @@ export class WebhooksService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
 
   async handleStripeEvent(event: Stripe.Event) {
@@ -57,10 +57,12 @@ export class WebhooksService {
       return { received: true };
     } catch (error: any) {
       this.logger.error('Error processing webhook:', error);
-      await this.prisma.webhookEvent.update({
-        where: { stripeEventId: event.id },
-        data: { processingError: error.message },
-      }).catch(() => null);
+      await this.prisma.webhookEvent
+        .update({
+          where: { stripeEventId: event.id },
+          data: { processingError: error.message },
+        })
+        .catch(() => null);
       throw error;
     }
   }
@@ -79,20 +81,20 @@ export class WebhooksService {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             status: 'active',
-            amount: 5.00,
+            amount: 5.0,
           },
           update: {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             status: 'active',
           },
-          include: { user: true }
+          include: { user: true },
         });
 
         await this.mailService.sendSubscriptionEmail(
           sub.user.email,
           sub.user.firstName,
-          'started'
+          'started',
         );
       }
     }
@@ -102,29 +104,43 @@ export class WebhooksService {
     const customerId = subscription.customer as string;
     const existingSub = await this.prisma.subscription.findUnique({
       where: { stripeCustomerId: customerId },
-      include: { user: true }
+      include: { user: true },
     });
 
     if (existingSub) {
-      const isNewlyCanceled = subscription.status === 'canceled' && existingSub.status !== 'canceled';
-      const isNewlyCancelingSoon = subscription.cancel_at_period_end && !existingSub.cancelAtPeriodEnd;
+      const isNewlyCanceled =
+        subscription.status === 'canceled' && existingSub.status !== 'canceled';
+      const isNewlyCancelingSoon =
+        subscription.cancel_at_period_end && !existingSub.cancelAtPeriodEnd;
 
       await this.prisma.subscription.update({
         where: { id: existingSub.id },
         data: {
           stripeSubscriptionId: subscription.id,
           status: subscription.status as any,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
+          currentPeriodStart: new Date(
+            subscription.current_period_start * 1000,
+          ),
           currentPeriodEnd: new Date(subscription.current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
-          canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+          canceledAt: subscription.canceled_at
+            ? new Date(subscription.canceled_at * 1000)
+            : null,
         },
       });
 
       if (isNewlyCanceled) {
-        await this.mailService.sendSubscriptionEmail(existingSub.user.email, existingSub.user.firstName, 'canceled');
+        await this.mailService.sendSubscriptionEmail(
+          existingSub.user.email,
+          existingSub.user.firstName,
+          'canceled',
+        );
       } else if (isNewlyCancelingSoon) {
-        await this.mailService.sendSubscriptionEmail(existingSub.user.email, existingSub.user.firstName, 'canceling_soon');
+        await this.mailService.sendSubscriptionEmail(
+          existingSub.user.email,
+          existingSub.user.firstName,
+          'canceling_soon',
+        );
       }
     }
   }
@@ -134,7 +150,7 @@ export class WebhooksService {
       const customerId = invoice.customer as string;
       const sub = await this.prisma.subscription.findUnique({
         where: { stripeCustomerId: customerId },
-        include: { user: true }
+        include: { user: true },
       });
 
       if (sub) {
@@ -157,10 +173,13 @@ export class WebhooksService {
 
         if (invoice.billing_reason === 'subscription_cycle') {
           await this.mailService.sendSubscriptionEmail(
-            sub.user.email, 
-            sub.user.firstName, 
-            'succeeded', 
-            { amount: invoice.amount_paid / 100, invoiceUrl: invoice.hosted_invoice_url }
+            sub.user.email,
+            sub.user.firstName,
+            'succeeded',
+            {
+              amount: invoice.amount_paid / 100,
+              invoiceUrl: invoice.hosted_invoice_url,
+            },
           );
         }
       }
@@ -172,7 +191,7 @@ export class WebhooksService {
       const customerId = invoice.customer as string;
       const sub = await this.prisma.subscription.findUnique({
         where: { stripeCustomerId: customerId },
-        include: { user: true }
+        include: { user: true },
       });
 
       if (sub) {
@@ -193,10 +212,10 @@ export class WebhooksService {
         });
 
         await this.mailService.sendSubscriptionEmail(
-          sub.user.email, 
-          sub.user.firstName, 
-          'failed', 
-          { invoiceUrl: invoice.hosted_invoice_url }
+          sub.user.email,
+          sub.user.firstName,
+          'failed',
+          { invoiceUrl: invoice.hosted_invoice_url },
         );
       }
     }

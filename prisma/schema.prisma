@@ -106,6 +106,7 @@ model Profile {
   visibility       VisibilityStatus @default(public)
   ratePerHour      Decimal?         @map("rate_per_hour") @db.Decimal(10, 2)
   services         String?
+  youtubeLink      String?          @map("youtube_link")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
