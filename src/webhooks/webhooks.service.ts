@@ -13,13 +13,15 @@ export class WebhooksService {
   ) {}
 
   async handleStripeEvent(event: Stripe.Event) {
+    this.logger.log(`Processing Stripe Event: ${event.type} (${event.id})`);
+
     try {
       const existingEvent = await this.prisma.webhookEvent.findUnique({
         where: { stripeEventId: event.id },
       });
 
       if (existingEvent) {
-        this.logger.log('Event already processed. Skipping.');
+        this.logger.log(`Event ${event.id} already processed. Skipping.`);
         return { received: true };
       }
 
@@ -54,9 +56,10 @@ export class WebhooksService {
         data: { processed: true },
       });
 
+      this.logger.log(`Successfully processed event: ${event.type}`);
       return { received: true };
     } catch (error: any) {
-      this.logger.error('Error processing webhook:', error);
+      this.logger.error(`Error processing webhook ${event.type}:`, error.message);
       await this.prisma.webhookEvent
         .update({
           where: { stripeEventId: event.id },
@@ -68,40 +71,73 @@ export class WebhooksService {
   }
 
   private async handleCheckoutSessionCompleted(session: any) {
+    this.logger.log(`Handling checkout.session.completed for session: ${session.id}`);
+    
     if (session.mode === 'subscription' && session.subscription) {
       const customerId = session.customer as string;
       const subscriptionId = session.subscription as string;
-      const userId = session.subscription_data?.metadata?.userId;
+      
+      // Try to get userId from session metadata (added in fix) 
+      // or fall back to subscription_data metadata if it exists in the raw object
+      const userId = (session.metadata?.userId || (session as any).subscription_data?.metadata?.userId) as string;
+
+      this.logger.log(`Metadata check - userId: ${userId}, customerId: ${customerId}`);
 
       if (userId) {
-        const sub = await this.prisma.subscription.upsert({
-          where: { userId },
-          create: {
-            userId,
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            status: 'active',
-            amount: 5.0,
-          },
-          update: {
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            status: 'active',
-          },
-          include: { user: true },
-        });
+        try {
+          const sub = await this.prisma.subscription.upsert({
+            where: { userId },
+            create: {
+              userId,
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: subscriptionId,
+              status: 'active',
+              amount: 5.0,
+            },
+            update: {
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: subscriptionId,
+              status: 'active',
+            },
+            include: { user: true },
+          });
 
-        await this.mailService.sendSubscriptionEmail(
-          sub.user.email,
-          sub.user.firstName,
-          'started',
-        );
+          this.logger.log(`Subscription updated for user ${userId}: active`);
+
+          await this.mailService.sendSubscriptionEmail(
+            sub.user.email,
+            sub.user.firstName,
+            'started',
+          );
+        } catch (dbError: any) {
+          this.logger.error(`Database error in handleCheckoutSessionCompleted: ${dbError.message}`);
+          throw dbError;
+        }
+      } else {
+        this.logger.warn(`No userId found in session metadata for session ${session.id}`);
+        // Attempt to find by customerId if userId is missing
+        const existingSub = await this.prisma.subscription.findUnique({
+          where: { stripeCustomerId: customerId },
+        });
+        
+        if (existingSub) {
+          this.logger.log(`Found existing subscription by customerId ${customerId}. Updating.`);
+          await this.prisma.subscription.update({
+            where: { id: existingSub.id },
+            data: {
+              stripeSubscriptionId: subscriptionId,
+              status: 'active',
+            },
+          });
+        }
       }
     }
   }
 
   private async handleSubscriptionUpdated(subscription: any) {
     const customerId = subscription.customer as string;
+    this.logger.log(`Handling subscription event for customer: ${customerId}, status: ${subscription.status}`);
+    
     const existingSub = await this.prisma.subscription.findUnique({
       where: { stripeCustomerId: customerId },
       include: { user: true },
@@ -129,6 +165,8 @@ export class WebhooksService {
         },
       });
 
+      this.logger.log(`Subscription ${subscription.id} updated in DB. Status: ${subscription.status}`);
+
       if (isNewlyCanceled) {
         await this.mailService.sendSubscriptionEmail(
           existingSub.user.email,
@@ -142,6 +180,8 @@ export class WebhooksService {
           'canceling_soon',
         );
       }
+    } else {
+      this.logger.warn(`No subscription record found for customerId: ${customerId}`);
     }
   }
 
@@ -170,6 +210,8 @@ export class WebhooksService {
             billingReason: invoice.billing_reason,
           },
         });
+
+        this.logger.log(`Payment history created for user ${sub.userId}, invoice ${invoice.id}`);
 
         if (invoice.billing_reason === 'subscription_cycle') {
           await this.mailService.sendSubscriptionEmail(
@@ -210,6 +252,8 @@ export class WebhooksService {
             billingReason: invoice.billing_reason,
           },
         });
+
+        this.logger.warn(`Payment failed for user ${sub.userId}, invoice ${invoice.id}`);
 
         await this.mailService.sendSubscriptionEmail(
           sub.user.email,
