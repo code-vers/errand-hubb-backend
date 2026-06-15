@@ -44,6 +44,10 @@ export class RegisterErrandDto {
   @IsOptional()
   services?: string;
 
+  @IsString()
+  @IsOptional()
+  youtubeLink?: string;
+
   @IsNumberString()
   @IsOptional()
   rate?: string;

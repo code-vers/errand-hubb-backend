@@ -24,7 +24,9 @@ async function bootstrap() {
       exceptionFactory: (errors) => {
         const result = errors.map((error) => ({
           property: error.property,
-          message: error.constraints ? Object.values(error.constraints)[0] : 'Invalid value',
+          message: error.constraints
+            ? Object.values(error.constraints)[0]
+            : 'Invalid value',
         }));
         return new BadRequestException(result);
       },
@@ -44,7 +46,7 @@ async function bootstrap() {
   console.log(`SERVER: -----------------------------------------`);
   console.log(`SERVER: Current Working Directory: ${process.cwd()}`);
   console.log(`SERVER: Static Files (MEDIA_ROOT): ${mediaRoot}`);
-  
+
   try {
     if (!fs.existsSync(mediaRoot)) {
       console.log(`SERVER: Media directory missing, creating at ${mediaRoot}`);
@@ -69,7 +71,11 @@ async function bootstrap() {
         'http://localhost:5173',
         'https://errand-hubb.vercel.app',
       ];
-      if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.startsWith('http://localhost:')
+      ) {
         callback(null, true);
       } else {
         callback(null, true); // Fallback to true for debugging, change to error in strict prod
@@ -81,6 +87,8 @@ async function bootstrap() {
   });
 
   await app.listen(config.PORT);
-  console.log(`Application is running on: http://localhost:${config.PORT}/api/v1`);
+  console.log(
+    `Application is running on: http://localhost:${config.PORT}/api/v1`,
+  );
 }
 bootstrap();

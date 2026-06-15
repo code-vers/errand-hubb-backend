@@ -24,9 +24,13 @@ export const config = {
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
   STRIPE_MONTHLY_PRICE_ID: process.env.STRIPE_MONTHLY_PRICE_ID as string,
   STRIPE_CURRENCY: (process.env.STRIPE_CURRENCY || 'usd') as string,
-  STRIPE_SUCCESS_URL: (process.env.STRIPE_SUCCESS_URL || `${process.env.FRONTEND_URL}/dashboard/subscription?success=true`) as string,
-  STRIPE_CANCEL_URL: (process.env.STRIPE_CANCEL_URL || `${process.env.FRONTEND_URL}/dashboard/subscription?canceled=true`) as string,
-  STRIPE_CUSTOMER_PORTAL_RETURN_URL: (process.env.STRIPE_CUSTOMER_PORTAL_RETURN_URL || `${process.env.FRONTEND_URL}/dashboard/subscription`) as string,
+  STRIPE_SUCCESS_URL: (process.env.STRIPE_SUCCESS_URL ||
+    `${process.env.FRONTEND_URL}/dashboard/subscription?success=true`) as string,
+  STRIPE_CANCEL_URL: (process.env.STRIPE_CANCEL_URL ||
+    `${process.env.FRONTEND_URL}/dashboard/subscription?canceled=true`) as string,
+  STRIPE_CUSTOMER_PORTAL_RETURN_URL: (process.env
+    .STRIPE_CUSTOMER_PORTAL_RETURN_URL ||
+    `${process.env.FRONTEND_URL}/dashboard/subscription`) as string,
   MEDIA_ROOT: process.env.MEDIA_ROOT || join(process.cwd(), 'media'),
 };
 

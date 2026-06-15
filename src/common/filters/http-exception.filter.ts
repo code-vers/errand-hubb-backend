@@ -30,9 +30,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
       const res = exceptionResponse as any;
-      
+
       // Handle the custom structure from our ValidationPipe exceptionFactory
-      if (Array.isArray(res.message) && res.message.length > 0 && typeof res.message[0] === 'object') {
+      if (
+        Array.isArray(res.message) &&
+        res.message.length > 0 &&
+        typeof res.message[0] === 'object'
+      ) {
         message = 'Validation failed';
         errors = res.message; // This is our [{ property, message }] array
       } else {

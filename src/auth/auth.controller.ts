@@ -84,7 +84,11 @@ export class AuthController {
     @Request() req: any,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.verifyTwoFactorLogin(dto.userId, dto.code, req);
+    const result = await this.authService.verifyTwoFactorLogin(
+      dto.userId,
+      dto.code,
+      req,
+    );
 
     if (result && 'accessToken' in result) {
       // Set cookie

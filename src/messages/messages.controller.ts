@@ -25,17 +25,26 @@ export class MessagesController {
 
   @Get('conversations')
   getConversations(@Request() req) {
-    return this.messagesService.getConversations(req.user.sub || req.user.id, req.user.role);
+    return this.messagesService.getConversations(
+      req.user.sub || req.user.id,
+      req.user.role,
+    );
   }
 
   @Get('conversations/:id/messages')
   getMessages(@Param('id') conversationId: string, @Request() req) {
-    return this.messagesService.getMessages(conversationId, req.user.sub || req.user.id);
+    return this.messagesService.getMessages(
+      conversationId,
+      req.user.sub || req.user.id,
+    );
   }
 
   @Post('conversations')
   startConversation(@Body() dto: StartConversationDto, @Request() req) {
-    return this.messagesService.startConversation(req.user.sub || req.user.id, dto.participantId);
+    return this.messagesService.startConversation(
+      req.user.sub || req.user.id,
+      dto.participantId,
+    );
   }
 
   @Post('upload')

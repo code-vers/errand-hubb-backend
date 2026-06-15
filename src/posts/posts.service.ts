@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
@@ -35,9 +39,9 @@ export class PostsService {
     });
   }
 
-  async findAll(query: { 
-    categoryId?: string; 
-    location?: string; 
+  async findAll(query: {
+    categoryId?: string;
+    location?: string;
     search?: string;
     minBudget?: string;
     maxBudget?: string;
@@ -47,7 +51,16 @@ export class PostsService {
     sortOrder?: 'asc' | 'desc';
     status?: string;
   }) {
-    const { categoryId, location, search, minBudget, maxBudget, sortBy = 'createdAt', sortOrder = 'desc', status } = query;
+    const {
+      categoryId,
+      location,
+      search,
+      minBudget,
+      maxBudget,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      status,
+    } = query;
 
     const page = Math.max(1, parseInt(query.page || '1', 10));
     const limit = Math.max(1, parseInt(query.limit || '10', 10));
@@ -160,13 +173,14 @@ export class PostsService {
   async findByUser(userId: string) {
     return this.prisma.post.findMany({
       where: { userId },
-      include: { 
+      include: {
         category: true,
         assignedTo: {
           select: {
             id: true,
             firstName: true,
             lastName: true,
+            profileImage: true,
           },
         },
       },
@@ -224,14 +238,14 @@ export class PostsService {
     return this.prisma.post.update({
       where: { id },
       data,
-      include: { 
+      include: {
         category: true,
         user: {
           select: {
             firstName: true,
             lastName: true,
-          }
-        }
+          },
+        },
       },
     });
   }

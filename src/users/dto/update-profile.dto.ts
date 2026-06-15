@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsDecimal } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  IsDecimal,
+} from 'class-validator';
 import { VisibilityStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 
@@ -50,4 +56,8 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   services?: string;
+
+  @IsOptional()
+  @IsString()
+  youtubeLink?: string;
 }

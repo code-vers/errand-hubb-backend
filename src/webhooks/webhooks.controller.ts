@@ -1,4 +1,11 @@
-import { Controller, Post, Headers, Req, BadRequestException, RawBodyRequest } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Headers,
+  Req,
+  BadRequestException,
+  RawBodyRequest,
+} from '@nestjs/common';
 import { WebhooksService } from './webhooks.service.js';
 import Stripe from 'stripe';
 import { config } from '../config/config.js';
@@ -28,7 +35,7 @@ export class WebhooksController {
       event = this.stripe.webhooks.constructEvent(
         req.rawBody,
         signature,
-        config.STRIPE_WEBHOOK_SECRET
+        config.STRIPE_WEBHOOK_SECRET,
       );
     } catch (err: any) {
       throw new BadRequestException('Webhook Error: ' + err.message);

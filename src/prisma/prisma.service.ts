@@ -16,18 +16,24 @@ export class PrismaService
     const isPooler = config.DATABASE_URL?.includes('-pooler');
 
     if (isNeon && !isPooler) {
-      console.warn('ADVISORY: You are connecting to Neon directly. For Vercel/Production, the "-pooler" endpoint is highly recommended.');
+      console.warn(
+        'ADVISORY: You are connecting to Neon directly. For Vercel/Production, the "-pooler" endpoint is highly recommended.',
+      );
     }
 
     // Prepare connection string - strip channel_binding if it causes issues
     let connectionString = config.DATABASE_URL;
     if (isNeon && connectionString.includes('channel_binding=')) {
-      connectionString = connectionString.replace(/&?channel_binding=[^&]*/, '');
+      connectionString = connectionString.replace(
+        /&?channel_binding=[^&]*/,
+        '',
+      );
     }
 
     const pool = new Pool({
       connectionString: connectionString,
-      ssl: (config.DATABASE_SSL || isNeon) ? { rejectUnauthorized: false } : false,
+      ssl:
+        config.DATABASE_SSL || isNeon ? { rejectUnauthorized: false } : false,
       max: isNeon ? 10 : 20, // Lower max for Neon free tier
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 30000, // 30s timeout for better reliability
@@ -51,9 +57,11 @@ export class PrismaService
     } catch (error: any) {
       console.error('Prisma: Connection failed');
       console.error('Error Detail:', error.message);
-      
+
       if (error.message.includes('ETIMEDOUT')) {
-        console.error('DIAGNOSIS: Database connection timed out. Check your internet or Neon IP Allowlist.');
+        console.error(
+          'DIAGNOSIS: Database connection timed out. Check your internet or Neon IP Allowlist.',
+        );
       }
     }
   }

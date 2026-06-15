@@ -10,7 +10,7 @@ export class MailService {
     console.log('--- MailService Debug ---');
     console.log('SMTP_HOST:', config.SMTP_HOST);
     console.log('SMTP_PORT:', config.SMTP_PORT);
-    
+
     // Safe logging for Render/Production
     const maskString = (str: string) => {
       if (!str) return 'MISSING';
@@ -42,22 +42,32 @@ export class MailService {
       tls: {
         // Ensure SSL certificate matches the host
         servername: 'smtp.gmail.com',
-        // If it still fails, we might need to set rejectUnauthorized: false 
+        // If it still fails, we might need to set rejectUnauthorized: false
         // but only as a last resort.
         rejectUnauthorized: true,
-      }
+      },
     };
 
-    console.log('MailService: Using explicit IPv4 manual configuration for Gmail on port 465');
+    console.log(
+      'MailService: Using explicit IPv4 manual configuration for Gmail on port 465',
+    );
     this.transporter = nodemailer.createTransport(transportConfig);
 
     // Verify connection configuration
     this.transporter.verify((error, success) => {
       if (error) {
-        console.error('MailService: Connection verification failed:', error.message);
-        console.error('DEBUG: Full error details:', JSON.stringify(error, null, 2));
+        console.error(
+          'MailService: Connection verification failed:',
+          error.message,
+        );
+        console.error(
+          'DEBUG: Full error details:',
+          JSON.stringify(error, null, 2),
+        );
         if (error.message.includes('ENETUNREACH')) {
-          console.error('HINT: Still seeing ENETUNREACH. This means the Render network is still trying to route to IPv6 despite our IPv4 force.');
+          console.error(
+            'HINT: Still seeing ENETUNREACH. This means the Render network is still trying to route to IPv6 despite our IPv4 force.',
+          );
         }
       } else {
         console.log('MailService: Server is ready to take our messages');
@@ -91,11 +101,16 @@ export class MailService {
 
     try {
       if (!config.SMTP_USER || !config.SMTP_PASS) {
-        throw new Error('SMTP credentials are missing. Please check your environment variables.');
+        throw new Error(
+          'SMTP credentials are missing. Please check your environment variables.',
+        );
       }
       console.log('MailService: Sending reset email to:', email);
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('MailService: Reset email sent successfully. MessageID:', info.messageId);
+      console.log(
+        'MailService: Reset email sent successfully. MessageID:',
+        info.messageId,
+      );
     } catch (error) {
       console.error('MailService: Failed to send reset email:', error);
       throw error;
@@ -126,16 +141,27 @@ export class MailService {
     };
 
     try {
-      console.log('MailService: Sending deletion verification email to:', email);
+      console.log(
+        'MailService: Sending deletion verification email to:',
+        email,
+      );
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('MailService: Deletion verification email sent. MessageID:', info.messageId);
+      console.log(
+        'MailService: Deletion verification email sent. MessageID:',
+        info.messageId,
+      );
     } catch (error) {
       console.error('MailService: Failed to send deletion email:', error);
       throw error;
     }
   }
 
-  async sendSubscriptionEmail(email: string, name: string, type: 'started' | 'succeeded' | 'failed' | 'canceled' | 'canceling_soon', details?: any) {
+  async sendSubscriptionEmail(
+    email: string,
+    name: string,
+    type: 'started' | 'succeeded' | 'failed' | 'canceled' | 'canceling_soon',
+    details?: any,
+  ) {
     let subject = '';
     let content = '';
 
@@ -184,7 +210,10 @@ export class MailService {
       await this.transporter.sendMail(mailOptions);
       console.log(`MailService: Subscription email (${type}) sent to:`, email);
     } catch (error) {
-      console.error(`MailService: Failed to send subscription email (${type}):`, error);
+      console.error(
+        `MailService: Failed to send subscription email (${type}):`,
+        error,
+      );
     }
   }
 }

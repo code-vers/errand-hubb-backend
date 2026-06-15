@@ -1,4 +1,18 @@
-import { Controller, Get, Body, Patch, UseGuards, Request, UseInterceptors, UploadedFile, NotFoundException, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFile,
+  NotFoundException,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -69,4 +83,3 @@ export class UsersController {
     return this.usersService.deleteAccount(userId, dto.password, dto.code);
   }
 }
-
