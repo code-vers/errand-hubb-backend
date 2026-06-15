@@ -4,9 +4,9 @@ import {
   Headers,
   Req,
   BadRequestException,
-  RawBodyRequest,
   Logger,
 } from '@nestjs/common';
+import type { RawBodyRequest } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service.js';
 import Stripe from 'stripe';
 import { config } from '../config/config.js';
@@ -26,14 +26,16 @@ export class WebhooksController {
   @Post('stripe')
   async handleStripeWebhook(
     @Headers('stripe-signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
+    @Req() req: any,
   ) {
     if (!signature) {
       this.logger.error('Missing stripe-signature header');
       throw new BadRequestException('Missing stripe-signature header');
     }
 
-    if (!req.rawBody) {
+    const rawRequest = req as RawBodyRequest<Request>;
+
+    if (!rawRequest.rawBody) {
       this.logger.error('Raw body not found. Ensure rawBody: true is set in NestFactory.create()');
       throw new BadRequestException('Raw body not found');
     }
@@ -42,7 +44,7 @@ export class WebhooksController {
 
     try {
       event = this.stripe.webhooks.constructEvent(
-        req.rawBody,
+        rawRequest.rawBody,
         signature,
         config.STRIPE_WEBHOOK_SECRET,
       );
