@@ -67,6 +67,11 @@ export class UsersService {
         status: {
           in: ['active', 'pending'],
         },
+        subscription: {
+          status: {
+            in: ['active', 'trialing'],
+          },
+        },
       },
       include: {
         profile: true,
