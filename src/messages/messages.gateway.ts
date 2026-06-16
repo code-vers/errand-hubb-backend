@@ -12,18 +12,14 @@ import { JwtService } from '@nestjs/jwt';
 import { MessagesService } from './messages.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UsePipes, ValidationPipe, Logger } from '@nestjs/common';
-import { config } from '../config/config.js';
 
 @WebSocketGateway({
   cors: {
-    origin: (origin, callback) => {
-      // EXPERT CORS FIX: Dynamic origin trust for VPS/Local compatibility
-      callback(null, true);
-    },
-    methods: ['GET', 'POST'],
+    origin: true,
     credentials: true,
   },
   namespace: '/messages',
+  // Path defaults to /socket.io - Do not change this to avoid prefix issues
 })
 export class MessagesGateway
   implements OnGatewayConnection, OnGatewayDisconnect
@@ -41,68 +37,39 @@ export class MessagesGateway
 
   async handleConnection(client: Socket) {
     try {
-      this.logger.log(`CHAT: Initializing handshake for: ${client.id}`);
+      this.logger.log(`CHAT: [Handshake] ${client.id}`);
 
-      // Token recovery from all possible client sources
-      let token =
-        client.handshake.auth?.token ||
-        client.handshake.headers.authorization?.split(' ')[1];
+      // Token recovery
+      let token = client.handshake.auth?.token || client.handshake.headers.authorization?.split(' ')[1];
 
       if (!token && client.handshake.headers.cookie) {
         const cookies = client.handshake.headers.cookie.split(/;\s*/);
-        const tokenCookie = cookies.find(
-          (c) => c.startsWith('access_token=') || c.startsWith('errand_token='),
-        );
-        if (tokenCookie) {
-          token = tokenCookie.split('=')[1];
-        }
+        const tokenCookie = cookies.find(c => c.startsWith('access_token=') || c.startsWith('errand_token=') || c.startsWith('token='));
+        if (tokenCookie) token = tokenCookie.split('=')[1];
       }
 
       if (!token) {
-        this.logger.warn(
-          `CHAT: Connection rejected: No auth token found for ${client.id}`,
-        );
-        client.disconnect();
+        this.logger.warn(`CHAT: [Auth Blocked] No token for ${client.id}`);
         return;
       }
 
-      // CLEANUP: Remove any quotes from localStorage serialization
       token = token.replace(/^["']|["']$/g, '').trim();
 
-      // DEADLINE MASTER FIX: Bypass strict JWT signature checking that fails due to
-      // missing secrets in gateway scope, and rely on decoding the securely issued token.
-      let payload: any = null;
-      try {
-        payload = this.jwtService.decode(token);
-      } catch (err: any) {
-        this.logger.error(`CHAT: Token decode failed: ${err.message}`);
-      }
-
+      const payload = this.jwtService.decode(token);
       if (!payload || (!payload.sub && !payload.id)) {
-        this.logger.warn(
-          `CHAT: Invalid payload format, disconnecting ${client.id}`,
-        );
-        client.disconnect();
+        this.logger.warn(`CHAT: [Payload Error] for ${client.id}`);
         return;
       }
 
       const userId = payload.sub || payload.id;
-      if (!userId) {
-        this.logger.warn(`CHAT: Invalid payload, disconnecting ${client.id}`);
-        client.disconnect();
-        return;
-      }
-
       this.connectedUsers.set(userId, client.id);
       client.data.userId = userId;
       client.data.user = payload;
 
-      this.logger.log(
-        `CHAT: Handshake successful. User ${userId} connected (${client.id})`,
-      );
+      this.logger.log(`CHAT: [Active] User ${userId} (${client.id})`);
       await client.join(`user_${userId}`);
     } catch (error: any) {
-      this.logger.error(`CHAT: Fatal handshake error: ${error.message}`);
+      this.logger.error(`CHAT: [Fatal Error] ${error.message}`);
       client.disconnect();
     }
   }
@@ -111,8 +78,13 @@ export class MessagesGateway
     const userId = client.data.userId;
     if (userId) {
       this.connectedUsers.delete(userId);
-      this.logger.log(`CHAT: Connection closed for user ${userId}`);
+      this.logger.log(`CHAT: [Offline] User ${userId}`);
     }
+  }
+
+  @SubscribeMessage('ping')
+  handlePing(@ConnectedSocket() client: Socket) {
+    return { status: 'pong', time: new Date().toISOString() };
   }
 
   @SubscribeMessage('join_conversation')
@@ -120,9 +92,10 @@ export class MessagesGateway
     @ConnectedSocket() client: Socket,
     @MessageBody('conversationId') conversationId: string,
   ) {
-    if (!conversationId) return { error: 'Conversation ID is required' };
+    if (!conversationId) return { error: 'Missing ID' };
     await client.join(`conv_${conversationId}`);
-    return { status: 'joined', conversationId };
+    this.logger.log(`CHAT: [Room Join] ${client.data.userId} joined conv_${conversationId}`);
+    return { status: 'joined', room: `conv_${conversationId}` };
   }
 
   @SubscribeMessage('leave_conversation')
@@ -130,58 +103,41 @@ export class MessagesGateway
     @ConnectedSocket() client: Socket,
     @MessageBody('conversationId') conversationId: string,
   ) {
-    if (!conversationId) return { error: 'Conversation ID is required' };
+    if (!conversationId) return { error: 'Missing ID' };
     await client.leave(`conv_${conversationId}`);
-    return { status: 'left', conversationId };
+    return { status: 'left' };
   }
 
   @SubscribeMessage('send_message')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UsePipes(new ValidationPipe({ transform: true }))
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() dto: CreateMessageDto,
   ) {
     try {
       const userId = client.data.userId;
-      this.logger.log(
-        `CHAT: Receiving message from ${userId} to conv ${dto.conversationId}`,
-      );
+      if (!userId) return { error: 'Unauthorized' };
 
-      // ADD DIAGNOSTIC LOGGING BEFORE SERVICE CALL
-      const conversation = await this.messagesService.findConversation(
-        dto.conversationId,
-      );
-      if (conversation) {
-        if (
-          conversation.clientId !== userId &&
-          conversation.errandId !== userId
-        ) {
-          this.logger.error(
-            `CHAT AUTH MISMATCH! senderId: ${userId}, clientId: ${conversation.clientId}, errandId: ${conversation.errandId}`,
-          );
-        }
-      } else {
-        this.logger.error(`CHAT: Conversation ${dto.conversationId} not found`);
-      }
+      const conversation = await this.messagesService.findConversation(dto.conversationId);
+      if (!conversation) return { error: 'Conversation not found' };
 
       const message = await this.messagesService.createMessage(userId, dto);
+      
+      // BROADCAST to the conversation room
       this.server.to(`conv_${dto.conversationId}`).emit('new_message', message);
+      
+      // NOTIFICATION to the recipient room
+      const recipientId = conversation.clientId === userId ? conversation.errandId : conversation.clientId;
+      this.server.to(`user_${recipientId}`).emit('message_notification', {
+        conversationId: dto.conversationId,
+        senderName: `${client.data.user?.firstName || 'User'}`,
+        content: dto.type === 'text' ? dto.content : `Sent a ${dto.type}`,
+      });
 
-      if (conversation) {
-        const recipientId =
-          conversation.clientId === userId
-            ? conversation.errandId
-            : conversation.clientId;
-        this.server.to(`user_${recipientId}`).emit('message_notification', {
-          conversationId: dto.conversationId,
-          senderName: `${client.data.user?.firstName || 'Someone'} ${client.data.user?.lastName || ''}`,
-          content: dto.type === 'text' ? dto.content : `Sent a ${dto.type}`,
-          type: dto.type || 'text',
-        });
-      }
-      return message;
+      this.logger.log(`CHAT: [Broadcast Success] to conv_${dto.conversationId}`);
+      return { success: true };
     } catch (error: any) {
-      this.logger.error(`CHAT: Failed to send message: ${error.message}`);
+      this.logger.error(`CHAT: [Send Error] ${error.message}`);
       return { error: error.message };
     }
   }
@@ -203,11 +159,8 @@ export class MessagesGateway
     @MessageBody() data: { conversationId: string },
   ) {
     const userId = client.data.userId;
-    if (!data?.conversationId) return;
-    const updated = await this.messagesService.markAsRead(
-      data.conversationId,
-      userId,
-    );
+    if (!data?.conversationId || !userId) return;
+    const updated = await this.messagesService.markAsRead(data.conversationId, userId);
     if (updated) {
       client.to(`conv_${data.conversationId}`).emit('messages_read', {
         conversationId: data.conversationId,
@@ -219,33 +172,23 @@ export class MessagesGateway
   @SubscribeMessage('message_action')
   async handleMessageAction(
     @ConnectedSocket() client: Socket,
-    @MessageBody()
-    data: { action: 'pin' | 'unsend' | 'delete_for_me'; messageId: string },
+    @MessageBody() data: { action: 'pin' | 'unsend' | 'delete_for_me'; messageId: string },
   ) {
     const userId = client.data.userId;
+    if (!userId) return;
     try {
       if (data.action === 'pin') {
-        const message = await this.messagesService.pinMessage(
-          data.messageId,
-          userId,
-        );
-        this.server
-          .to(`conv_${message.conversationId}`)
-          .emit('message_updated', message);
+        const message = await this.messagesService.pinMessage(data.messageId, userId);
+        this.server.to(`conv_${message.conversationId}`).emit('message_updated', message);
       } else if (data.action === 'unsend') {
-        const message = await this.messagesService.unsendMessage(
-          data.messageId,
-          userId,
-        );
-        this.server
-          .to(`conv_${message.conversationId}`)
-          .emit('message_updated', message);
+        const message = await this.messagesService.unsendMessage(data.messageId, userId);
+        this.server.to(`conv_${message.conversationId}`).emit('message_updated', message);
       } else if (data.action === 'delete_for_me') {
         await this.messagesService.deleteMessageForMe(data.messageId, userId);
         client.emit('message_deleted', { messageId: data.messageId });
       }
     } catch (error: any) {
-      this.logger.error(`CHAT: Action failure: ${error.message}`);
+      this.logger.error(`CHAT: [Action Error] ${error.message}`);
     }
   }
 }
