@@ -12,6 +12,8 @@ import { MailModule } from './mail/mail.module.js';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
 import { WebhooksModule } from './webhooks/webhooks.module.js';
 import { MessagesModule } from './messages/messages.module.js';
+import { AdsModule } from './ads/ads.module.js';
+import { AdsSubscriptionsModule } from './ads-subscriptions/ads-subscriptions.module.js';
 import { config } from './config/config.js';
 
 @Module({
@@ -25,6 +27,8 @@ import { config } from './config/config.js';
     SubscriptionsModule,
     WebhooksModule,
     MessagesModule,
+    AdsModule,
+    AdsSubscriptionsModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
