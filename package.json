@@ -19,6 +19,7 @@
     "prisma:studio": "prisma studio",
     "seed:admin": "node --loader ts-node/esm prisma/seed-admin.ts",
     "seed:categories": "node --loader ts-node/esm prisma/seed-categories.ts",
+    "seed:ads": "node --loader ts-node/esm prisma/seed-ads.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
