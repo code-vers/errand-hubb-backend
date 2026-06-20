@@ -77,58 +77,73 @@ export class WebhooksService {
       const customerId = session.customer as string;
       const subscriptionId = session.subscription as string;
       
-      // Try to get userId from session metadata (added in fix) 
-      // or fall back to subscription_data metadata if it exists in the raw object
       const userId = (session.metadata?.userId || (session as any).subscription_data?.metadata?.userId) as string;
+      const subscriptionType = (session.metadata?.subscriptionType || (session as any).subscription_data?.metadata?.subscriptionType) as string;
 
-      this.logger.log(`Metadata check - userId: ${userId}, customerId: ${customerId}`);
+      this.logger.log(`Metadata check - userId: ${userId}, type: ${subscriptionType}, customerId: ${customerId}`);
 
       if (userId) {
         try {
-          const sub = await this.prisma.subscription.upsert({
-            where: { userId },
-            create: {
-              userId,
-              stripeCustomerId: customerId,
-              stripeSubscriptionId: subscriptionId,
-              status: 'active',
-              amount: 5.0,
-            },
-            update: {
-              stripeCustomerId: customerId,
-              stripeSubscriptionId: subscriptionId,
-              status: 'active',
-            },
-            include: { user: true },
-          });
-
-          this.logger.log(`Subscription updated for user ${userId}: active`);
-
-          await this.mailService.sendSubscriptionEmail(
-            sub.user.email,
-            sub.user.firstName,
-            'started',
-          );
+          if (subscriptionType === 'ads') {
+            const sub = await this.prisma.adsSubscription.upsert({
+              where: { userId },
+              create: {
+                userId,
+                stripeCustomerId: customerId,
+                stripeSubscriptionId: subscriptionId,
+                status: 'active',
+                amount: 20.0,
+              },
+              update: {
+                stripeCustomerId: customerId,
+                stripeSubscriptionId: subscriptionId,
+                status: 'active',
+              },
+              include: { user: true },
+            });
+            this.logger.log(`Ads Subscription updated for user ${userId}: active`);
+            await this.mailService.sendSubscriptionEmail(sub.user.email, sub.user.firstName, 'started');
+          } else {
+            const sub = await this.prisma.subscription.upsert({
+              where: { userId },
+              create: {
+                userId,
+                stripeCustomerId: customerId,
+                stripeSubscriptionId: subscriptionId,
+                status: 'active',
+                amount: 5.0,
+              },
+              update: {
+                stripeCustomerId: customerId,
+                stripeSubscriptionId: subscriptionId,
+                status: 'active',
+              },
+              include: { user: true },
+            });
+            this.logger.log(`Normal Subscription updated for user ${userId}: active`);
+            await this.mailService.sendSubscriptionEmail(sub.user.email, sub.user.firstName, 'started');
+          }
         } catch (dbError: any) {
           this.logger.error(`Database error in handleCheckoutSessionCompleted: ${dbError.message}`);
           throw dbError;
         }
       } else {
         this.logger.warn(`No userId found in session metadata for session ${session.id}`);
-        // Attempt to find by customerId if userId is missing
-        const existingSub = await this.prisma.subscription.findUnique({
-          where: { stripeCustomerId: customerId },
-        });
-        
+        // Fallback search by customerId
+        const existingSub = await this.prisma.subscription.findUnique({ where: { stripeCustomerId: customerId } });
         if (existingSub) {
-          this.logger.log(`Found existing subscription by customerId ${customerId}. Updating.`);
           await this.prisma.subscription.update({
             where: { id: existingSub.id },
-            data: {
-              stripeSubscriptionId: subscriptionId,
-              status: 'active',
-            },
+            data: { stripeSubscriptionId: subscriptionId, status: 'active' },
           });
+        } else {
+          const existingAdsSub = await this.prisma.adsSubscription.findUnique({ where: { stripeCustomerId: customerId } });
+          if (existingAdsSub) {
+            await this.prisma.adsSubscription.update({
+              where: { id: existingAdsSub.id },
+              data: { stripeSubscriptionId: subscriptionId, status: 'active' },
+            });
+          }
         }
       }
     }
@@ -138,50 +153,55 @@ export class WebhooksService {
     const customerId = subscription.customer as string;
     this.logger.log(`Handling subscription event for customer: ${customerId}, status: ${subscription.status}`);
     
+    // Check both tables
     const existingSub = await this.prisma.subscription.findUnique({
       where: { stripeCustomerId: customerId },
       include: { user: true },
     });
 
     if (existingSub) {
-      const isNewlyCanceled =
-        subscription.status === 'canceled' && existingSub.status !== 'canceled';
-      const isNewlyCancelingSoon =
-        subscription.cancel_at_period_end && !existingSub.cancelAtPeriodEnd;
+      await this.updateSubscriptionRecord('normal', existingSub, subscription);
+      return;
+    }
 
-      await this.prisma.subscription.update({
-        where: { id: existingSub.id },
-        data: {
-          stripeSubscriptionId: subscription.id,
-          status: subscription.status as any,
-          currentPeriodStart: new Date(
-            subscription.current_period_start * 1000,
-          ),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
-          canceledAt: subscription.canceled_at
-            ? new Date(subscription.canceled_at * 1000)
-            : null,
-        },
-      });
+    const existingAdsSub = await this.prisma.adsSubscription.findUnique({
+      where: { stripeCustomerId: customerId },
+      include: { user: true },
+    });
 
-      this.logger.log(`Subscription ${subscription.id} updated in DB. Status: ${subscription.status}`);
+    if (existingAdsSub) {
+      await this.updateSubscriptionRecord('ads', existingAdsSub, subscription);
+      return;
+    }
 
-      if (isNewlyCanceled) {
-        await this.mailService.sendSubscriptionEmail(
-          existingSub.user.email,
-          existingSub.user.firstName,
-          'canceled',
-        );
-      } else if (isNewlyCancelingSoon) {
-        await this.mailService.sendSubscriptionEmail(
-          existingSub.user.email,
-          existingSub.user.firstName,
-          'canceling_soon',
-        );
-      }
+    this.logger.warn(`No subscription record found for customerId: ${customerId}`);
+  }
+
+  private async updateSubscriptionRecord(type: 'normal' | 'ads', existingRecord: any, subscription: any) {
+    const isNewlyCanceled = subscription.status === 'canceled' && existingRecord.status !== 'canceled';
+    const isNewlyCancelingSoon = subscription.cancel_at_period_end && !existingRecord.cancelAtPeriodEnd;
+
+    const updateData = {
+      stripeSubscriptionId: subscription.id,
+      status: subscription.status as any,
+      currentPeriodStart: new Date(subscription.current_period_start * 1000),
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+    };
+
+    if (type === 'normal') {
+      await this.prisma.subscription.update({ where: { id: existingRecord.id }, data: updateData });
     } else {
-      this.logger.warn(`No subscription record found for customerId: ${customerId}`);
+      await this.prisma.adsSubscription.update({ where: { id: existingRecord.id }, data: updateData });
+    }
+
+    this.logger.log(`${type === 'ads' ? 'Ads' : 'Normal'} Subscription ${subscription.id} updated in DB. Status: ${subscription.status}`);
+
+    if (isNewlyCanceled) {
+      await this.mailService.sendSubscriptionEmail(existingRecord.user.email, existingRecord.user.firstName, 'canceled');
+    } else if (isNewlyCancelingSoon) {
+      await this.mailService.sendSubscriptionEmail(existingRecord.user.email, existingRecord.user.firstName, 'canceling_soon');
     }
   }
 
