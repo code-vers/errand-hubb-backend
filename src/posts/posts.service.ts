@@ -64,6 +64,7 @@ export class PostsService {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     status?: string;
+    userRole?: string;
   }) {
     const {
       categoryId,
@@ -74,6 +75,7 @@ export class PostsService {
       sortBy = 'createdAt',
       sortOrder = 'desc',
       status,
+      userRole,
     } = query;
 
     const page = Math.max(1, parseInt(query.page || '1', 10));
@@ -81,6 +83,10 @@ export class PostsService {
     const skip = (page - 1) * limit;
 
     const where: Prisma.PostWhereInput = {};
+
+    if (userRole) {
+      where.user = { role: userRole as any };
+    }
 
     if (status && status.toLowerCase() !== 'all') {
       where.status = status;

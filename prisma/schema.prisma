@@ -36,6 +36,7 @@ model User {
   profile               Profile?
   securityLogs          SecurityLog[]
   subscription          Subscription?
+  serviceRequests       ServiceRequest[] @relation("UserServiceRequests")
 
   // Ads Relations
   ads                   Ad[]             @relation("UserAds")
@@ -45,16 +46,18 @@ model User {
 }
 
 model Conversation {
-  id        String    @id @default(uuid())
-  clientId  String    @map("client_id")
-  errandId  String    @map("errand_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  client    User      @relation("ClientConversations", fields: [clientId], references: [id])
-  errand    User      @relation("ErrandConversations", fields: [errandId], references: [id])
-  messages  Message[]
+  id               String          @id @default(uuid())
+  clientId         String          @map("client_id")
+  errandId         String          @map("errand_id")
+  serviceRequestId String?         @map("service_request_id")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  client           User            @relation("ClientConversations", fields: [clientId], references: [id])
+  errand           User            @relation("ErrandConversations", fields: [errandId], references: [id])
+  serviceRequest   ServiceRequest? @relation("ServiceRequestConversations", fields: [serviceRequestId], references: [id], onDelete: SetNull)
+  messages         Message[]
 
-  @@unique([clientId, errandId])
+  @@unique([clientId, errandId, serviceRequestId])
   @@map("conversations")
 }
 
@@ -152,7 +155,8 @@ model Category {
   status      CategoryStatus @default(active)
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
-  posts       Post[]
+  posts           Post[]
+  serviceRequests ServiceRequest[]
 
   @@map("categories")
 }
@@ -287,6 +291,16 @@ enum IconType {
   url
 }
 
+enum ServiceRequestStatus {
+  draft
+  active
+  in_discussion
+  assigned
+  completed
+  cancelled
+  expired
+}
+
 enum CategoryStatus {
   active
   inactive
@@ -374,4 +388,28 @@ enum AdStatus {
   pending
   approved
   rejected
+}
+
+model ServiceRequest {
+  id            String               @id @default(uuid())
+  userId        String               @map("user_id")
+  title         String
+  description   String               @db.Text
+  categoryId    String               @map("category_id")
+  budget        Decimal?             @db.Decimal(10, 2)
+  city          String
+  state         String?
+  dateNeeded    DateTime?            @map("date_needed")
+  time          String?
+  urgencyLevel  String               @default("normal") @map("urgency_level")
+  imageUrl      String?              @map("image_url")
+  status        ServiceRequestStatus @default(active)
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  user          User                 @relation("UserServiceRequests", fields: [userId], references: [id], onDelete: Cascade)
+  category      Category             @relation(fields: [categoryId], references: [id])
+  conversations Conversation[]       @relation("ServiceRequestConversations")
+
+  @@map("service_requests")
 }

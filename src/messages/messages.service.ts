@@ -198,10 +198,14 @@ export class MessagesService {
       },
     };
 
-    // Find or create conversation
+    // Find or create conversation (non-service-request conversations use null serviceRequestId)
     let conversation = await this.prisma.conversation.findUnique({
       where: {
-        clientId_errandId: { clientId, errandId },
+        clientId_errandId_serviceRequestId: {
+          clientId,
+          errandId,
+          serviceRequestId: null as unknown as string,
+        },
       },
       include,
     });
@@ -218,7 +222,7 @@ export class MessagesService {
 
     return {
       ...conversation,
-      unreadCount: conversation._count?.messages || 0,
+      unreadCount: (conversation as any)._count?.messages || 0,
     };
   }
 
