@@ -91,7 +91,11 @@ export class PostsService {
     if (status && status.toLowerCase() !== 'all') {
       where.status = status;
     } else if (status === undefined) {
-      where.status = 'active';
+      if (userRole === 'client') {
+        where.status = { in: ['Pending Pickup', 'ASAP', 'Scheduled'] };
+      } else {
+        where.status = 'active';
+      }
     }
 
     if (categoryId && categoryId !== 'all') {
