@@ -59,7 +59,7 @@ export class AuthService {
     return user;
   }
 
-  async registerErrand(dto: RegisterErrandDto, profileImage?: string) {
+  async registerErrand(dto: RegisterErrandDto, profileImage?: string, gallery: string[] = []) {
     const existingUser = await this.usersService.findOneByEmail(dto.email);
     if (existingUser) {
       throw new ConflictException('Email already registered');
@@ -84,6 +84,7 @@ export class AuthService {
           services: dto.services,
           youtubeLink: dto.youtubeLink,
           ratePerHour: dto.rate ? parseFloat(dto.rate) : undefined,
+          gallery: gallery,
         },
       },
     });

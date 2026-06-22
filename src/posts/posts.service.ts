@@ -135,6 +135,7 @@ export class PostsService {
               firstName: true,
               lastName: true,
               profileImage: true,
+              profile: true,
             },
           },
           assignedTo: {
