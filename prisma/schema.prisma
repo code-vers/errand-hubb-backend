@@ -111,6 +111,7 @@ model Profile {
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
   youtubeLink      String?          @map("youtube_link")
+  gallery          String[]         @default([])
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")

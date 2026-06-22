@@ -6,6 +6,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   Request,
   Res,
@@ -19,7 +20,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { TwoFactorVerifyDto } from './dto/two-factor.dto.js';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import type { Response } from 'express';
@@ -41,14 +42,32 @@ export class AuthController {
   }
 
   @Post('register/errand')
-  @UseInterceptors(FileInterceptor('profileImage', multerOptions('profiles')))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'profileImage', maxCount: 1 },
+        { name: 'gallery', maxCount: 5 },
+      ],
+      multerOptions('profiles'),
+    ),
+  )
   registerErrand(
     @Body() dto: RegisterErrandDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles()
+    files?: {
+      profileImage?: Express.Multer.File[];
+      gallery?: Express.Multer.File[];
+    },
   ) {
     console.log('--- Register Errand ---');
-    const profileImage = file ? `/media/profiles/${file.filename}` : undefined;
-    return this.authService.registerErrand(dto, profileImage);
+    const profileImage =
+      files?.profileImage && files.profileImage[0]
+        ? `/media/profiles/${files.profileImage[0].filename}`
+        : undefined;
+    const gallery = files?.gallery
+      ? files.gallery.map((file) => `/media/profiles/${file.filename}`)
+      : [];
+    return this.authService.registerErrand(dto, profileImage, gallery);
   }
 
   @UseGuards(ThrottlerGuard)

@@ -7,6 +7,7 @@ import {
   Request,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   NotFoundException,
   Delete,
   HttpCode,
@@ -15,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer-options.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { DeleteAccountDto } from './dto/delete-account.dto.js';
@@ -38,27 +39,58 @@ export class UsersController {
   }
 
   @Patch('profile')
-  @UseInterceptors(FileInterceptor('profileImage', multerOptions('profiles')))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'profileImage', maxCount: 1 },
+        { name: 'gallery', maxCount: 5 },
+      ],
+      multerOptions('profiles'),
+    ),
+  )
   async updateProfile(
     @Request() req: any,
     @Body() updateDto: UpdateProfileDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles()
+    files?: {
+      profileImage?: Express.Multer.File[];
+      gallery?: Express.Multer.File[];
+    },
   ) {
     const userId = req.user?.id || req.user?.sub;
     console.log('CONTROLLER: Updating profile for ID:', userId);
 
     let profileImage: string | undefined;
-    if (file) {
-      profileImage = `/media/profiles/${file.filename}`;
+    if (files?.profileImage && files.profileImage[0]) {
+      profileImage = `/media/profiles/${files.profileImage[0].filename}`;
     }
 
-    const { firstName, lastName, ...profileData } = updateDto;
+    const { firstName, lastName, retainedGallery, ...profileData } = updateDto;
+
+    let profileUpdateData: any = { ...profileData };
+
+    if ((files?.gallery && files.gallery.length > 0) || retainedGallery !== undefined) {
+      let parsedRetainedGallery: string[] = [];
+      if (retainedGallery) {
+        try {
+          parsedRetainedGallery = typeof retainedGallery === 'string'
+            ? JSON.parse(retainedGallery)
+            : retainedGallery;
+        } catch (e) {
+          parsedRetainedGallery = Array.isArray(retainedGallery) ? retainedGallery : [retainedGallery];
+        }
+      }
+      const newGalleryFiles = files?.gallery
+        ? files.gallery.map((file) => `/media/profiles/${file.filename}`)
+        : [];
+      profileUpdateData.gallery = [...parsedRetainedGallery, ...newGalleryFiles];
+    }
 
     const user = await this.usersService.updateFullProfile(userId, {
       firstName,
       lastName,
       profileImage,
-      profile: Object.keys(profileData).length > 0 ? profileData : undefined,
+      profile: Object.keys(profileUpdateData).length > 0 ? profileUpdateData : undefined,
     });
 
     if (!user) {
