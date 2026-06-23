@@ -42,6 +42,8 @@ export class PostsController {
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
     @Query('status') status?: string,
     @Query('userRole') userRole?: string,
+    @Query('workerName') workerName?: string,
+    @Query('workerEmail') workerEmail?: string,
   ) {
     return this.postsService.findAll({
       categoryId,
@@ -55,6 +57,8 @@ export class PostsController {
       sortOrder,
       status,
       userRole,
+      workerName,
+      workerEmail,
     });
   }
 

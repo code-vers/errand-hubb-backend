@@ -11,7 +11,8 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { MessagesService } from './messages.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
-import { UsePipes, ValidationPipe, Logger } from '@nestjs/common';
+import { UsePipes, ValidationPipe, Logger, Inject, forwardRef } from '@nestjs/common';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @WebSocketGateway({
   cors: {
@@ -33,6 +34,8 @@ export class MessagesGateway
   constructor(
     private readonly jwtService: JwtService,
     private readonly messagesService: MessagesService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: any,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -128,10 +131,25 @@ export class MessagesGateway
       
       // NOTIFICATION to the recipient room
       const recipientId = conversation.clientId === userId ? conversation.errandId : conversation.clientId;
+      const senderName = `${client.data.user?.firstName || 'User'}`;
+      const contentPreview = dto.type === 'text' ? dto.content : `Sent a ${dto.type}`;
+
+      // Save notification to DB
+      await this.notificationsService.createNotification(recipientId, {
+        type: 'new_message',
+        title: `New message from ${senderName}`,
+        message: contentPreview.substring(0, 100) + (contentPreview.length > 100 ? '...' : ''),
+        metadata: {
+          conversationId: dto.conversationId,
+          senderName,
+          redirectUrl: `/dashboard/messages?convId=${dto.conversationId}`,
+        },
+      });
+
       this.server.to(`user_${recipientId}`).emit('message_notification', {
         conversationId: dto.conversationId,
-        senderName: `${client.data.user?.firstName || 'User'}`,
-        content: dto.type === 'text' ? dto.content : `Sent a ${dto.type}`,
+        senderName,
+        content: contentPreview,
       });
 
       this.logger.log(`CHAT: [Broadcast Success] to conv_${dto.conversationId}`);
