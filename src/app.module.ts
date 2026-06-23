@@ -15,6 +15,7 @@ import { MessagesModule } from './messages/messages.module.js';
 import { AdsModule } from './ads/ads.module.js';
 import { AdsSubscriptionsModule } from './ads-subscriptions/ads-subscriptions.module.js';
 import { ServiceRequestsModule } from './service-requests/service-requests.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 import { config } from './config/config.js';
 
 @Module({
@@ -28,6 +29,7 @@ import { config } from './config/config.js';
     SubscriptionsModule,
     WebhooksModule,
     MessagesModule,
+    NotificationsModule,
     AdsModule,
     AdsSubscriptionsModule,
     ServiceRequestsModule,

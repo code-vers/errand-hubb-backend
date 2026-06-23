@@ -7,10 +7,14 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
 import { UpdatePostDto } from './dto/update-post.dto.js';
 import { Prisma } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async create(userId: string, createPostDto: CreatePostDto) {
     const { categoryId, budget, dateNeeded, ...rest } = createPostDto;
@@ -21,15 +25,21 @@ export class PostsService {
     });
 
     if (existingPost) {
-      return this.update(existingPost.id, userId, {
+      const updated = await this.update(existingPost.id, userId, {
         ...rest,
         categoryId,
         budget,
         dateNeeded,
       } as any);
+      
+      // Notify active subscribers even on renewal/updates of status if needed
+      // but let's notify anyway to be completely safe
+      await this.notifyActiveSubscribers(userId, updated);
+      
+      return updated;
     }
 
-    return this.prisma.post.create({
+    const post = await this.prisma.post.create({
       data: {
         ...rest,
         state: rest.state || '',
@@ -51,6 +61,65 @@ export class PostsService {
         },
       },
     });
+
+    await this.notifyActiveSubscribers(userId, post);
+
+    return post;
+  }
+
+  private async notifyActiveSubscribers(clientUserId: string, post: any) {
+    try {
+      const client = await this.prisma.user.findUnique({
+        where: { id: clientUserId },
+      });
+      const clientName = client ? `${client.firstName} ${client.lastName}`.trim() || client.email : 'A client';
+
+      // Find active subscribed errand providers
+      const subscribers = await this.prisma.user.findMany({
+        where: {
+          role: 'errand',
+          subscription: {
+            status: {
+              in: ['active', 'trialing'],
+            },
+          },
+          id: { not: clientUserId },
+        },
+      });
+
+      console.log(`POSTS: Notifying ${subscribers.length} active subscribers about post ${post.id}`);
+
+      for (const sub of subscribers) {
+        // Prevent duplicate notification for the same post creation/update within a short time window if needed,
+        // but since we mark the post/errand, let's check if they already have an unread notification for this post
+        const existingNotif = await this.prisma.notification.findFirst({
+          where: {
+            userId: sub.id,
+            type: 'new_errand',
+            isRead: false,
+            metadata: {
+              path: ['postId'],
+              equals: post.id,
+            },
+          },
+        });
+
+        if (!existingNotif) {
+          await this.notificationsService.createNotification(sub.id, {
+            type: 'new_errand',
+            title: 'New Errand Posted',
+            message: `New errand posted by ${clientName}: ${post.title}`,
+            metadata: {
+              postId: post.id,
+              clientName,
+              redirectUrl: '/dashboard/available-jobs',
+            },
+          });
+        }
+      }
+    } catch (err: any) {
+      console.error('POSTS: Error in notifying active subscribers:', err.message);
+    }
   }
 
   async findAll(query: {

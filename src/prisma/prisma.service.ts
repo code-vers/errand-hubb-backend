@@ -88,10 +88,12 @@ export class PrismaService
       const groups = new Map<string, any[]>();
       for (const conv of conversations) {
         const key = `${conv.clientId}_${conv.errandId}`;
-        if (!groups.has(key)) {
-          groups.set(key, []);
+        let list = groups.get(key);
+        if (!list) {
+          list = [];
+          groups.set(key, list);
         }
-        groups.get(key).push(conv);
+        list.push(conv);
       }
 
       for (const [key, convs] of groups.entries()) {
