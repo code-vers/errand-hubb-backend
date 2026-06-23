@@ -54,8 +54,18 @@ export class PrismaService
       console.log('Prisma: Attempting to connect...');
       await (this as any).$connect();
       console.log('Prisma: Connected successfully');
+
+      // Clean duplicate conversations
+      await this.cleanDuplicateConversations();
+
+      // Create partial unique index to prevent duplicate conversations at DB-level
+      console.log('Prisma: Creating partial unique index if not exists...');
+      await (this as any).$executeRawUnsafe(
+        `CREATE UNIQUE INDEX IF NOT EXISTS unique_client_errand_no_service_request ON conversations (client_id, errand_id) WHERE service_request_id IS NULL;`
+      );
+      console.log('Prisma: Partial unique index checked/created successfully');
     } catch (error: any) {
-      console.error('Prisma: Connection failed');
+      console.error('Prisma: Connection or setup failed');
       console.error('Error Detail:', error.message);
 
       if (error.message.includes('ETIMEDOUT')) {
@@ -63,6 +73,49 @@ export class PrismaService
           'DIAGNOSIS: Database connection timed out. Check your internet or Neon IP Allowlist.',
         );
       }
+    }
+  }
+
+  async cleanDuplicateConversations() {
+    try {
+      console.log('Prisma: Checking for duplicate conversations to clean up...');
+      // 1. Find all conversations with serviceRequestId = null
+      const conversations = await (this as any).conversation.findMany({
+        where: { serviceRequestId: null },
+        orderBy: { createdAt: 'asc' }, // Keep the oldest first
+      });
+
+      const groups = new Map<string, any[]>();
+      for (const conv of conversations) {
+        const key = `${conv.clientId}_${conv.errandId}`;
+        if (!groups.has(key)) {
+          groups.set(key, []);
+        }
+        groups.get(key).push(conv);
+      }
+
+      for (const [key, convs] of groups.entries()) {
+        if (convs.length > 1) {
+          const keepConv = convs[0];
+          const duplicates = convs.slice(1);
+          console.log(`Prisma: Found ${duplicates.length} duplicate conversation(s) for client/errand pair ${key}. Keeping conversation ${keepConv.id}`);
+
+          for (const dup of duplicates) {
+            // Re-link any messages from duplicate to keepConv
+            await (this as any).message.updateMany({
+              where: { conversationId: dup.id },
+              data: { conversationId: keepConv.id },
+            });
+            // Delete duplicate conversation
+            await (this as any).conversation.delete({
+              where: { id: dup.id },
+            });
+          }
+        }
+      }
+      console.log('Prisma: Duplicate conversation cleanup completed successfully');
+    } catch (err: any) {
+      console.error('Prisma: Error during duplicate conversation cleanup:', err.message);
     }
   }
 

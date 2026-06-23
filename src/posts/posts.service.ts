@@ -115,10 +115,42 @@ export class PostsService {
     }
 
     if (search) {
+      const searchTerms = search.trim().split(/\s+/);
+      const nameOrConditions: Prisma.PostWhereInput[] = [];
+      if (searchTerms.length === 1) {
+        nameOrConditions.push(
+          { user: { firstName: { contains: searchTerms[0], mode: 'insensitive' } } },
+          { user: { lastName: { contains: searchTerms[0], mode: 'insensitive' } } }
+        );
+      } else {
+        nameOrConditions.push(
+          {
+            user: {
+              AND: [
+                { firstName: { contains: searchTerms[0], mode: 'insensitive' } },
+                { lastName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } }
+              ]
+            }
+          },
+          {
+            user: {
+              AND: [
+                { lastName: { contains: searchTerms[0], mode: 'insensitive' } },
+                { firstName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } }
+              ]
+            }
+          }
+        );
+      }
+
       where.OR = [
         ...(where.OR || []),
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
+        { city: { contains: search, mode: 'insensitive' } },
+        { state: { contains: search, mode: 'insensitive' } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+        ...nameOrConditions,
       ];
     }
 

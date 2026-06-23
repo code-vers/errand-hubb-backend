@@ -10,6 +10,8 @@ import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class MessagesService {
+  private pendingCreations = new Set<string>();
+
   constructor(private readonly prisma: PrismaService) {}
 
   async getConversations(userId: string, role: string) {
@@ -200,6 +202,13 @@ export class MessagesService {
 
     // Find or create conversation (non-service-request conversations use null serviceRequestId)
     // Using findFirst because Prisma 7.x doesn't allow null in compound unique findUnique
+    const lockKey = `${clientId}_${errandId}`;
+    let attempts = 0;
+    while (this.pendingCreations.has(lockKey) && attempts < 10) {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      attempts++;
+    }
+
     let conversation = await this.prisma.conversation.findFirst({
       where: {
         clientId,
@@ -210,13 +219,60 @@ export class MessagesService {
     });
 
     if (!conversation) {
-      console.log(
-        `SERVICE: Creating new conversation for ${clientId} and ${errandId}`,
-      );
-      conversation = await this.prisma.conversation.create({
-        data: { clientId, errandId },
-        include,
-      });
+      if (attempts >= 10) {
+        // Double check one last time before forcing
+        conversation = await this.prisma.conversation.findFirst({
+          where: { clientId, errandId, serviceRequestId: null },
+          include,
+        });
+        if (conversation) {
+          return {
+            ...conversation,
+            unreadCount: (conversation as any)._count?.messages || 0,
+          };
+        }
+      }
+
+      this.pendingCreations.add(lockKey);
+      try {
+        // Double check within lock
+        conversation = await this.prisma.conversation.findFirst({
+          where: {
+            clientId,
+            errandId,
+            serviceRequestId: null,
+          },
+          include,
+        });
+
+        if (!conversation) {
+          console.log(
+            `SERVICE: Creating new conversation for ${clientId} and ${errandId}`,
+          );
+          try {
+            conversation = await this.prisma.conversation.create({
+              data: { clientId, errandId },
+              include,
+            });
+          } catch (err: any) {
+            if (err.code === 'P2002') {
+              console.log(`SERVICE: Concurrent creation detected for ${clientId} and ${errandId}. Fetching existing conversation.`);
+              conversation = await this.prisma.conversation.findFirst({
+                where: {
+                  clientId,
+                  errandId,
+                  serviceRequestId: null,
+                },
+                include,
+              });
+            } else {
+              throw err;
+            }
+          }
+        }
+      } finally {
+        this.pendingCreations.delete(lockKey);
+      }
     }
 
     return {
