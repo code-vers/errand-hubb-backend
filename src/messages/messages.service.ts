@@ -199,13 +199,12 @@ export class MessagesService {
     };
 
     // Find or create conversation (non-service-request conversations use null serviceRequestId)
-    let conversation = await this.prisma.conversation.findUnique({
+    // Using findFirst because Prisma 7.x doesn't allow null in compound unique findUnique
+    let conversation = await this.prisma.conversation.findFirst({
       where: {
-        clientId_errandId_serviceRequestId: {
-          clientId,
-          errandId,
-          serviceRequestId: null as unknown as string,
-        },
+        clientId,
+        errandId,
+        serviceRequestId: null,
       },
       include,
     });

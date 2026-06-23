@@ -65,6 +65,8 @@ export class PostsService {
     sortOrder?: 'asc' | 'desc';
     status?: string;
     userRole?: string;
+    workerName?: string;
+    workerEmail?: string;
   }) {
     const {
       categoryId,
@@ -76,6 +78,8 @@ export class PostsService {
       sortOrder = 'desc',
       status,
       userRole,
+      workerName,
+      workerEmail,
     } = query;
 
     const page = Math.max(1, parseInt(query.page || '1', 10));
@@ -115,6 +119,52 @@ export class PostsService {
         ...(where.OR || []),
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Worker name search: matches firstName or lastName (case-insensitive, partial)
+    if (workerName) {
+      const nameTerms = workerName.trim().split(/\s+/);
+      if (nameTerms.length === 1) {
+        // Single term: match either firstName OR lastName
+        where.AND = [
+          ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+          {
+            OR: [
+              { user: { firstName: { contains: nameTerms[0], mode: 'insensitive' } } },
+              { user: { lastName: { contains: nameTerms[0], mode: 'insensitive' } } },
+            ],
+          },
+        ];
+      } else {
+        // Multiple terms: match first term against firstName AND second against lastName, or vice versa
+        where.AND = [
+          ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+          {
+            OR: [
+              {
+                AND: [
+                  { user: { firstName: { contains: nameTerms[0], mode: 'insensitive' } } },
+                  { user: { lastName: { contains: nameTerms.slice(1).join(' '), mode: 'insensitive' } } },
+                ],
+              },
+              {
+                AND: [
+                  { user: { lastName: { contains: nameTerms[0], mode: 'insensitive' } } },
+                  { user: { firstName: { contains: nameTerms.slice(1).join(' '), mode: 'insensitive' } } },
+                ],
+              },
+            ],
+          },
+        ];
+      }
+    }
+
+    // Worker email search: case-insensitive partial match
+    if (workerEmail) {
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+        { user: { email: { contains: workerEmail, mode: 'insensitive' } } },
       ];
     }
 
