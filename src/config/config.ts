@@ -38,7 +38,7 @@ export const config = {
     `${getSafeEnv('FRONTEND_URL')}/dashboard/subscription?canceled=true`).trim(),
   STRIPE_CUSTOMER_PORTAL_RETURN_URL: (getSafeEnv('STRIPE_CUSTOMER_PORTAL_RETURN_URL') ||
     `${getSafeEnv('FRONTEND_URL')}/dashboard/subscription`).trim(),
-  
+
   // Ads Subscription
   STRIPE_ADS_MONTHLY_PRICE_ID: getSafeEnv('STRIPE_ADS_MONTHLY_PRICE_ID').trim(),
   STRIPE_ADS_SUCCESS_URL: (getSafeEnv('STRIPE_ADS_SUCCESS_URL') ||
