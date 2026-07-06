@@ -37,6 +37,9 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpires = new Date();
+    verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
 
     const user = await this.usersService.createUser({
       firstName: dto.firstName,
@@ -45,6 +48,9 @@ export class AuthService {
       password: hashedPassword,
       role: UserRole.client,
       status: UserStatus.active,
+      isVerified: false,
+      verificationToken,
+      verificationTokenExpires,
       profileImage,
       profile: {
         create: {
@@ -55,6 +61,7 @@ export class AuthService {
       },
     });
 
+    await this.mailService.sendVerificationEmail(user.email, verificationToken);
     await this.recordSecurityLog(user.id, 'ACCOUNT_CREATED');
     return user;
   }
@@ -66,6 +73,9 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpires = new Date();
+    verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
 
     const user = await this.usersService.createUser({
       firstName: dto.firstName,
@@ -74,6 +84,9 @@ export class AuthService {
       password: hashedPassword,
       role: UserRole.errand,
       status: UserStatus.active,
+      isVerified: false,
+      verificationToken,
+      verificationTokenExpires,
       profileImage,
       profile: {
         create: {
@@ -89,6 +102,7 @@ export class AuthService {
       },
     });
 
+    await this.mailService.sendVerificationEmail(user.email, verificationToken);
     await this.recordSecurityLog(user.id, 'ACCOUNT_CREATED');
     return user;
   }
@@ -102,6 +116,10 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isVerified) {
+      throw new UnauthorizedException('Please verify your email before logging in.');
     }
 
     // Check if 2FA is enabled
@@ -438,5 +456,46 @@ export class AuthService {
     await this.recordSecurityLog(userId, 'PASSWORD_CHANGED', req);
 
     return { message: 'Password updated successfully' };
+  }
+
+  async verifyEmail(token: string) {
+    const user = await this.usersService.findByVerificationToken(token);
+    if (!user) {
+      throw new BadRequestException('Invalid or expired verification link');
+    }
+
+    await this.usersService.update(user.id, {
+      isVerified: true,
+      verificationToken: null,
+      verificationTokenExpires: null,
+    });
+
+    await this.recordSecurityLog(user.id, 'EMAIL_VERIFIED');
+
+    return { message: 'Email verified successfully' };
+  }
+
+  async resendVerificationEmail(email: string) {
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.isVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpires = new Date();
+    verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
+
+    await this.usersService.update(user.id, {
+      verificationToken,
+      verificationTokenExpires,
+    });
+
+    await this.mailService.sendVerificationEmail(user.email, verificationToken);
+
+    return { message: 'Verification email sent successfully' };
   }
 }

@@ -75,6 +75,48 @@ export class MailService {
     });
   }
 
+  async sendVerificationEmail(email: string, token: string) {
+    const verifyUrl = `${config.FRONTEND_URL}/verify-email?token=${token}`;
+    console.log('MailService: Preparing verification email with URL:', verifyUrl);
+
+    const mailOptions = {
+      from: `"Errand Hub" <${config.SMTP_FROM}>`,
+      to: email,
+      subject: 'Verify Your Email Address',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h1 style="color: #2563eb; text-align: center;">Verify Your Email</h1>
+          <p>Hello,</p>
+          <p>Thank you for registering with Errand Hub! Please click the button below to verify your email address:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verifyUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Email Address</a>
+          </div>
+          <p>This link will expire in 24 hours.</p>
+          <p>If you did not create an account, please ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #666; text-align: center;">&copy; 2026 Errand Hub. All rights reserved.</p>
+        </div>
+      `,
+    };
+
+    try {
+      if (!config.SMTP_USER || !config.SMTP_PASS) {
+        throw new Error(
+          'SMTP credentials are missing. Please check your environment variables.',
+        );
+      }
+      console.log('MailService: Sending verification email to:', email);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log(
+        'MailService: Verification email sent successfully. MessageID:',
+        info.messageId,
+      );
+    } catch (error) {
+      console.error('MailService: Failed to send verification email:', error);
+      throw error;
+    }
+  }
+
   async sendPasswordResetEmail(email: string, token: string) {
     const resetUrl = `${config.FRONTEND_URL}/reset-password?token=${token}`;
     console.log('MailService: Preparing reset email with URL:', resetUrl);

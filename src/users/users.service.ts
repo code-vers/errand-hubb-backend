@@ -284,4 +284,15 @@ export class UsersService {
       },
     });
   }
+
+  async findByVerificationToken(token: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        verificationToken: token,
+        verificationTokenExpires: {
+          gt: new Date(),
+        },
+      },
+    });
+  }
 }

@@ -25,6 +25,11 @@ model User {
   deleteAccountExpires  DateTime?        @map("delete_account_expires")
   deleteAccountToken    String?          @map("delete_account_token")
   recoveryCodes         String[]         @map("recovery_codes")
+  
+  // Email Verification
+  isVerified            Boolean          @default(false) @map("is_verified")
+  verificationToken     String?          @map("verification_token")
+  verificationTokenExpires DateTime?     @map("verification_token_expires")
   conversationsAsClient Conversation[]   @relation("ClientConversations")
   conversationsAsErrand Conversation[]   @relation("ErrandConversations")
   loginActivities       LoginActivity[]
