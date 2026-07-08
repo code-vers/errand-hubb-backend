@@ -11,6 +11,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "pay:test": "cp .env.test .env && echo 'Switched to TEST payment environment'",
+    "pay:live": "cp .env.live .env && echo 'Switched to LIVE payment environment'",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
