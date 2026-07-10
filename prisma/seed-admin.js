@@ -46,8 +46,8 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Start seeding admin user...');
-  
-  const adminEmail = 'admin@gmail.com';
+
+  const adminEmail = 'lordbarringtoncalabasas@gmail.com';
   const adminPassword = 'admin@123';
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
