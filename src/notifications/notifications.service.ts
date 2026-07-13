@@ -31,6 +31,14 @@ export class NotificationsService {
     return notification;
   }
 
+  async notifyAdmins(data: { type: string; title: string; message: string; metadata?: any }) {
+    const admins = await this.prisma.user.findMany({ where: { role: 'admin' } });
+    const notifications = await Promise.all(
+      admins.map(admin => this.createNotification(admin.id, data))
+    );
+    return notifications;
+  }
+
   async getUserNotifications(userId: string, page = 1, limit = 20) {
     const skip = (page - 1) * limit;
 

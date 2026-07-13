@@ -152,6 +152,15 @@ export class MessagesGateway
         content: contentPreview,
       });
 
+      if (dto.type === 'calendar') {
+        await this.notificationsService.notifyAdmins({
+          type: 'system_alert',
+          title: 'New Chat Schedule Created',
+          message: `${senderName} has created a new schedule in a chat.`,
+          metadata: { redirectUrl: '/dashboard/service-request-management' },
+        });
+      }
+
       this.logger.log(`CHAT: [Broadcast Success] to conv_${dto.conversationId}`);
       return { success: true };
     } catch (error: any) {

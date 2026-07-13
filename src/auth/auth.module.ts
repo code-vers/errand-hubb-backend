@@ -5,11 +5,13 @@ import { AuthController } from './auth.controller.js';
 import { UsersModule } from '../users/users.module.js';
 import { config } from '../config/config.js';
 import { MailModule } from '../mail/mail.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
     UsersModule,
     MailModule,
+    NotificationsModule,
     JwtModule.register({
       global: true,
       secret: config.JWT_SECRET,

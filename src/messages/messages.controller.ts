@@ -65,4 +65,17 @@ export class MessagesController {
   getAdminConversations() {
     return this.messagesService.getAdminConversations();
   }
+
+  @Get('admin/conversations/:id/messages')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.admin)
+  getAdminMessages(@Param('id') conversationId: string) {
+    return this.messagesService.getAdminMessages(conversationId);
+  }
+  @Get('admin/schedules')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.admin)
+  getAdminSchedules() {
+    return this.messagesService.getAdminSchedules();
+  }
 }

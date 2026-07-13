@@ -427,16 +427,87 @@ export class MessagesService {
     return this.prisma.conversation.findMany({
       include: {
         client: {
-          select: { id: true, email: true, firstName: true, lastName: true },
+          select: { id: true, email: true, firstName: true, lastName: true, profileImage: true },
         },
         errand: {
-          select: { id: true, email: true, firstName: true, lastName: true },
+          select: { id: true, email: true, firstName: true, lastName: true, profileImage: true },
         },
         _count: {
           select: { messages: true },
         },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        }
       },
       orderBy: { updatedAt: 'desc' },
+    });
+  }
+
+  async getAdminMessages(conversationId: string) {
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    return this.prisma.message.findMany({
+      where: {
+        conversationId,
+      },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getAdminSchedules() {
+    return this.prisma.message.findMany({
+      where: {
+        type: 'calendar',
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+            role: true,
+          },
+        },
+        conversation: {
+          include: {
+            client: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profileImage: true,
+              },
+            },
+            errand: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profileImage: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
