@@ -419,3 +419,28 @@ model ServiceRequest {
 
   @@map("service_requests")
 }
+
+enum MerchandiseOrderStatus {
+  pending
+  accepted
+  shipped
+  delivered
+  cancelled
+}
+
+model MerchandiseOrder {
+  id          String                 @id @default(uuid())
+  name        String
+  email       String
+  address     String
+  city        String
+  state       String
+  zipCode     String                 @map("zip_code")
+  items       Json
+  totalAmount Decimal                @map("total_amount") @db.Decimal(10, 2)
+  status      MerchandiseOrderStatus @default(pending)
+  createdAt   DateTime               @default(now()) @map("created_at")
+  updatedAt   DateTime               @updatedAt @map("updated_at")
+
+  @@map("merchandise_orders")
+}

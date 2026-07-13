@@ -17,6 +17,7 @@ import { AdsSubscriptionsModule } from './ads-subscriptions/ads-subscriptions.mo
 import { ServiceRequestsModule } from './service-requests/service-requests.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { config } from './config/config.js';
+import { MerchandiseOrdersModule } from './merchandise-orders/merchandise-orders.module.js';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { config } from './config/config.js';
       rootPath: config.MEDIA_ROOT,
       serveRoot: '/media',
     }),
+    MerchandiseOrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
