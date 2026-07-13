@@ -471,6 +471,46 @@ export class MessagesService {
     });
   }
 
+  async getAdminSchedules() {
+    return this.prisma.message.findMany({
+      where: {
+        type: 'calendar',
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+            role: true,
+          },
+        },
+        conversation: {
+          include: {
+            client: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profileImage: true,
+              },
+            },
+            errand: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profileImage: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async findConversation(id: string) {
     return this.prisma.conversation.findUnique({
       where: { id },

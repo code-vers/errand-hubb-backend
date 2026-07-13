@@ -20,6 +20,7 @@ import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { UAParser } from 'ua-parser-js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async registerClient(dto: RegisterClientDto, profileImage?: string) {
@@ -63,6 +65,14 @@ export class AuthService {
 
     await this.mailService.sendVerificationEmail(user.email, verificationToken);
     await this.recordSecurityLog(user.id, 'ACCOUNT_CREATED');
+
+    await this.notificationsService.notifyAdmins({
+      type: 'new_user',
+      title: 'New Client Registration',
+      message: `${user.firstName} ${user.lastName} has registered as a Client.`,
+      metadata: { redirectUrl: '/dashboard/users' },
+    });
+
     return user;
   }
 
@@ -104,6 +114,14 @@ export class AuthService {
 
     await this.mailService.sendVerificationEmail(user.email, verificationToken);
     await this.recordSecurityLog(user.id, 'ACCOUNT_CREATED');
+
+    await this.notificationsService.notifyAdmins({
+      type: 'new_user',
+      title: 'New Errandr Registration',
+      message: `${user.firstName} ${user.lastName} has registered as an Errandr.`,
+      metadata: { redirectUrl: '/dashboard/users' },
+    });
+
     return user;
   }
 
