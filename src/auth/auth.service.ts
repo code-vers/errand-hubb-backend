@@ -122,6 +122,10 @@ export class AuthService {
       throw new UnauthorizedException('Please verify your email before logging in.');
     }
 
+    if (user.status === UserStatus.deactivated) {
+      throw new UnauthorizedException('Your account has been blocked by the administrator.');
+    }
+
     // Check if 2FA is enabled
     if (user.isTwoFactorEnabled) {
       return {
@@ -142,6 +146,10 @@ export class AuthService {
     const user = await this.usersService.findOneById(userId);
     if (!user || !user.twoFactorSecret) {
       throw new UnauthorizedException('Invalid request');
+    }
+
+    if (user.status === UserStatus.deactivated) {
+      throw new UnauthorizedException('Your account has been blocked by the administrator.');
     }
 
     // Try verifying TOTP first

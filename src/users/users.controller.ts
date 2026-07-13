@@ -13,6 +13,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -21,6 +22,8 @@ import { multerOptions } from '../common/utils/multer-options.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { DeleteAccountDto } from './dto/delete-account.dto.js';
 import { Throttle } from '@nestjs/throttler';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -113,5 +116,22 @@ export class UsersController {
   async deleteAccount(@Request() req: any, @Body() dto: DeleteAccountDto) {
     const userId = req.user?.id || req.user?.sub;
     return this.usersService.deleteAccount(userId, dto.password, dto.code);
+  }
+
+  @Get('admin/all')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  async getAllUsersForAdmin() {
+    return this.usersService.findAllUsersForAdmin();
+  }
+
+  @Patch('admin/:id/status')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  async updateUserStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ) {
+    return this.usersService.updateUserStatus(id, status);
   }
 }
