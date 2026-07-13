@@ -18,6 +18,7 @@ import { ServiceRequestsModule } from './service-requests/service-requests.modul
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { config } from './config/config.js';
 import { MerchandiseOrdersModule } from './merchandise-orders/merchandise-orders.module.js';
+import { DashboardModule } from './dashboard/dashboard.module.js';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { MerchandiseOrdersModule } from './merchandise-orders/merchandise-orders
       serveRoot: '/media',
     }),
     MerchandiseOrdersModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
