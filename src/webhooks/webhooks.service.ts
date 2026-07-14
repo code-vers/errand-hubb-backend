@@ -72,6 +72,20 @@ export class WebhooksService {
 
   private async handleCheckoutSessionCompleted(session: any) {
     this.logger.log(`Handling checkout.session.completed for session: ${session.id}`);
+
+    const metadataType = session.metadata?.type || (session as any).subscription_data?.metadata?.type;
+    
+    if (metadataType === 'merchandise') {
+      const orderId = session.metadata?.orderId;
+      if (orderId) {
+        await this.prisma.merchandiseOrder.update({
+          where: { id: orderId },
+          data: { isPaid: true },
+        });
+        this.logger.log(`Merchandise Order ${orderId} marked as paid.`);
+      }
+      return;
+    }
     
     if (session.mode === 'subscription' && session.subscription) {
       const customerId = session.customer as string;
