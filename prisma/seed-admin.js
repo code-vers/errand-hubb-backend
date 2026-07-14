@@ -31,7 +31,10 @@ if (isNeon && databaseUrl.includes('channel_binding=')) {
 
 const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: isNeon || process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  ssl:
+    isNeon || process.env.DATABASE_SSL === 'true'
+      ? { rejectUnauthorized: false }
+      : false,
   max: isNeon ? 10 : 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
@@ -87,3 +90,5 @@ main()
     await prisma.$disconnect();
     await pool.end();
   });
+
+// seed done
