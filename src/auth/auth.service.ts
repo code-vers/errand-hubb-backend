@@ -136,7 +136,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!user.isVerified) {
+    if (!user.isVerified && user.role !== UserRole.admin) {
       throw new UnauthorizedException('Please verify your email before logging in.');
     }
 
