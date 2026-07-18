@@ -39,14 +39,14 @@ export class SubscriptionsService {
         metadata: { userId: user.id },
       });
       customerId = customer.id;
-
-      const amount = plan === 'yearly' ? 50.0 : 5.0;
-      await this.prisma.subscription.upsert({
-        where: { userId },
-        create: { userId, stripeCustomerId: customerId, amount },
-        update: { stripeCustomerId: customerId, amount },
-      });
     }
+
+    const amount = plan === 'yearly' ? 50.0 : 5.0;
+    await this.prisma.subscription.upsert({
+      where: { userId },
+      create: { userId, stripeCustomerId: customerId, amount },
+      update: { stripeCustomerId: customerId, amount },
+    });
 
     try {
       const priceId = plan === 'yearly' ? config.STRIPE_YEARLY_PRICE_ID : config.STRIPE_MONTHLY_PRICE_ID;
@@ -57,8 +57,8 @@ export class SubscriptionsService {
         mode: 'subscription',
         success_url: config.STRIPE_SUCCESS_URL,
         cancel_url: config.STRIPE_CANCEL_URL,
-        metadata: { userId: user.id },
-        subscription_data: { metadata: { userId: user.id } },
+        metadata: { userId: user.id, plan },
+        subscription_data: { metadata: { userId: user.id, plan } },
       });
       return { url: session.url };
     } catch (error: any) {

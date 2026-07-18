@@ -93,6 +93,7 @@ export class WebhooksService {
       
       const userId = (session.metadata?.userId || (session as any).subscription_data?.metadata?.userId) as string;
       const subscriptionType = (session.metadata?.subscriptionType || (session as any).subscription_data?.metadata?.subscriptionType) as string;
+      const plan = (session.metadata?.plan || (session as any).subscription_data?.metadata?.plan) as string;
 
       this.logger.log(`Metadata check - userId: ${userId}, type: ${subscriptionType}, customerId: ${customerId}`);
 
@@ -118,6 +119,7 @@ export class WebhooksService {
             this.logger.log(`Ads Subscription updated for user ${userId}: active`);
             await this.mailService.sendSubscriptionEmail(sub.user.email, sub.user.firstName, 'started');
           } else {
+            const amount = plan === 'yearly' ? 50.0 : 5.0;
             const sub = await this.prisma.subscription.upsert({
               where: { userId },
               create: {
@@ -125,12 +127,13 @@ export class WebhooksService {
                 stripeCustomerId: customerId,
                 stripeSubscriptionId: subscriptionId,
                 status: 'active',
-                amount: 5.0,
+                amount,
               },
               update: {
                 stripeCustomerId: customerId,
                 stripeSubscriptionId: subscriptionId,
                 status: 'active',
+                amount,
               },
               include: { user: true },
             });
