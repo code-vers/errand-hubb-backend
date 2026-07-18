@@ -18,7 +18,7 @@ export class SubscriptionsService {
     });
   }
 
-  async createCheckoutSession(userId: string) {
+  async createCheckoutSession(userId: string, plan: 'monthly' | 'yearly' = 'monthly') {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { subscription: true },
@@ -40,18 +40,20 @@ export class SubscriptionsService {
       });
       customerId = customer.id;
 
+      const amount = plan === 'yearly' ? 50.0 : 5.0;
       await this.prisma.subscription.upsert({
         where: { userId },
-        create: { userId, stripeCustomerId: customerId, amount: 5.0 },
-        update: { stripeCustomerId: customerId },
+        create: { userId, stripeCustomerId: customerId, amount },
+        update: { stripeCustomerId: customerId, amount },
       });
     }
 
     try {
+      const priceId = plan === 'yearly' ? config.STRIPE_YEARLY_PRICE_ID : config.STRIPE_MONTHLY_PRICE_ID;
       const session = await this.stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
-        line_items: [{ price: config.STRIPE_MONTHLY_PRICE_ID, quantity: 1 }],
+        line_items: [{ price: priceId, quantity: 1 }],
         mode: 'subscription',
         success_url: config.STRIPE_SUCCESS_URL,
         cancel_url: config.STRIPE_CANCEL_URL,

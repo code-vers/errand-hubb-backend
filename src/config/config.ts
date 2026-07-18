@@ -31,6 +31,7 @@ export const config = {
   STRIPE_SECRET_KEY: getSafeEnv('STRIPE_SECRET_KEY').trim(),
   STRIPE_WEBHOOK_SECRET: getSafeEnv('STRIPE_WEBHOOK_SECRET').trim(),
   STRIPE_MONTHLY_PRICE_ID: getSafeEnv('STRIPE_MONTHLY_PRICE_ID').trim(),
+  STRIPE_YEARLY_PRICE_ID: getSafeEnv('STRIPE_YEARLY_PRICE_ID').trim(),
   STRIPE_CURRENCY: (process.env.STRIPE_CURRENCY || 'usd') as string,
   STRIPE_SUCCESS_URL: (getSafeEnv('STRIPE_SUCCESS_URL') ||
     `${getSafeEnv('FRONTEND_URL')}/dashboard/subscription?success=true`).trim(),

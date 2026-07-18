@@ -6,6 +6,7 @@ import {
   UseGuards,
   Query,
   Param,
+  Body,
 } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -16,9 +17,13 @@ export class SubscriptionsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('create-checkout-session')
-  createCheckoutSession(@Request() req: any) {
+  createCheckoutSession(
+    @Request() req: any,
+    @Body() body: { plan?: 'monthly' | 'yearly' },
+  ) {
     return this.subscriptionsService.createCheckoutSession(
       req.user.id || req.user.sub,
+      body?.plan || 'monthly',
     );
   }
 
