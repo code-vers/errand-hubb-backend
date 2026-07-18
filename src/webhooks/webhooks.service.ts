@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import Stripe from 'stripe';
+import { config } from '../config/config.js';
 
 @Injectable()
 export class WebhooksService {
@@ -198,7 +199,7 @@ export class WebhooksService {
     const isNewlyCanceled = subscription.status === 'canceled' && existingRecord.status !== 'canceled';
     const isNewlyCancelingSoon = subscription.cancel_at_period_end && !existingRecord.cancelAtPeriodEnd;
 
-    const updateData = {
+    const updateData: any = {
       stripeSubscriptionId: subscription.id,
       status: subscription.status as any,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
@@ -206,6 +207,15 @@ export class WebhooksService {
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
     };
+
+    const priceId = subscription.items?.data?.[0]?.price?.id;
+    if (priceId) {
+      if (priceId === config.STRIPE_YEARLY_PRICE_ID) {
+        updateData.amount = 50.0;
+      } else if (priceId === config.STRIPE_MONTHLY_PRICE_ID) {
+        updateData.amount = 5.0;
+      }
+    }
 
     if (type === 'normal') {
       await this.prisma.subscription.update({ where: { id: existingRecord.id }, data: updateData });
