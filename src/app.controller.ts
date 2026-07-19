@@ -18,4 +18,9 @@ export class AppController {
   async getErrandProfiles() {
     return this.usersService.findAllErrands();
   }
+
+  @Get('debug-sentry')
+  debugSentry() {
+    throw new Error('My first Sentry error!');
+  }
 }

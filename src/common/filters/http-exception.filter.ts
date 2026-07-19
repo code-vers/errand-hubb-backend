@@ -1,15 +1,17 @@
 import {
   ExceptionFilter,
   Catch,
-  ArgumentsHost,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import * as nestCommon from '@nestjs/common';
 import { Response } from 'express';
+import { SentryExceptionCaptured } from '@sentry/nestjs';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  @SentryExceptionCaptured()
+  catch(exception: any, host: nestCommon.ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
