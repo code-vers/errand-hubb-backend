@@ -1,0 +1,8 @@
+name: Backend Deployment
+
+on:
+  push:
+    branches:
+      - main
+      
+      
