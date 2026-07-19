@@ -18,7 +18,7 @@ const pool = new Pool({
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-
+//hiii
 const categories = [
   {
     name: 'Grocery Shopping',
