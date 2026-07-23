@@ -258,4 +258,43 @@ export class MailService {
       );
     }
   }
+  async sendContactEmail(
+    firstName: string,
+    lastName: string,
+    email: string,
+    subject: string,
+    message: string,
+  ) {
+    const adminEmail = config.SMTP_USER || 'Info@errandhubb.com';
+    
+    const mailOptions = {
+      from: `"Errand Hub Contact Form" <${config.SMTP_FROM}>`,
+      to: adminEmail,
+      replyTo: email,
+      subject: `New Contact Message: ${subject}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h2 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">New Contact Form Submission</h2>
+          <p><strong>From:</strong> ${firstName} ${lastName}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <div style="margin-top: 20px; padding: 15px; background-color: #f9fafb; border-left: 4px solid #EC6F27; white-space: pre-wrap;">
+            ${message}
+          </div>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #666; text-align: center;">This message was sent from the Errand Hub contact form.</p>
+        </div>
+      `,
+    };
+
+    try {
+      console.log('MailService: Sending contact email from:', email);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('MailService: Contact email sent successfully. MessageID:', info.messageId);
+      return { success: true, message: 'Email sent successfully' };
+    } catch (error) {
+      console.error('MailService: Failed to send contact email:', error);
+      throw error;
+    }
+  }
 }
