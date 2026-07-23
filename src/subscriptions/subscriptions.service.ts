@@ -18,7 +18,10 @@ export class SubscriptionsService {
     });
   }
 
-  async createCheckoutSession(userId: string, plan: 'monthly' | 'yearly' = 'monthly') {
+  async createCheckoutSession(
+    userId: string,
+    plan: 'monthly' | 'yearly' = 'monthly',
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { subscription: true },
@@ -49,7 +52,10 @@ export class SubscriptionsService {
     });
 
     try {
-      const priceId = plan === 'yearly' ? config.STRIPE_YEARLY_PRICE_ID : config.STRIPE_MONTHLY_PRICE_ID;
+      const priceId =
+        plan === 'yearly'
+          ? config.STRIPE_YEARLY_PRICE_ID
+          : config.STRIPE_MONTHLY_PRICE_ID;
       const session = await this.stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
@@ -203,6 +209,7 @@ export class SubscriptionsService {
         },
       },
     });
+
     if (!payment) throw new NotFoundException('Payment not found');
     return payment;
   }
