@@ -44,6 +44,7 @@ export class PostsController {
     @Query('userRole') userRole?: string,
     @Query('workerName') workerName?: string,
     @Query('workerEmail') workerEmail?: string,
+    @Query('preferredCategoryIds') preferredCategoryIds?: string | string[],
   ) {
     return this.postsService.findAll({
       categoryId,
@@ -59,6 +60,7 @@ export class PostsController {
       userRole,
       workerName,
       workerEmail,
+      preferredCategoryIds,
     });
   }
 

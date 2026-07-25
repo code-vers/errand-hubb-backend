@@ -72,6 +72,14 @@ export class UsersController {
 
     let profileUpdateData: any = { ...profileData };
 
+    if (profileUpdateData.categoryIds && typeof profileUpdateData.categoryIds === 'string') {
+      try {
+        profileUpdateData.categoryIds = JSON.parse(profileUpdateData.categoryIds);
+      } catch (e) {
+        profileUpdateData.categoryIds = [profileUpdateData.categoryIds];
+      }
+    }
+
     if ((files?.gallery && files.gallery.length > 0) || retainedGallery !== undefined) {
       let parsedRetainedGallery: string[] = [];
       if (retainedGallery) {

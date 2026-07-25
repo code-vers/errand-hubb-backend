@@ -9,5 +9,9 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
 
   @IsOptional()
   @IsString()
+  postState?: string;
+
+  @IsOptional()
+  @IsString()
   id?: string;
 }

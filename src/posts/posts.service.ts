@@ -19,26 +19,6 @@ export class PostsService {
   async create(userId: string, createPostDto: CreatePostDto) {
     const { categoryId, budget, dateNeeded, ...rest } = createPostDto;
 
-    // Check if user already has an active post to prevent duplicates
-    const existingPost = await this.prisma.post.findFirst({
-      where: { userId, status: 'active' },
-    });
-
-    if (existingPost) {
-      const updated = await this.update(existingPost.id, userId, {
-        ...rest,
-        categoryId,
-        budget,
-        dateNeeded,
-      } as any);
-      
-      // Notify active subscribers even on renewal/updates of status if needed
-      // but let's notify anyway to be completely safe
-      await this.notifyActiveSubscribers(userId, updated);
-      
-      return updated;
-    }
-
     const post = await this.prisma.post.create({
       data: {
         ...rest,
@@ -133,9 +113,11 @@ export class PostsService {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     status?: string;
+    postState?: string;
     userRole?: string;
     workerName?: string;
     workerEmail?: string;
+    preferredCategoryIds?: string | string[];
   }) {
     const {
       categoryId,
@@ -146,9 +128,11 @@ export class PostsService {
       sortBy = 'createdAt',
       sortOrder = 'desc',
       status,
+      postState,
       userRole,
       workerName,
       workerEmail,
+      preferredCategoryIds,
     } = query;
 
     const page = Math.max(1, parseInt(query.page || '1', 10));
@@ -162,13 +146,21 @@ export class PostsService {
     }
 
     if (status && status.toLowerCase() !== 'all') {
-      where.status = status;
-    } else if (status === undefined) {
-      if (userRole === 'client') {
-        where.status = { in: ['Pending Pickup', 'ASAP', 'Scheduled'] };
+      if (status.toLowerCase() === 'available') {
+        where.status = { in: ['Pending Pickup', 'ASAP', 'active'] };
       } else {
-        where.status = 'active';
+        where.status = status;
       }
+    } else if (status === undefined) {
+      if (userRole !== 'client') {
+        where.status = { in: ['Pending Pickup', 'ASAP', 'active'] };
+      }
+    }
+
+    if (postState && postState.toLowerCase() !== 'all') {
+      where.postState = postState;
+    } else if (userRole !== 'client') {
+      where.postState = 'active';
     }
 
     if (categoryId && categoryId !== 'all') {
@@ -275,28 +267,100 @@ export class PostsService {
       if (maxBudget) where.budget.lte = new Prisma.Decimal(maxBudget);
     }
 
+    const include = {
+      category: true,
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profileImage: true,
+          profile: true,
+        },
+      },
+      assignedTo: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    };
+
+    let parsedPreferredCategoryIds: string[] = [];
+    if (preferredCategoryIds) {
+      try {
+        parsedPreferredCategoryIds = typeof preferredCategoryIds === 'string'
+          ? JSON.parse(preferredCategoryIds)
+          : preferredCategoryIds;
+      } catch (e) {
+        parsedPreferredCategoryIds = Array.isArray(preferredCategoryIds) ? preferredCategoryIds : [preferredCategoryIds];
+      }
+    }
+
+    if (parsedPreferredCategoryIds.length > 0) {
+      const matchWhere = { ...where, categoryId: { in: parsedPreferredCategoryIds } };
+      const nonMatchWhere = { ...where, categoryId: { notIn: parsedPreferredCategoryIds } };
+
+      const [matchCount, nonMatchCount] = await Promise.all([
+        this.prisma.post.count({ where: matchWhere }),
+        this.prisma.post.count({ where: nonMatchWhere }),
+      ]);
+
+      const total = matchCount + nonMatchCount;
+      let posts: any[] = [];
+
+      if (skip < matchCount) {
+        // We need to fetch from matches
+        const matches = await this.prisma.post.findMany({
+          where: matchWhere,
+          include,
+          orderBy: { [sortBy]: sortOrder },
+          skip,
+          take: limit,
+        });
+        posts.push(...matches);
+
+        // If we still need more, fetch from non-matches
+        if (posts.length < limit && nonMatchCount > 0) {
+          const remainingLimit = limit - posts.length;
+          const nonMatches = await this.prisma.post.findMany({
+            where: nonMatchWhere,
+            include,
+            orderBy: { [sortBy]: sortOrder },
+            skip: 0,
+            take: remainingLimit,
+          });
+          posts.push(...nonMatches);
+        }
+      } else {
+        // We only fetch from non-matches
+        const nonMatchSkip = skip - matchCount;
+        posts = await this.prisma.post.findMany({
+          where: nonMatchWhere,
+          include,
+          orderBy: { [sortBy]: sortOrder },
+          skip: nonMatchSkip,
+          take: limit,
+        });
+      }
+
+      return {
+        data: posts,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
+
+    // Default behavior without preferred categories
     const [posts, total] = await Promise.all([
       this.prisma.post.findMany({
         where,
-        include: {
-          category: true,
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profileImage: true,
-              profile: true,
-            },
-          },
-          assignedTo: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-            },
-          },
-        },
+        include,
         orderBy: { [sortBy]: sortOrder },
         skip,
         take: limit,

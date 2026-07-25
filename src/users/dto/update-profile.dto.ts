@@ -62,6 +62,9 @@ export class UpdateProfileDto {
   youtubeLink?: string;
 
   @IsOptional()
+  categoryIds?: any;
+
+  @IsOptional()
   gallery?: any;
 
   @IsOptional()
