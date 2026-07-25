@@ -82,6 +82,17 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
+    let parsedCategoryIds: string[] = [];
+    if (dto.categoryIds) {
+      try {
+        parsedCategoryIds = typeof dto.categoryIds === 'string'
+          ? JSON.parse(dto.categoryIds)
+          : dto.categoryIds;
+      } catch (e) {
+        parsedCategoryIds = Array.isArray(dto.categoryIds) ? dto.categoryIds : [dto.categoryIds];
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationTokenExpires = new Date();
@@ -108,6 +119,7 @@ export class AuthService {
           youtubeLink: dto.youtubeLink,
           ratePerHour: dto.rate ? parseFloat(dto.rate) : undefined,
           gallery: gallery,
+          categoryIds: parsedCategoryIds.length > 0 ? parsedCategoryIds : undefined,
         },
       },
     });

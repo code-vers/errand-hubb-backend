@@ -54,4 +54,7 @@ export class RegisterErrandDto {
 
   @IsOptional()
   profileImage?: any;
+
+  @IsOptional()
+  categoryIds?: string | string[];
 }
