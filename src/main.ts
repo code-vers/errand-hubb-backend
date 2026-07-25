@@ -10,8 +10,14 @@ import cookieParser from 'cookie-parser';
 import { join } from 'path';
 import * as fs from 'fs';
 
+import { urlencoded, json } from 'express';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
+  
+  // Increase payload limit for multiple images
+  app.use(json({ limit: '100mb' }));
+  app.use(urlencoded({ extended: true, limit: '100mb' }));
 
   // Global Prefix
   app.setGlobalPrefix('api/v1');

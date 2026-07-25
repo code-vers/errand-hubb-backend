@@ -46,7 +46,7 @@ export class AuthController {
     FileFieldsInterceptor(
       [
         { name: 'profileImage', maxCount: 1 },
-        { name: 'gallery', maxCount: 5 },
+        { name: 'gallery', maxCount: 10 },
       ],
       multerOptions('profiles'),
     ),
