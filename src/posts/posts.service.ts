@@ -113,6 +113,7 @@ export class PostsService {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     status?: string;
+    postState?: string;
     userRole?: string;
     workerName?: string;
     workerEmail?: string;
@@ -127,6 +128,7 @@ export class PostsService {
       sortBy = 'createdAt',
       sortOrder = 'desc',
       status,
+      postState,
       userRole,
       workerName,
       workerEmail,
@@ -144,13 +146,21 @@ export class PostsService {
     }
 
     if (status && status.toLowerCase() !== 'all') {
-      where.status = status;
-    } else if (status === undefined) {
-      if (userRole === 'client') {
-        where.status = { in: ['active', 'Pending Pickup', 'ASAP', 'Scheduled'] };
+      if (status.toLowerCase() === 'available') {
+        where.status = { in: ['Pending Pickup', 'ASAP', 'active'] };
       } else {
-        where.status = 'active';
+        where.status = status;
       }
+    } else if (status === undefined) {
+      if (userRole !== 'client') {
+        where.status = { in: ['Pending Pickup', 'ASAP', 'active'] };
+      }
+    }
+
+    if (postState && postState.toLowerCase() !== 'all') {
+      where.postState = postState;
+    } else if (userRole !== 'client') {
+      where.postState = 'active';
     }
 
     if (categoryId && categoryId !== 'all') {

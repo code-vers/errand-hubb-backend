@@ -39,6 +39,10 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsString()
+  postState?: string;
+
+  @IsOptional()
+  @IsString()
   contactInfo?: string;
 
   @IsOptional()
