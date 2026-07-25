@@ -15,9 +15,9 @@ import { urlencoded, json } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
   
-  // Increase payload limit for multiple images
-  app.use(json({ limit: '100mb' }));
-  app.use(urlencoded({ extended: true, limit: '100mb' }));
+  // Remove payload limit for unlimited large images
+  app.use(json({ limit: '50000mb' }));
+  app.use(urlencoded({ extended: true, limit: '50000mb', parameterLimit: 1000000 }));
 
   // Global Prefix
   app.setGlobalPrefix('api/v1');
