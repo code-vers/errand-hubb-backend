@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpCode, Query } from '@nestjs/common';
 import { AppService } from './app.service.js';
 import { UsersService } from './users/users.service.js';
 import { MailService } from './mail/mail.service.js';
@@ -17,8 +17,8 @@ export class AppController {
   }
 
   @Get('errand-profiles')
-  async getErrandProfiles() {
-    return this.usersService.findAllErrands();
+  async getErrandProfiles(@Query() query: any) {
+    return this.usersService.findAllErrands(query);
   }
 
   @Post('contact')

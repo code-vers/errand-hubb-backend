@@ -60,48 +60,125 @@ export class UsersService {
     return user;
   }
 
-  async findAllErrands() {
-    // Fetch all posts from errand users with active subscriptions
-    const posts = await this.prisma.post.findMany({
-      where: {
-        user: {
-          role: 'errand',
-          status: 'active',
-          subscription: {
-            status: {
-              in: ['active', 'trialing'],
-            },
-          },
-        },
-        status: 'active',
-      },
-      include: {
-        category: true,
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            profileImage: true,
-            profile: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+  async findAllErrands(query: any = {}) {
+    const {
+      categoryId,
+      location,
+      search,
+      minBudget,
+      maxBudget,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
 
-    // Filter to keep only the latest post per user
-    const uniquePostsMap = new Map();
-    for (const post of posts) {
-      if (!uniquePostsMap.has(post.userId)) {
-        uniquePostsMap.set(post.userId, post);
-      }
+    const page = Math.max(1, parseInt(query.page || '1', 10));
+    const limit = Math.max(1, parseInt(query.limit || '10', 10));
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.UserWhereInput = {
+      role: 'errand',
+      status: 'active',
+      subscription: {
+        status: {
+          in: ['active', 'trialing'],
+        },
+      },
+    };
+
+    const profileWhere: any = {};
+
+    if (categoryId && categoryId !== 'all') {
+      profileWhere.categoryIds = { has: categoryId };
     }
 
-    return Array.from(uniquePostsMap.values());
+    if (location) {
+      profileWhere.OR = [
+        { city: { contains: location, mode: 'insensitive' } },
+        { state: { contains: location, mode: 'insensitive' } },
+      ];
+    }
+
+    if (minBudget || maxBudget) {
+      profileWhere.ratePerHour = {};
+      if (minBudget) profileWhere.ratePerHour.gte = new Prisma.Decimal(minBudget);
+      if (maxBudget) profileWhere.ratePerHour.lte = new Prisma.Decimal(maxBudget);
+    }
+
+    if (Object.keys(profileWhere).length > 0) {
+      where.profile = { is: profileWhere };
+    }
+
+    if (search) {
+      const searchTerms = search.trim().split(/\s+/);
+      const nameOrConditions: Prisma.UserWhereInput[] = [];
+      if (searchTerms.length === 1) {
+        nameOrConditions.push(
+          { firstName: { contains: searchTerms[0], mode: 'insensitive' } },
+          { lastName: { contains: searchTerms[0], mode: 'insensitive' } }
+        );
+      } else {
+        nameOrConditions.push(
+          {
+            AND: [
+              { firstName: { contains: searchTerms[0], mode: 'insensitive' } },
+              { lastName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } },
+            ],
+          },
+          {
+            AND: [
+              { lastName: { contains: searchTerms[0], mode: 'insensitive' } },
+              { firstName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } },
+            ],
+          }
+        );
+      }
+      where.OR = [
+        ...(where.OR || []),
+        { email: { contains: search, mode: 'insensitive' } },
+        ...nameOrConditions,
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          profileImage: true,
+          profile: true,
+          createdAt: true,
+        },
+        orderBy: {
+          [sortBy === 'budget' ? 'createdAt' : sortBy]: sortOrder,
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    // If sorting by budget (ratePerHour), we need to sort in memory since it's on a relation
+    let sortedUsers = users;
+    if (sortBy === 'budget') {
+      sortedUsers.sort((a, b) => {
+        const rateA = a.profile?.ratePerHour ? Number(a.profile.ratePerHour) : 0;
+        const rateB = b.profile?.ratePerHour ? Number(b.profile.ratePerHour) : 0;
+        return sortOrder === 'asc' ? rateA - rateB : rateB - rateA;
+      });
+    }
+
+    return {
+      data: sortedUsers,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async createUser(data: Prisma.UserCreateInput) {

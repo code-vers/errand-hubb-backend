@@ -19,26 +19,6 @@ export class PostsService {
   async create(userId: string, createPostDto: CreatePostDto) {
     const { categoryId, budget, dateNeeded, ...rest } = createPostDto;
 
-    // Check if user already has an active post to prevent duplicates
-    const existingPost = await this.prisma.post.findFirst({
-      where: { userId, status: 'active' },
-    });
-
-    if (existingPost) {
-      const updated = await this.update(existingPost.id, userId, {
-        ...rest,
-        categoryId,
-        budget,
-        dateNeeded,
-      } as any);
-      
-      // Notify active subscribers even on renewal/updates of status if needed
-      // but let's notify anyway to be completely safe
-      await this.notifyActiveSubscribers(userId, updated);
-      
-      return updated;
-    }
-
     const post = await this.prisma.post.create({
       data: {
         ...rest,
@@ -165,7 +145,7 @@ export class PostsService {
       where.status = status;
     } else if (status === undefined) {
       if (userRole === 'client') {
-        where.status = { in: ['Pending Pickup', 'ASAP', 'Scheduled'] };
+        where.status = { in: ['active', 'Pending Pickup', 'ASAP', 'Scheduled'] };
       } else {
         where.status = 'active';
       }

@@ -113,6 +113,7 @@ model Profile {
   visibility       VisibilityStatus @default(public)
   ratePerHour      Decimal?         @map("rate_per_hour") @db.Decimal(10, 2)
   services         String?
+  categoryIds      String[]         @default([]) @map("category_ids")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
   youtubeLink      String?          @map("youtube_link")
