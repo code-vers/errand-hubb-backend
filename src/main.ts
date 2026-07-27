@@ -15,9 +15,25 @@ import { urlencoded, json } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
   
-  // Remove payload limit for unlimited large images
-  app.use(json({ limit: '50000mb' }));
-  app.use(urlencoded({ extended: true, limit: '50000mb', parameterLimit: 1000000 }));
+  // Remove payload limit for unlimited large images and preserve rawBody for webhooks
+  app.use(
+    json({
+      limit: '50000mb',
+      verify: (req: any, _res: any, buf: Buffer) => {
+        req.rawBody = buf;
+      },
+    }),
+  );
+  app.use(
+    urlencoded({
+      extended: true,
+      limit: '50000mb',
+      parameterLimit: 1000000,
+      verify: (req: any, _res: any, buf: Buffer) => {
+        req.rawBody = buf;
+      },
+    }),
+  );
 
   // Global Prefix
   app.setGlobalPrefix('api/v1');
