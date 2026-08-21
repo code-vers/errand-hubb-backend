@@ -53,11 +53,50 @@ export class UsersService {
 
     if (!user) {
       console.error('SERVICE: User NOT FOUND in database for ID:', id);
+      return null;
     } else {
       console.log('SERVICE: User found:', user.email);
     }
 
-    return user;
+    // Compute real-time user account overview statistics
+    const [totalPosts, activePosts, completedJobsCount, totalHiresCount] =
+      await Promise.all([
+        this.prisma.post.count({ where: { userId: id } }),
+        this.prisma.post.count({
+          where: { userId: id, status: 'active' },
+        }),
+        this.prisma.post.count({
+          where: {
+            OR: [
+              { userId: id, status: 'completed' },
+              { assignedToId: id, status: 'completed' },
+            ],
+          },
+        }),
+        this.prisma.post.count({
+          where: {
+            OR: [
+              { userId: id, assignedToId: { not: null } },
+              { assignedToId: id },
+            ],
+          },
+        }),
+      ]);
+
+    const stats = {
+      totalPosts,
+      activePosts,
+      completedJobs: Math.max(
+        user.profile?.jobsCompleted || 0,
+        completedJobsCount,
+      ),
+      totalHires: totalHiresCount,
+    };
+
+    return {
+      ...user,
+      stats,
+    };
   }
 
   async findAllErrands(query: any = {}) {
