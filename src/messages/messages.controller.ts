@@ -8,6 +8,7 @@ import {
   Request,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -52,6 +53,11 @@ export class MessagesController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', multerOptions('chat')))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException(
+        'No file uploaded or file failed validation.',
+      );
+    }
     return {
       url: `/media/chat/${file.filename}`,
       mimetype: file.mimetype,

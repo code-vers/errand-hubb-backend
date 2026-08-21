@@ -8,6 +8,9 @@ import * as fs from 'fs';
 import { config } from '../../config/config.js';
 
 export const multerOptions = (dest: string) => ({
+  limits: {
+    fileSize: dest === 'chat' ? 100 * 1024 * 1024 : 10 * 1024 * 1024,
+  },
   storage: diskStorage({
     destination: (req, file, callback) => {
       const uploadPath = join(config.MEDIA_ROOT, dest);
@@ -34,22 +37,21 @@ export const multerOptions = (dest: string) => ({
     },
   }),
   fileFilter: (req: any, file: any, callback: any) => {
-    // Allow images and audio for chat
+    // Allow images, audio, video, and common documents for chat
     if (dest === 'chat') {
-      if (
-        !file.originalname.match(
-          /\.(jpg|jpeg|png|gif|webp|mp3|wav|m4a|ogg|webm)$/,
-        )
-      ) {
+      const chatAllowedRegex =
+        /\.(jpg|jpeg|png|gif|webp|svg|mp3|wav|m4a|ogg|webm|aac|flac|mp4|mov|avi|mkv|flv|wmv|m4v|pdf|doc|docx|txt|xls|xlsx|csv|ppt|pptx|zip|rar)$/i;
+
+      if (!file.originalname.match(chatAllowedRegex)) {
         return callback(
           new BadRequestException(
-            'Only images and audio files are allowed for chat!',
+            'Unsupported file type! Please upload a valid image, video, audio, or document file.',
           ),
           false,
         );
       }
     } else {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
         return callback(
           new BadRequestException('Only image files are allowed!'),
           false,
@@ -59,3 +61,4 @@ export const multerOptions = (dest: string) => ({
     callback(null, true);
   },
 });
+
