@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -7,6 +7,7 @@ export class CreatePostDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(2000, { message: 'Description cannot exceed 2000 characters.' })
   description: string;
 
   @IsString()
