@@ -188,6 +188,9 @@ export class MessagesGateway
     const userId = client.data.userId;
     if (!data?.conversationId || !userId) return;
     const updated = await this.messagesService.markAsRead(data.conversationId, userId);
+    if (this.notificationsService?.markMessageNotificationsAsRead) {
+      await this.notificationsService.markMessageNotificationsAsRead(userId, data.conversationId);
+    }
     if (updated) {
       client.to(`conv_${data.conversationId}`).emit('messages_read', {
         conversationId: data.conversationId,

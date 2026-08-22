@@ -132,6 +132,37 @@ export class NotificationsService {
     return { success: true };
   }
 
+  async markMessageNotificationsAsRead(userId: string, conversationId?: string) {
+    try {
+      const unreadNotifs = await this.prisma.notification.findMany({
+        where: {
+          userId,
+          isRead: false,
+          type: 'new_message',
+        },
+      });
+
+      const idsToMark = unreadNotifs
+        .filter((n) => {
+          if (!conversationId) return true;
+          const meta = n.metadata as any;
+          return !meta || !meta.conversationId || meta.conversationId === conversationId;
+        })
+        .map((n) => n.id);
+
+      if (idsToMark.length > 0) {
+        await this.prisma.notification.updateMany({
+          where: { id: { in: idsToMark } },
+          data: { isRead: true },
+        });
+
+        await this.emitUnreadCountUpdate(userId);
+      }
+    } catch (err: any) {
+      console.error('NOTIFICATIONS: Failed to mark message notifications as read:', err.message);
+    }
+  }
+
   private async emitUnreadCountUpdate(userId: string) {
     try {
       const { count } = await this.getUnreadCount(userId);
@@ -141,3 +172,4 @@ export class NotificationsService {
     }
   }
 }
+

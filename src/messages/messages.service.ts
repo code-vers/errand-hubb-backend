@@ -3,16 +3,23 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UserRole } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @Injectable()
 export class MessagesService {
   private pendingCreations = new Set<string>();
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService?: any,
+  ) {}
 
   async getConversations(userId: string, role: string) {
     const where =
@@ -94,6 +101,10 @@ export class MessagesService {
       data: { isRead: true },
     });
 
+    if (this.notificationsService?.markMessageNotificationsAsRead) {
+      await this.notificationsService.markMessageNotificationsAsRead(userId, conversationId);
+    }
+
     return this.prisma.message.findMany({
       where: {
         conversationId,
@@ -124,6 +135,11 @@ export class MessagesService {
       },
       data: { isRead: true },
     });
+
+    if (this.notificationsService?.markMessageNotificationsAsRead) {
+      await this.notificationsService.markMessageNotificationsAsRead(userId, conversationId);
+    }
+
     return result.count > 0;
   }
 
