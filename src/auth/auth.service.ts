@@ -447,7 +447,9 @@ export class AuthService {
   async resetPassword(dto: ResetPasswordDto) {
     const user = await this.usersService.findByResetToken(dto.token);
     if (!user) {
-      throw new BadRequestException('Invalid or expired reset token');
+      throw new BadRequestException(
+        'This password reset link has already been used or has expired. Please request a new reset link.'
+      );
     }
 
     const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
