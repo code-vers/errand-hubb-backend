@@ -159,7 +159,7 @@ export class PostsService {
 
     if (postState && postState.toLowerCase() !== 'all') {
       where.postState = postState;
-    } else if (userRole !== 'client') {
+    } else if (!postState) {
       where.postState = 'active';
     }
 
