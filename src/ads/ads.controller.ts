@@ -11,13 +11,13 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdsService } from './ads.service.js';
 import { CreateAdDto } from './dto/create-ad.dto.js';
 import { UpdateAdDto } from './dto/update-ad.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
-import { AdsSubscriptionGuard } from '../auth/guards/ads-subscription.guard.js';
 import { AdStatus } from '@prisma/client';
 import { multerOptions } from '../common/utils/multer-options.js';
 
@@ -26,14 +26,25 @@ export class AdsController {
   constructor(private readonly adsService: AdsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdsSubscriptionGuard)
+  @UseGuards(JwtAuthGuard)
   create(@Request() req: any, @Body() dto: CreateAdDto) {
     const userId = req.user.sub || req.user.id;
     return this.adsService.create(userId, dto);
   }
 
+  @Post('admin')
+  @UseGuards(JwtAuthGuard)
+  adminCreate(@Request() req: any, @Body() dto: CreateAdDto) {
+    const role = req.user.role;
+    if (role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
+    const userId = req.user.sub || req.user.id;
+    return this.adsService.create(userId, dto);
+  }
+
   @Post('upload')
-  @UseGuards(JwtAuthGuard, AdsSubscriptionGuard)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file', multerOptions('ads')))
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     return {
@@ -48,6 +59,7 @@ export class AdsController {
     @Query('search') search?: string,
     @Query('location') location?: string,
     @Query('status') status?: AdStatus,
+    @Query('includeAll') includeAll?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
@@ -57,6 +69,7 @@ export class AdsController {
       search,
       location,
       status,
+      includeAll,
       page,
       limit,
     });
@@ -74,13 +87,22 @@ export class AdsController {
     return this.adsService.getCategories();
   }
 
+  @Patch('reorder')
+  @UseGuards(JwtAuthGuard)
+  reorder(@Request() req: any, @Body() body: { orders: { id: string; position: number }[] }) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
+    return this.adsService.reorderAds(body.orders);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.adsService.findOne(id);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, AdsSubscriptionGuard)
+  @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
     @Request() req: any,
