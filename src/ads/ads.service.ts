@@ -67,46 +67,82 @@ export class AdsService {
       ];
     }
 
-    // Fetch all matching ads for sorting by position
-    const [allMatchingAds, total] = await Promise.all([
-      this.prisma.ad.findMany({
-        where,
-        include: {
-          category: true,
-          subcategory: true,
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
-              profileImage: true,
+    try {
+      // Fetch all matching ads for sorting by position
+      const [allMatchingAds, total] = await Promise.all([
+        this.prisma.ad.findMany({
+          where,
+          include: {
+            category: true,
+            subcategory: true,
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                profileImage: true,
+              },
             },
           },
+        }),
+        this.prisma.ad.count({ where }),
+      ]);
+
+      // Sort by position > 0 ascending, then createdAt descending
+      const sortedAds = allMatchingAds.sort((a, b) => {
+        const posA = a.position && a.position > 0 ? a.position : 99999;
+        const posB = b.position && b.position > 0 ? b.position : 99999;
+        if (posA !== posB) return posA - posB;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+      const paginatedData = sortedAds.slice(skip, skip + limit);
+
+      return {
+        data: paginatedData,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
         },
-      }),
-      this.prisma.ad.count({ where }),
-    ]);
+      };
+    } catch (err: any) {
+      console.warn('findAll Ads query fallback due to schema state:', err?.message);
+      const [data, total] = await Promise.all([
+        this.prisma.ad.findMany({
+          where,
+          include: {
+            category: true,
+            subcategory: true,
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                profileImage: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+        }),
+        this.prisma.ad.count({ where }),
+      ]);
 
-    // Sort by position > 0 ascending, then createdAt descending
-    const sortedAds = allMatchingAds.sort((a, b) => {
-      const posA = a.position && a.position > 0 ? a.position : Infinity;
-      const posB = b.position && b.position > 0 ? b.position : Infinity;
-      if (posA !== posB) return posA - posB;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-
-    const paginatedData = sortedAds.slice(skip, skip + limit);
-
-    return {
-      data: paginatedData,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
   }
 
   async findOne(id: string) {
