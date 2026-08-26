@@ -48,6 +48,21 @@ export class RegisterErrandDto {
   @IsOptional()
   youtubeLink?: string;
 
+  @IsOptional()
+  youtubeLinks?: string[] | string;
+
+  @IsString()
+  @IsOptional()
+  youtubeLink1?: string;
+
+  @IsString()
+  @IsOptional()
+  youtubeLink2?: string;
+
+  @IsString()
+  @IsOptional()
+  youtubeLink3?: string;
+
   @IsNumberString()
   @IsOptional()
   rate?: string;

@@ -98,6 +98,29 @@ export class AuthService {
     const verificationTokenExpires = new Date();
     verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
 
+    let parsedYoutubeLinks: string[] = [];
+    if (dto.youtubeLinks) {
+      if (typeof dto.youtubeLinks === 'string') {
+        try {
+          parsedYoutubeLinks = JSON.parse(dto.youtubeLinks);
+        } catch (e) {
+          parsedYoutubeLinks = [dto.youtubeLinks];
+        }
+      } else if (Array.isArray(dto.youtubeLinks)) {
+        parsedYoutubeLinks = dto.youtubeLinks;
+      }
+    }
+    if (dto.youtubeLink1) parsedYoutubeLinks.push(dto.youtubeLink1);
+    if (dto.youtubeLink2) parsedYoutubeLinks.push(dto.youtubeLink2);
+    if (dto.youtubeLink3) parsedYoutubeLinks.push(dto.youtubeLink3);
+    if (dto.youtubeLink && !parsedYoutubeLinks.includes(dto.youtubeLink)) {
+      parsedYoutubeLinks.unshift(dto.youtubeLink);
+    }
+    parsedYoutubeLinks = parsedYoutubeLinks
+      .map((l) => (typeof l === 'string' ? l.trim() : ''))
+      .filter((l) => l.length > 0)
+      .slice(0, 3);
+
     const user = await this.usersService.createUser({
       firstName: dto.firstName,
       lastName: dto.lastName,
@@ -116,7 +139,8 @@ export class AuthService {
           state: dto.state,
           bio: dto.bio,
           services: dto.services,
-          youtubeLink: dto.youtubeLink,
+          youtubeLink: parsedYoutubeLinks[0] || dto.youtubeLink || undefined,
+          youtubeLinks: parsedYoutubeLinks,
           ratePerHour: dto.rate ? parseFloat(dto.rate) : undefined,
           gallery: gallery,
           categoryIds: parsedCategoryIds.length > 0 ? parsedCategoryIds : undefined,

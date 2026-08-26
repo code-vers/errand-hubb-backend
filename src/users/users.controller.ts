@@ -80,6 +80,36 @@ export class UsersController {
       }
     }
 
+    let parsedYoutubeLinks: string[] = [];
+    if (profileUpdateData.youtubeLinks) {
+      if (typeof profileUpdateData.youtubeLinks === 'string') {
+        try {
+          parsedYoutubeLinks = JSON.parse(profileUpdateData.youtubeLinks);
+        } catch (e) {
+          parsedYoutubeLinks = [profileUpdateData.youtubeLinks];
+        }
+      } else if (Array.isArray(profileUpdateData.youtubeLinks)) {
+        parsedYoutubeLinks = profileUpdateData.youtubeLinks;
+      }
+    }
+    if (profileUpdateData.youtubeLink1) parsedYoutubeLinks.push(profileUpdateData.youtubeLink1);
+    if (profileUpdateData.youtubeLink2) parsedYoutubeLinks.push(profileUpdateData.youtubeLink2);
+    if (profileUpdateData.youtubeLink3) parsedYoutubeLinks.push(profileUpdateData.youtubeLink3);
+    if (profileUpdateData.youtubeLink && !parsedYoutubeLinks.includes(profileUpdateData.youtubeLink)) {
+      parsedYoutubeLinks.unshift(profileUpdateData.youtubeLink);
+    }
+    if (parsedYoutubeLinks.length > 0 || profileUpdateData.youtubeLinks !== undefined || profileUpdateData.youtubeLink !== undefined) {
+      parsedYoutubeLinks = parsedYoutubeLinks
+        .map((l) => (typeof l === 'string' ? l.trim() : ''))
+        .filter((l) => l.length > 0)
+        .slice(0, 3);
+      profileUpdateData.youtubeLinks = parsedYoutubeLinks;
+      profileUpdateData.youtubeLink = parsedYoutubeLinks[0] || null;
+    }
+    delete profileUpdateData.youtubeLink1;
+    delete profileUpdateData.youtubeLink2;
+    delete profileUpdateData.youtubeLink3;
+
     if ((files?.gallery && files.gallery.length > 0) || retainedGallery !== undefined) {
       let parsedRetainedGallery: string[] = [];
       if (retainedGallery) {
