@@ -356,6 +356,7 @@ model Ad {
   youtubeLink   String?       @map("youtube_link")
   status        AdStatus      @default(active)
   isFeatured    Boolean       @default(false) @map("is_featured")
+  position      Int?          @default(0) @map("position")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
 

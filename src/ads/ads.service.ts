@@ -13,7 +13,7 @@ export class AdsService {
       data: {
         ...dto,
         userId,
-        status: AdStatus.active, // Default to active for now as requested
+        status: dto.position ? AdStatus.active : AdStatus.active,
       },
       include: {
         category: true,
@@ -39,13 +39,16 @@ export class AdsService {
     page?: string;
     limit?: string;
     status?: AdStatus;
+    includeAll?: string;
   }) {
-    const { categoryId, subcategoryId, search, location, status = AdStatus.active } = query;
+    const { categoryId, subcategoryId, search, location, includeAll } = query;
+    const status = query.status || (includeAll === 'true' ? undefined : AdStatus.active);
     const page = Math.max(1, parseInt(query.page || '1', 10));
     const limit = Math.max(1, parseInt(query.limit || '10', 10));
     const skip = (page - 1) * limit;
 
-    const where: Prisma.AdWhereInput = { status };
+    const where: Prisma.AdWhereInput = {};
+    if (status) where.status = status;
 
     if (categoryId) where.categoryId = categoryId;
     if (subcategoryId) where.subcategoryId = subcategoryId;
@@ -64,7 +67,8 @@ export class AdsService {
       ];
     }
 
-    const [data, total] = await Promise.all([
+    // Fetch all matching ads for sorting by position
+    const [allMatchingAds, total] = await Promise.all([
       this.prisma.ad.findMany({
         where,
         include: {
@@ -75,19 +79,27 @@ export class AdsService {
               id: true,
               firstName: true,
               lastName: true,
+              email: true,
               profileImage: true,
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
       }),
       this.prisma.ad.count({ where }),
     ]);
 
+    // Sort by position > 0 ascending, then createdAt descending
+    const sortedAds = allMatchingAds.sort((a, b) => {
+      const posA = a.position && a.position > 0 ? a.position : Infinity;
+      const posB = b.position && b.position > 0 ? b.position : Infinity;
+      if (posA !== posB) return posA - posB;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    const paginatedData = sortedAds.slice(skip, skip + limit);
+
     return {
-      data,
+      data: paginatedData,
       meta: {
         total,
         page,
@@ -108,6 +120,7 @@ export class AdsService {
             id: true,
             firstName: true,
             lastName: true,
+            email: true,
             profileImage: true,
           },
         },
@@ -119,13 +132,19 @@ export class AdsService {
   }
 
   async findByUser(userId: string) {
-    return this.prisma.ad.findMany({
+    const ads = await this.prisma.ad.findMany({
       where: { userId },
       include: {
         category: true,
         subcategory: true,
       },
-      orderBy: { createdAt: 'desc' },
+    });
+
+    return ads.sort((a, b) => {
+      const posA = a.position && a.position > 0 ? a.position : Infinity;
+      const posB = b.position && b.position > 0 ? b.position : Infinity;
+      if (posA !== posB) return posA - posB;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }
 
@@ -146,6 +165,17 @@ export class AdsService {
         subcategory: true,
       },
     });
+  }
+
+  async reorderAds(adOrders: { id: string; position: number }[]) {
+    const updates = adOrders.map((item) =>
+      this.prisma.ad.update({
+        where: { id: item.id },
+        data: { position: item.position },
+      })
+    );
+    await Promise.all(updates);
+    return { success: true, message: 'Ad positions updated successfully' };
   }
 
   async remove(id: string, userId: string) {

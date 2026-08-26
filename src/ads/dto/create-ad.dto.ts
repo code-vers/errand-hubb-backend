@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUrl, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsUrl, IsUUID, IsInt, IsBoolean } from 'class-validator';
 
 export class CreateAdDto {
   @IsString()
@@ -32,4 +32,12 @@ export class CreateAdDto {
   @IsString()
   @IsOptional()
   imageUrl?: string;
+
+  @IsInt()
+  @IsOptional()
+  position?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isFeatured?: boolean;
 }
