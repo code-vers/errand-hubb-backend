@@ -194,13 +194,59 @@ export class ReviewsService {
 
     if (query.search && query.search.trim().length > 0) {
       const searchStr = query.search.trim();
+      const searchTerms = searchStr.split(/\s+/);
+
+      const nameConditions: any[] = [];
+      if (searchTerms.length === 1) {
+        nameConditions.push(
+          { reviewer: { firstName: { contains: searchTerms[0], mode: 'insensitive' } } },
+          { reviewer: { lastName: { contains: searchTerms[0], mode: 'insensitive' } } },
+          { reviewee: { firstName: { contains: searchTerms[0], mode: 'insensitive' } } },
+          { reviewee: { lastName: { contains: searchTerms[0], mode: 'insensitive' } } }
+        );
+      } else {
+        nameConditions.push(
+          {
+            reviewer: {
+              AND: [
+                { firstName: { contains: searchTerms[0], mode: 'insensitive' } },
+                { lastName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } },
+              ],
+            },
+          },
+          {
+            reviewer: {
+              AND: [
+                { lastName: { contains: searchTerms[0], mode: 'insensitive' } },
+                { firstName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } },
+              ],
+            },
+          },
+          {
+            reviewee: {
+              AND: [
+                { firstName: { contains: searchTerms[0], mode: 'insensitive' } },
+                { lastName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } },
+              ],
+            },
+          },
+          {
+            reviewee: {
+              AND: [
+                { lastName: { contains: searchTerms[0], mode: 'insensitive' } },
+                { firstName: { contains: searchTerms.slice(1).join(' '), mode: 'insensitive' } },
+              ],
+            },
+          }
+        );
+      }
+
       where.OR = [
         { comment: { contains: searchStr, mode: 'insensitive' } },
-        { reviewer: { firstName: { contains: searchStr, mode: 'insensitive' } } },
-        { reviewer: { lastName: { contains: searchStr, mode: 'insensitive' } } },
-        { reviewee: { firstName: { contains: searchStr, mode: 'insensitive' } } },
-        { reviewee: { lastName: { contains: searchStr, mode: 'insensitive' } } },
+        { reviewer: { email: { contains: searchStr, mode: 'insensitive' } } },
+        { reviewee: { email: { contains: searchStr, mode: 'insensitive' } } },
         { post: { title: { contains: searchStr, mode: 'insensitive' } } },
+        ...nameConditions,
       ];
     }
 
