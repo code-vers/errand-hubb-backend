@@ -22,6 +22,23 @@ export class ReviewsController {
     return this.reviewsService.createReview(req.user.id, dto);
   }
 
+  @Get('all')
+  async getAllReviews(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('rating') rating?: string,
+    @Query('role') role?: string,
+  ) {
+    return this.reviewsService.getAllReviews({
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : 10,
+      search,
+      rating: rating ? parseInt(rating, 10) : undefined,
+      role,
+    });
+  }
+
   @Get('user/:userId')
   async getUserReviews(
     @Param('userId') userId: string,

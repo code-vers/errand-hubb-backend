@@ -171,6 +171,103 @@ export class ReviewsService {
     return { eligible: true };
   }
 
+  async getAllReviews(query: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    rating?: number;
+    role?: string;
+  }) {
+    const page = Math.max(1, query.page || 1);
+    const limit = Math.max(1, query.limit || 10);
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (query.rating && Number(query.rating) > 0) {
+      where.rating = Number(query.rating);
+    }
+
+    if (query.role && query.role !== 'all') {
+      where.reviewerRole = query.role;
+    }
+
+    if (query.search && query.search.trim().length > 0) {
+      const searchStr = query.search.trim();
+      where.OR = [
+        { comment: { contains: searchStr, mode: 'insensitive' } },
+        { reviewer: { firstName: { contains: searchStr, mode: 'insensitive' } } },
+        { reviewer: { lastName: { contains: searchStr, mode: 'insensitive' } } },
+        { reviewee: { firstName: { contains: searchStr, mode: 'insensitive' } } },
+        { reviewee: { lastName: { contains: searchStr, mode: 'insensitive' } } },
+        { post: { title: { contains: searchStr, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [reviews, total, allRatings] = await Promise.all([
+      this.prisma.review.findMany({
+        where,
+        include: {
+          reviewer: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              profileImage: true,
+              role: true,
+            },
+          },
+          reviewee: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              profileImage: true,
+              role: true,
+            },
+          },
+          post: {
+            select: {
+              id: true,
+              title: true,
+              budget: true,
+              status: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.review.count({ where }),
+      this.prisma.review.findMany({ select: { rating: true } }),
+    ]);
+
+    const totalPlatformReviews = allRatings.length;
+    const totalScore = allRatings.reduce((acc, curr) => acc + curr.rating, 0);
+    const platformAvgRating = totalPlatformReviews > 0 ? Number((totalScore / totalPlatformReviews).toFixed(1)) : 0;
+    const fiveStarCount = allRatings.filter((r) => r.rating === 5).length;
+    const oneStarCount = allRatings.filter((r) => r.rating === 1).length;
+
+    return {
+      data: reviews,
+      stats: {
+        totalReviews: totalPlatformReviews,
+        averageRating: platformAvgRating,
+        fiveStarCount,
+        oneStarCount,
+      },
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   private calculateSummary(ratings: { rating: number }[]) {
     const totalReviews = ratings.length;
     if (totalReviews === 0) {
