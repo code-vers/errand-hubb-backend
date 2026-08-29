@@ -189,6 +189,11 @@ export class UsersService {
           profileImage: true,
           profile: true,
           createdAt: true,
+          reviewsReceived: {
+            select: {
+              rating: true,
+            },
+          },
         },
         orderBy: {
           [sortBy === 'budget' ? 'createdAt' : sortBy]: sortOrder,
@@ -199,8 +204,21 @@ export class UsersService {
       this.prisma.user.count({ where }),
     ]);
 
-    // If sorting by budget (ratePerHour), we need to sort in memory since it's on a relation
-    let sortedUsers = users;
+    const mappedUsers = users.map((u) => {
+      const reviews = u.reviewsReceived || [];
+      const reviewCount = reviews.length;
+      const totalScore = reviews.reduce((sum, r) => sum + r.rating, 0);
+      const averageRating = reviewCount > 0 ? Number((totalScore / reviewCount).toFixed(1)) : 0;
+
+      const { reviewsReceived, ...rest } = u;
+      return {
+        ...rest,
+        reviewCount,
+        rating: averageRating,
+      };
+    });
+
+    let sortedUsers = mappedUsers;
     if (sortBy === 'budget') {
       sortedUsers.sort((a, b) => {
         const rateA = a.profile?.ratePerHour ? Number(a.profile.ratePerHour) : 0;

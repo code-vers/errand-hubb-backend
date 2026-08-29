@@ -275,6 +275,11 @@ export class PostsService {
           lastName: true,
           profileImage: true,
           profile: true,
+          reviewsReceived: {
+            select: {
+              rating: true,
+            },
+          },
         },
       },
       assignedTo: {
@@ -367,8 +372,28 @@ export class PostsService {
       this.prisma.post.count({ where }),
     ]);
 
+    const mappedPosts = posts.map((post) => {
+      if (post.user) {
+        const reviews = (post.user as any).reviewsReceived || [];
+        const reviewCount = reviews.length;
+        const totalScore = reviews.reduce((sum: number, r: any) => sum + r.rating, 0);
+        const averageRating = reviewCount > 0 ? Number((totalScore / reviewCount).toFixed(1)) : 0;
+        const { reviewsReceived, ...restUser } = post.user as any;
+
+        return {
+          ...post,
+          user: {
+            ...restUser,
+            reviewCount,
+            rating: averageRating,
+          },
+        };
+      }
+      return post;
+    });
+
     return {
-      data: posts,
+      data: mappedPosts,
       meta: {
         total,
         page,
