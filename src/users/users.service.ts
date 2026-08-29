@@ -117,11 +117,6 @@ export class UsersService {
     const where: Prisma.UserWhereInput = {
       role: 'errand',
       status: 'active',
-      subscription: {
-        status: {
-          in: ['active', 'trialing'],
-        },
-      },
     };
 
     const profileWhere: any = {};
