@@ -43,6 +43,7 @@ export class PostsController {
     @Query('status') status?: string,
     @Query('postState') postState?: string,
     @Query('userRole') userRole?: string,
+    @Query('userId') userId?: string,
     @Query('workerName') workerName?: string,
     @Query('workerEmail') workerEmail?: string,
     @Query('preferredCategoryIds') preferredCategoryIds?: string | string[],
@@ -60,6 +61,7 @@ export class PostsController {
       status,
       postState,
       userRole,
+      userId,
       workerName,
       workerEmail,
       preferredCategoryIds,
@@ -94,6 +96,28 @@ export class PostsController {
   remove(@Param('id') id: string, @Request() req: any) {
     const userId = req.user.sub || req.user.id;
     return this.postsService.remove(id, userId);
+  }
+
+  @Patch(':id/complete')
+  @UseGuards(JwtAuthGuard)
+  markCompleted(
+    @Param('id') id: string,
+    @Request() req: any,
+    @Body('assignedToId') assignedToId?: string,
+  ) {
+    const userId = req.user.sub || req.user.id;
+    return this.postsService.markCompleted(id, userId, assignedToId);
+  }
+
+  @Patch(':id/assign')
+  @UseGuards(JwtAuthGuard)
+  assignPost(
+    @Param('id') id: string,
+    @Request() req: any,
+    @Body('assignedToId') assignedToId: string,
+  ) {
+    const userId = req.user.sub || req.user.id;
+    return this.postsService.assignPost(id, userId, assignedToId);
   }
 
   // Admin endpoints

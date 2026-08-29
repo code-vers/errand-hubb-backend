@@ -20,6 +20,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { config } from './config/config.js';
 import { MerchandiseOrdersModule } from './merchandise-orders/merchandise-orders.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
+import { ReviewsModule } from './reviews/reviews.module.js';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { DashboardModule } from './dashboard/dashboard.module.js';
     AdsModule,
     AdsSubscriptionsModule,
     ServiceRequestsModule,
+    ReviewsModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',

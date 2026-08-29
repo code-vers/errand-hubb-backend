@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePostDto } from './dto/create-post.dto.js';
@@ -115,6 +116,7 @@ export class PostsService {
     status?: string;
     postState?: string;
     userRole?: string;
+    userId?: string;
     workerName?: string;
     workerEmail?: string;
     preferredCategoryIds?: string | string[];
@@ -141,26 +143,23 @@ export class PostsService {
 
     const where: Prisma.PostWhereInput = {};
 
-    if (userRole) {
-      where.user = { role: userRole as any };
+    if (query.userId) {
+      where.userId = query.userId;
     }
 
     if (status && status.toLowerCase() !== 'all') {
       if (status.toLowerCase() === 'available') {
-        where.status = { in: ['Pending Pickup', 'ASAP', 'active'] };
+        where.status = { notIn: ['completed', 'Completed', 'cancelled', 'Cancelled'] };
+        where.postState = { notIn: ['completed', 'Completed', 'cancelled', 'Cancelled'] };
       } else {
         where.status = status;
       }
-    } else if (status === undefined) {
-      if (userRole !== 'client') {
-        where.status = { in: ['Pending Pickup', 'ASAP', 'active'] };
-      }
+    } else if (status === undefined && !query.userId) {
+      where.status = { notIn: ['completed', 'Completed', 'cancelled', 'Cancelled'] };
     }
 
-    if (postState && postState.toLowerCase() !== 'all') {
+    if (postState && postState.toLowerCase() !== 'all' && status?.toLowerCase() !== 'available') {
       where.postState = postState;
-    } else if (!postState) {
-      where.postState = 'active';
     }
 
     if (categoryId && categoryId !== 'all') {
@@ -415,6 +414,14 @@ export class PostsService {
       where: { userId },
       include: {
         category: true,
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+          },
+        },
         assignedTo: {
           select: {
             id: true,
@@ -462,6 +469,94 @@ export class PostsService {
     return this.prisma.post.delete({
       where: { id },
     });
+  }
+
+  async markCompleted(id: string, userId: string, assignedToId?: string) {
+    const post = await this.findOne(id);
+
+    const targetAssignedId = post.assignedToId || assignedToId;
+    if (!targetAssignedId) {
+      throw new BadRequestException('Cannot mark errand as completed before an Errander is assigned.');
+    }
+
+    if (post.userId !== userId && post.assignedToId !== userId && targetAssignedId !== userId) {
+      throw new ForbiddenException('Not authorized to mark this errand as completed');
+    }
+
+    const data: Prisma.PostUpdateInput = {
+      status: 'completed',
+      postState: 'completed',
+    };
+
+    if (!post.assignedToId && targetAssignedId) {
+      data.assignedTo = { connect: { id: targetAssignedId } };
+    }
+
+    const updated = await this.prisma.post.update({
+      where: { id },
+      data,
+      include: {
+        category: true,
+        user: { select: { id: true, firstName: true, lastName: true, profileImage: true } },
+        assignedTo: { select: { id: true, firstName: true, lastName: true, profileImage: true } },
+      },
+    });
+
+    try {
+      const targetUserId = post.userId === userId ? (post.assignedToId || assignedToId) : post.userId;
+      if (targetUserId) {
+        await this.notificationsService.createNotification(targetUserId, {
+          type: 'task_completed',
+          title: 'Errand Marked as Completed',
+          message: `The errand "${post.title}" was marked as completed. Click to leave a review!`,
+          metadata: { postId: id, redirectUrl: '/dashboard/my-posts' },
+        });
+      }
+    } catch (e) {
+      // Ignore notification failure
+    }
+
+    return updated;
+  }
+
+  async assignPost(id: string, userId: string, assignedToId: string) {
+    const post = await this.findOne(id);
+
+    if (post.userId !== userId) {
+      throw new ForbiddenException('Only the post owner can assign an errander');
+    }
+
+    const assignedUser = await this.prisma.user.findUnique({ where: { id: assignedToId } });
+    if (!assignedUser) {
+      throw new NotFoundException('Assigned errander user not found');
+    }
+
+    const updated = await this.prisma.post.update({
+      where: { id },
+      data: {
+        assignedTo: { connect: { id: assignedToId } },
+        status: 'In Progress',
+        postState: 'assigned',
+      },
+      include: {
+        category: true,
+        user: { select: { id: true, firstName: true, lastName: true, profileImage: true } },
+        assignedTo: { select: { id: true, firstName: true, lastName: true, profileImage: true } },
+      },
+    });
+
+    try {
+      await this.notificationsService.createNotification(assignedToId, {
+        type: 'errand_assigned',
+        title: 'You Were Assigned an Errand!',
+        message: `You have been assigned to: "${post.title}".`,
+        metadata: { postId: id, redirectUrl: '/dashboard/my-posts' },
+      });
+    } catch (e) {
+      // Ignore notification failure
+    }
+
+    return updated;
   }
 
   async adminUpdate(id: string, updatePostDto: UpdatePostDto) {

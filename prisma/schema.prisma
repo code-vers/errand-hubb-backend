@@ -47,6 +47,10 @@ model User {
   ads                   Ad[]             @relation("UserAds")
   adsSubscription       AdsSubscription?
 
+  // Review Relations
+  reviewsWritten        Review[]         @relation("ReviewsWritten")
+  reviewsReceived       Review[]         @relation("ReviewsReceived")
+
   @@map("users")
 }
 
@@ -192,6 +196,7 @@ model Post {
   assignedTo   User?     @relation("AssignedPosts", fields: [assignedToId], references: [id])
   category     Category  @relation(fields: [categoryId], references: [id])
   user         User      @relation("UserPosts", fields: [userId], references: [id], onDelete: Cascade)
+  reviews      Review[]
 
   @@map("posts")
 }
@@ -420,8 +425,29 @@ model ServiceRequest {
   user          User                 @relation("UserServiceRequests", fields: [userId], references: [id], onDelete: Cascade)
   category      Category             @relation(fields: [categoryId], references: [id])
   conversations Conversation[]       @relation("ServiceRequestConversations")
+  reviews       Review[]
 
   @@map("service_requests")
+}
+
+model Review {
+  id               String   @id @default(uuid())
+  reviewerId       String   @map("reviewer_id")
+  revieweeId       String   @map("reviewee_id")
+  reviewerRole     UserRole @map("reviewer_role")
+  postId           String?  @map("post_id")
+  serviceRequestId String?  @map("service_request_id")
+  rating           Int
+  comment          String   @db.Text
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  reviewer       User            @relation("ReviewsWritten", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewee       User            @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Cascade)
+  post           Post?           @relation(fields: [postId], references: [id], onDelete: SetNull)
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id], onDelete: SetNull)
+
+  @@map("reviews")
 }
 
 enum MerchandiseOrderStatus {
