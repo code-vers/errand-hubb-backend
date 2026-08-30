@@ -13,7 +13,7 @@ export class AdsService {
       data: {
         ...dto,
         userId,
-        status: dto.position ? AdStatus.active : AdStatus.active,
+        status: dto.status || AdStatus.active,
       },
       include: {
         category: true,

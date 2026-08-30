@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsUrl, IsUUID, IsInt, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsUrl, IsUUID, IsInt, IsBoolean, IsEnum } from 'class-validator';
+import { AdStatus } from '@prisma/client';
 
 export class CreateAdDto {
   @IsString()
@@ -40,4 +41,8 @@ export class CreateAdDto {
   @IsBoolean()
   @IsOptional()
   isFeatured?: boolean;
+
+  @IsEnum(AdStatus)
+  @IsOptional()
+  status?: AdStatus;
 }
