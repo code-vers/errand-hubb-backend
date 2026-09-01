@@ -40,6 +40,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-socket.io": "^11.1.26",
     "@nestjs/serve-static": "^5.0.5",
+    "@nestjs/swagger": "^11.4.7",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/websockets": "^11.1.26",
     "@prisma/adapter-pg": "^7.8.0",
@@ -59,6 +60,7 @@
     "socket.io": "^4.8.3",
     "speakeasy": "^2.0.0",
     "stripe": "^22.2.0",
+    "swagger-ui-express": "^5.0.1",
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {

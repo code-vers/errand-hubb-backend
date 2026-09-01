@@ -7,11 +7,19 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiHeader,
+  ApiBody,
+} from '@nestjs/swagger';
 import { WebhooksService } from './webhooks.service.js';
 import Stripe from 'stripe';
 import { config } from '../config/config.js';
 import { Request } from 'express';
 
+@ApiTags('Webhooks')
 @Controller('webhooks')
 export class WebhooksController {
   private stripe: Stripe;
@@ -24,6 +32,21 @@ export class WebhooksController {
   }
 
   @Post('stripe')
+  @ApiOperation({ summary: 'Stripe Webhook Event Receiver (Verifies stripe-signature against raw request body)' })
+  @ApiHeader({ name: 'stripe-signature', required: true, description: 'Stripe cryptographic webhook signature header' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      description: 'Stripe raw JSON event payload',
+      properties: {
+        id: { type: 'string', example: 'evt_123456789' },
+        type: { type: 'string', example: 'checkout.session.completed' },
+        data: { type: 'object' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: '{ received: true }' })
+  @ApiResponse({ status: 400, description: 'Missing signature or invalid raw body' })
   async handleStripeWebhook(
     @Headers('stripe-signature') signature: string,
     @Req() req: any,

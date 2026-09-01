@@ -12,6 +12,8 @@ import * as fs from 'fs';
 
 import { urlencoded, json } from 'express';
 
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
   
@@ -109,9 +111,39 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
 
+  // Swagger OpenAPI Documentation
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('ErrandHub API Documentation')
+    .setDescription(
+      'Interactive API documentation and direct testing portal for ErrandHub backend services.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter your JWT access token obtained from /api/v1/auth/login',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, swaggerDocument, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
   await app.listen(config.PORT);
   console.log(
     `Application is running on: http://localhost:${config.PORT}/api/v1`,
+  );
+  console.log(
+    `Swagger documentation is available at: http://localhost:${config.PORT}/api/docs`,
   );
 }
 bootstrap();

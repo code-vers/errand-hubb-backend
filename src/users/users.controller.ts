@@ -15,6 +15,15 @@ import {
   Post,
   Param,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { FileInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -25,12 +34,17 @@ import { Throttle } from '@nestjs/throttler';
 import { RolesGuard } from '../common/guards/roles.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 
+@ApiTags('Users')
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
+  @ApiOperation({ summary: 'Get current user profile, ratings summary, and active subscription info' })
+  @ApiResponse({ status: 200, description: 'Current user profile with full details' })
+  @ApiResponse({ status: 404, description: 'Current user record not found' })
   async getMe(@Request() req: any) {
     const userId = req.user?.id || req.user?.sub;
     console.log('CONTROLLER: Fetching profile for ID:', userId);
@@ -42,6 +56,9 @@ export class UsersController {
   }
 
   @Patch('profile')
+  @ApiOperation({ summary: 'Update profile details, avatar, and gallery images' })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -144,6 +161,8 @@ export class UsersController {
   @Throttle({ default: { limit: 3, ttl: 900000 } }) // 3 requests per 15 minutes
   @Post('request-delete-account')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send email confirmation code to initiate account deletion' })
+  @ApiResponse({ status: 200, description: 'Confirmation code sent to registered email' })
   async requestDeleteAccount(@Request() req: any) {
     const userId = req.user?.id || req.user?.sub;
     return this.usersService.requestDeleteAccount(userId);
@@ -151,6 +170,9 @@ export class UsersController {
 
   @Post('delete-account-permanently')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Permanently delete account using password and verification code' })
+  @ApiResponse({ status: 200, description: 'Account permanently deleted' })
+  @ApiResponse({ status: 400, description: 'Invalid code or password incorrect' })
   async deleteAccount(@Request() req: any, @Body() dto: DeleteAccountDto) {
     const userId = req.user?.id || req.user?.sub;
     return this.usersService.deleteAccount(userId, dto.password, dto.code);
@@ -159,6 +181,8 @@ export class UsersController {
   @Get('admin/all')
   @UseGuards(RolesGuard)
   @Roles('admin')
+  @ApiOperation({ summary: '[Admin] Get list of all registered users' })
+  @ApiResponse({ status: 200, description: 'List of users' })
   async getAllUsersForAdmin() {
     return this.usersService.findAllUsersForAdmin();
   }
@@ -166,6 +190,18 @@ export class UsersController {
   @Patch('admin/:id/status')
   @UseGuards(RolesGuard)
   @Roles('admin')
+  @ApiOperation({ summary: '[Admin] Update active/suspended status of a user' })
+  @ApiParam({ name: 'id', description: 'Target user ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['status'],
+      properties: {
+        status: { type: 'string', enum: ['active', 'suspended', 'inactive'], example: 'active' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'User status updated successfully' })
   async updateUserStatus(
     @Param('id') id: string,
     @Body('status') status: string,
