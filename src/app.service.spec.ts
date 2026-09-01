@@ -1,0 +1,14 @@
+import { describe, beforeEach, it, expect } from '@jest/globals';
+import { AppService } from './app.service.js';
+
+describe('AppService', () => {
+  let appService: AppService;
+
+  beforeEach(() => {
+    appService = new AppService();
+  });
+
+  it('should return "Hello World!"', () => {
+    expect(appService.getHello()).toBe('Hello World!');
+  });
+});

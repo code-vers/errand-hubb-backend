@@ -33,7 +33,8 @@ export class MessagesGateway
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly messagesService: MessagesService,
+    @Inject(forwardRef(() => MessagesService))
+    private readonly messagesService: any,
     @Inject(forwardRef(() => NotificationsService))
     private readonly notificationsService: any,
   ) {}
