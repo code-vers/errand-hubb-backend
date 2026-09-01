@@ -287,6 +287,13 @@ export class PostsService {
           id: true,
           firstName: true,
           lastName: true,
+          profileImage: true,
+          profile: true,
+          reviewsReceived: {
+            select: {
+              rating: true,
+            },
+          },
         },
       },
     };
@@ -350,7 +357,7 @@ export class PostsService {
       }
 
       return {
-        data: posts,
+        data: posts.map((p) => this.mapPostReviews(p)),
         meta: {
           total,
           page,
@@ -372,28 +379,8 @@ export class PostsService {
       this.prisma.post.count({ where }),
     ]);
 
-    const mappedPosts = posts.map((post) => {
-      if (post.user) {
-        const reviews = (post.user as any).reviewsReceived || [];
-        const reviewCount = reviews.length;
-        const totalScore = reviews.reduce((sum: number, r: any) => sum + r.rating, 0);
-        const averageRating = reviewCount > 0 ? Number((totalScore / reviewCount).toFixed(1)) : 0;
-        const { reviewsReceived, ...restUser } = post.user as any;
-
-        return {
-          ...post,
-          user: {
-            ...restUser,
-            reviewCount,
-            rating: averageRating,
-          },
-        };
-      }
-      return post;
-    });
-
     return {
-      data: mappedPosts,
+      data: posts.map((p) => this.mapPostReviews(p)),
       meta: {
         total,
         page,
@@ -401,6 +388,39 @@ export class PostsService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  private mapPostReviews(post: any) {
+    if (!post) return post;
+    const result = { ...post };
+
+    if (result.user) {
+      const userReviews = (result.user as any).reviewsReceived || [];
+      const reviewCount = userReviews.length;
+      const totalScore = userReviews.reduce((sum: number, r: any) => sum + r.rating, 0);
+      const averageRating = reviewCount > 0 ? Number((totalScore / reviewCount).toFixed(1)) : 0;
+      const { reviewsReceived, ...restUser } = result.user as any;
+      result.user = {
+        ...restUser,
+        reviewCount,
+        rating: averageRating,
+      };
+    }
+
+    if (result.assignedTo) {
+      const assignedReviews = (result.assignedTo as any).reviewsReceived || [];
+      const reviewCount = assignedReviews.length;
+      const totalScore = assignedReviews.reduce((sum: number, r: any) => sum + r.rating, 0);
+      const averageRating = reviewCount > 0 ? Number((totalScore / reviewCount).toFixed(1)) : 0;
+      const { reviewsReceived, ...restAssigned } = result.assignedTo as any;
+      result.assignedTo = {
+        ...restAssigned,
+        reviewCount,
+        rating: averageRating,
+      };
+    }
+
+    return result;
   }
 
   async findOne(id: string) {
@@ -415,6 +435,11 @@ export class PostsService {
             lastName: true,
             profileImage: true,
             profile: true,
+            reviewsReceived: {
+              select: {
+                rating: true,
+              },
+            },
           },
         },
         assignedTo: {
@@ -422,6 +447,13 @@ export class PostsService {
             id: true,
             firstName: true,
             lastName: true,
+            profileImage: true,
+            profile: true,
+            reviewsReceived: {
+              select: {
+                rating: true,
+              },
+            },
           },
         },
       },
@@ -431,12 +463,17 @@ export class PostsService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    return post;
+    return this.mapPostReviews(post);
   }
 
   async findByUser(userId: string) {
-    return this.prisma.post.findMany({
-      where: { userId },
+    const posts = await this.prisma.post.findMany({
+      where: {
+        OR: [
+          { userId },
+          { assignedToId: userId },
+        ],
+      },
       include: {
         category: true,
         user: {
@@ -445,6 +482,12 @@ export class PostsService {
             firstName: true,
             lastName: true,
             profileImage: true,
+            profile: true,
+            reviewsReceived: {
+              select: {
+                rating: true,
+              },
+            },
           },
         },
         assignedTo: {
@@ -453,11 +496,19 @@ export class PostsService {
             firstName: true,
             lastName: true,
             profileImage: true,
+            profile: true,
+            reviewsReceived: {
+              select: {
+                rating: true,
+              },
+            },
           },
         },
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    return posts.map((p) => this.mapPostReviews(p));
   }
 
   async update(id: string, userId: string, updatePostDto: UpdatePostDto) {
@@ -527,6 +578,18 @@ export class PostsService {
       },
     });
 
+    // Increment completed jobs on errander profile
+    try {
+      if (targetAssignedId) {
+        await this.prisma.profile.update({
+          where: { userId: targetAssignedId },
+          data: { jobsCompleted: { increment: 1 } },
+        }).catch(() => null);
+      }
+    } catch (e) {
+      // Ignore if profile doesn't exist
+    }
+
     try {
       const targetUserId = post.userId === userId ? (post.assignedToId || assignedToId) : post.userId;
       if (targetUserId) {
@@ -541,7 +604,7 @@ export class PostsService {
       // Ignore notification failure
     }
 
-    return updated;
+    return this.mapPostReviews(updated);
   }
 
   async assignPost(id: string, userId: string, assignedToId: string) {

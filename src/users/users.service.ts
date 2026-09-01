@@ -58,8 +58,8 @@ export class UsersService {
       console.log('SERVICE: User found:', user.email);
     }
 
-    // Compute real-time user account overview statistics
-    const [totalPosts, activePosts, completedJobsCount, totalHiresCount] =
+    // Compute real-time user account overview statistics and ratings
+    const [totalPosts, activePosts, completedJobsCount, totalHiresCount, userReviews] =
       await Promise.all([
         this.prisma.post.count({ where: { userId: id } }),
         this.prisma.post.count({
@@ -81,7 +81,15 @@ export class UsersService {
             ],
           },
         }),
+        this.prisma.review.findMany({
+          where: { revieweeId: id },
+          select: { rating: true },
+        }),
       ]);
+
+    const reviewCount = userReviews.length;
+    const totalScore = userReviews.reduce((sum, r) => sum + r.rating, 0);
+    const averageRating = reviewCount > 0 ? Number((totalScore / reviewCount).toFixed(1)) : 0;
 
     const stats = {
       totalPosts,
@@ -91,10 +99,14 @@ export class UsersService {
         completedJobsCount,
       ),
       totalHires: totalHiresCount,
+      rating: averageRating,
+      reviewCount,
     };
 
     return {
       ...user,
+      rating: averageRating,
+      reviewCount,
       stats,
     };
   }
