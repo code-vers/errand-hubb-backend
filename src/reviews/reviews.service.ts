@@ -29,14 +29,32 @@ export class ReviewsService {
     if (!reviewer) throw new NotFoundException('Reviewer user not found.');
     if (!reviewee) throw new NotFoundException('Reviewee user not found.');
 
-    // Check if task exists & verify completion
+    // Check if task exists & verify completion and participant authorization
     if (cleanPostId) {
       const post = await this.prisma.post.findUnique({ where: { id: cleanPostId } });
-      if (!post) throw new NotFoundException('Post not found.');
+      if (!post) throw new NotFoundException('Errand post not found.');
 
-      // Check duplicate review
+      const isCompleted =
+        post.status === 'completed' ||
+        post.status === 'Completed' ||
+        post.postState === 'completed';
+
+      if (!isCompleted) {
+        throw new BadRequestException('Reviews can only be submitted after the errand is marked as completed.');
+      }
+
+      const isClientReviewingErrandr = post.userId === reviewerId && post.assignedToId === revieweeId;
+      const isErrandrReviewingClient = post.assignedToId === reviewerId && post.userId === revieweeId;
+
+      if (!isClientReviewingErrandr && !isErrandrReviewingClient) {
+        throw new ForbiddenException(
+          'You are not authorized to review this errand. Only the client and assigned errander can submit reviews.',
+        );
+      }
+
+      // Check duplicate review (one review per user per errand)
       const existing = await this.prisma.review.findFirst({
-        where: { reviewerId, revieweeId, postId: cleanPostId },
+        where: { reviewerId, postId: cleanPostId },
       });
       if (existing) {
         throw new BadRequestException('You have already submitted a review for this errand.');
@@ -48,7 +66,7 @@ export class ReviewsService {
       if (!sr) throw new NotFoundException('Service request not found.');
 
       const existing = await this.prisma.review.findFirst({
-        where: { reviewerId, revieweeId, serviceRequestId: cleanServiceRequestId },
+        where: { reviewerId, serviceRequestId: cleanServiceRequestId },
       });
       if (existing) {
         throw new BadRequestException('You have already submitted a review for this service request.');
@@ -78,16 +96,6 @@ export class ReviewsService {
         },
       },
     });
-
-    // Increment completed jobs on reviewee profile if reviewee is an errander
-    try {
-      await this.prisma.profile.update({
-        where: { userId: revieweeId },
-        data: { jobsCompleted: { increment: 1 } },
-      }).catch(() => null);
-    } catch (e) {
-      // Ignore if profile doesn't exist
-    }
 
     return review;
   }
@@ -154,18 +162,45 @@ export class ReviewsService {
       return { eligible: false, reason: 'Invalid user or self-review' };
     }
 
-    if (postId) {
+    if (postId && postId.trim().length > 0) {
+      const cleanPostId = postId.trim();
+      const post = await this.prisma.post.findUnique({ where: { id: cleanPostId } });
+      if (!post) {
+        return { eligible: false, reason: 'Errand post not found' };
+      }
+
+      const isCompleted =
+        post.status === 'completed' ||
+        post.status === 'Completed' ||
+        post.postState === 'completed';
+
+      if (!isCompleted) {
+        return { eligible: false, reason: 'Errand is not marked as completed yet' };
+      }
+
+      const isClientReviewingErrandr = post.userId === reviewerId && post.assignedToId === revieweeId;
+      const isErrandrReviewingClient = post.assignedToId === reviewerId && post.userId === revieweeId;
+
+      if (!isClientReviewingErrandr && !isErrandrReviewingClient) {
+        return { eligible: false, reason: 'You are not an authorized participant for this errand' };
+      }
+
       const existing = await this.prisma.review.findFirst({
-        where: { reviewerId, revieweeId, postId },
+        where: { reviewerId, postId: cleanPostId },
       });
-      if (existing) return { eligible: false, reason: 'Already reviewed for this post' };
+      if (existing) {
+        return { eligible: false, reason: 'You have already submitted a review for this errand' };
+      }
     }
 
-    if (serviceRequestId) {
+    if (serviceRequestId && serviceRequestId.trim().length > 0) {
+      const cleanServiceRequestId = serviceRequestId.trim();
       const existing = await this.prisma.review.findFirst({
-        where: { reviewerId, revieweeId, serviceRequestId },
+        where: { reviewerId, serviceRequestId: cleanServiceRequestId },
       });
-      if (existing) return { eligible: false, reason: 'Already reviewed for this service request' };
+      if (existing) {
+        return { eligible: false, reason: 'You have already submitted a review for this service request' };
+      }
     }
 
     return { eligible: true };
