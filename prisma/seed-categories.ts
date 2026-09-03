@@ -1,3 +1,4 @@
+
 import { PrismaClient } from '@prisma/client';
 import { IconType } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -18,7 +19,7 @@ const pool = new Pool({
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-//hiii
+
 const categories = [
   {
     name: 'Grocery Shopping',
@@ -113,9 +114,9 @@ const categories = [
 
 async function main() {
   console.log('Start seeding categories...');
-  
+
   const categoryNames = categories.map(c => c.name);
-  
+
   // Set categories not in the current list to inactive
   await prisma.category.updateMany({
     where: {
