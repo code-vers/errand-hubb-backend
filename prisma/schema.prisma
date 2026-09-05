@@ -359,6 +359,7 @@ model Ad {
   location      String?       @map("location")
   contactInfo   String?       @map("contact_info")
   youtubeLink   String?       @map("youtube_link")
+  websiteUrl    String?       @map("website_url")
   status        AdStatus      @default(active)
   isFeatured    Boolean       @default(false) @map("is_featured")
   position      Int?          @default(0) @map("position")

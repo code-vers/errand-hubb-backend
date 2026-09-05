@@ -39,6 +39,11 @@ export class CreateAdDto {
   @IsOptional()
   youtubeLink?: string;
 
+  @ApiPropertyOptional({ description: 'Business website URL', example: 'https://expresslogistics.com' })
+  @IsUrl()
+  @IsOptional()
+  websiteUrl?: string;
+
   @ApiPropertyOptional({ description: 'Ad banner image URL' })
   @IsString()
   @IsOptional()
